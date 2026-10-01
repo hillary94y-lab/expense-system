@@ -47,7 +47,7 @@
                     <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
                         ✅ 每月固定支出与 Vendor 提交清单 (Monthly Recurring Checklist)
                     </h2>
-                    <p class="text-xs text-slate-300 mt-1">每个月固定需要 Submit 的费用清单。提交并付款后直接打勾 (Tick)，系统会自动计入总表！数据实时保存在浏览器中，永不丢失。</p>
+                    <p class="text-xs text-slate-300 mt-1">每个月固定需要 Submit 的费用清单。支持自由添加、勾选 (Tick) 和一键记入总表！数据实时保存在浏览器中，永不丢失。</p>
                 </div>
                 <div class="flex items-center gap-3 bg-slate-900 px-4 py-2 rounded-lg border border-slate-700">
                     <span class="text-xs text-slate-300 font-semibold">选择报销月份：</span>
@@ -57,6 +57,38 @@
                         </template>
                     </select>
                 </div>
+            </div>
+
+            <!-- ➕ 自由添加新的固定 Vendor 项目表单 -->
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
+                <h3 class="text-xs font-bold text-amber-400 uppercase">➕ 自定义添加新的固定开支 / Vendor 项目</h3>
+                <form @submit.prevent="addRecurringItem" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Vendor / 收款方</label>
+                        <input type="text" x-model="newChecklistForm.vendor" placeholder="例如: TNB / Maxis" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">费用类别 (Category)</label>
+                        <select x-model="newChecklistForm.category" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-amber-300 font-bold">
+                            <template x-for="item in allItemsList" :key="item">
+                                <option :value="item" x-text="item"></option>
+                            </template>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">预估/固定金额 (MYR)</label>
+                        <input type="number" step="0.01" x-model.number="newChecklistForm.amount" placeholder="0.00" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-amber-300 font-mono" required>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">发票号 (可选)</label>
+                        <input type="text" x-model="newChecklistForm.invoiceNo" placeholder="Invoice No." class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-white font-mono">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 px-4 rounded transition shadow">
+                            + 添加到 Checklist
+                        </button>
+                    </div>
+                </form>
             </div>
 
             <!-- 固定清单表格 -->
@@ -74,12 +106,12 @@
                                 <th class="p-3">费用类别 (Category)</th>
                                 <th class="p-3">预估/固定金额 (MYR)</th>
                                 <th class="p-3">发票号 (Invoice No.)</th>
-                                <th class="p-3">操作</th>
+                                <th class="p-3 text-center">操作</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800">
                             <template x-for="(item, index) in recurringChecklist" :key="index">
-                                <tr :class="item.submitted[selectedMonth] ? 'bg-emerald-950/20' : 'hover:bg-slate-800/50'" class="transition">
+                                <tr :class="item.submitted && item.submitted[selectedMonth] ? 'bg-emerald-950/20' : 'hover:bg-slate-800/50'" class="transition">
                                     <td class="p-3 text-center">
                                         <input type="checkbox" x-model="item.submitted[selectedMonth]" @change="toggleChecklist(item)" class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
                                     </td>
@@ -87,9 +119,12 @@
                                     <td class="p-3 text-amber-300" x-text="item.category"></td>
                                     <td class="p-3 font-mono text-slate-200" x-text="'RM ' + Number(item.amount).toFixed(2)"></td>
                                     <td class="p-3 font-mono text-slate-400" x-text="item.invoiceNo || '待补充'"></td>
-                                    <td class="p-3">
+                                    <td class="p-3 flex justify-center gap-2">
                                         <button @click="quickFillToTable(item)" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-2.5 py-1 rounded text-[11px] transition">
                                             一键记入总表
+                                        </button>
+                                        <button @click="deleteRecurringItem(index)" class="bg-red-950/60 border border-red-900 text-red-400 px-2 py-1 rounded text-[11px] hover:bg-red-900">
+                                            删除
                                         </button>
                                     </td>
                                 </tr>
@@ -268,7 +303,7 @@
 
     </main>
 
-    <!-- 核心逻辑：本地永久存储与 Checklist 管理 -->
+    <!-- 核心逻辑：本地永久存储与自定义 Checklist 添加 -->
     <script>
         function masterApp() {
             const todayStr = new Date().toISOString().split('T')[0];
@@ -280,7 +315,7 @@
                 selectedDate: todayStr,
                 monthsList: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
                 
-                // 默认每月固定支出 Vendor 清单
+                // 默认固定 Vendor 清单
                 recurringChecklist: [
                     { vendor: 'Boustead Nucleus Sdn Bhd', category: 'Office rental', amount: 24805.00, invoiceNo: 'NT/ESST-RENTAL', submitted: {} },
                     { vendor: 'Boustead Nucleus Sdn Bhd', category: 'Office Water', amount: 7.10, invoiceNo: 'NT/ESST-WATER', submitted: {} },
@@ -289,6 +324,14 @@
                     { vendor: 'Boustead Nucleus Sdn Bhd', category: 'Car Park/Motorbike Rental', amount: 180.00, invoiceNo: 'NT/ESST-PARK', submitted: {} },
                     { vendor: 'Coway Malaysia Sdn Bhd', category: 'Office Water Filter/Coway', amount: 120.00, invoiceNo: 'COWAY-01', submitted: {} }
                 ],
+
+                // 新增表单绑定
+                newChecklistForm: {
+                    vendor: '',
+                    category: 'Office rental',
+                    amount: '',
+                    invoiceNo: ''
+                },
 
                 entitySections: [
                     {
@@ -332,8 +375,7 @@
                 },
 
                 init() {
-                    // 🌟 自动从本地加载数据，确保刷新不会不见
-                    let savedData = localStorage.getItem('admin_master_data_v2');
+                    let savedData = localStorage.getItem('admin_master_data_v3');
                     if (savedData) {
                         try {
                             let parsed = JSON.parse(savedData);
@@ -344,12 +386,35 @@
                 },
 
                 saveData() {
-                    // 🌟 实时保存到本地浏览器 LocalStorage
                     let dataToSave = {
                         matrices: this.matrices,
                         checklist: this.recurringChecklist
                     };
-                    localStorage.setItem('admin_master_data_v2', JSON.stringify(dataToSave));
+                    localStorage.setItem('admin_master_data_v3', JSON.stringify(dataToSave));
+                },
+
+                addRecurringItem() {
+                    if (this.newChecklistForm.vendor && this.newChecklistForm.amount) {
+                        this.recurringChecklist.push({
+                            vendor: this.newChecklistForm.vendor,
+                            category: this.newChecklistForm.category,
+                            amount: Number(this.newChecklistForm.amount),
+                            invoiceNo: this.newChecklistForm.invoiceNo || 'INV-NEW',
+                            submitted: {}
+                        });
+                        this.newChecklistForm.vendor = '';
+                        this.newChecklistForm.amount = '';
+                        this.newChecklistForm.invoiceNo = '';
+                        this.saveData();
+                        alert("✅ 成功添加新的固定 Vendor 项目！");
+                    }
+                },
+
+                deleteRecurringItem(index) {
+                    if (confirm("确定要删除这个固定 Vendor 项目吗？")) {
+                        this.recurringChecklist.splice(index, 1);
+                        this.saveData();
+                    }
                 },
 
                 toggleChecklist(item) {
@@ -376,7 +441,6 @@
                     this.matrices[this.currentCompany][cat][mon].invoiceNo = item.invoiceNo;
                     this.matrices[this.currentCompany][cat][mon].remark = item.vendor;
 
-                    // 自动勾选
                     if (!item.submitted) item.submitted = {};
                     item.submitted[mon] = true;
 
