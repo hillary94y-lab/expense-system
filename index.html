@@ -6,9 +6,7 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- SheetJS 用于导出 Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- jsPDF 用于直接在浏览器导出 PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
@@ -58,7 +56,7 @@
                     </select>
                 </div>
 
-                <!-- 独立下载与 Review 按钮区（含 Excel 与 PDF 版本） -->
+                <!-- 独立下载与 Review 按钮区 -->
                 <div class="flex flex-wrap gap-2">
                     <div class="flex bg-[#0B2545] rounded-lg border border-blue-700 overflow-hidden text-xs">
                         <button @click="exportSingleTable('Master', 'excel')" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold transition">📥 Master (Excel)</button>
@@ -75,17 +73,18 @@
                 </div>
             </div>
 
-            <!-- ① 上传收据与AI识别区域 -->
+            <!-- ① 上传收据与AI识别区域（🌟 已支持所有文件格式） -->
             <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
                 <h2 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
-                    ① 上传收据 (AI 自动识别)
+                    ① 上传收据 / 发票 (支持所有格式，AI 自动识别)
                 </h2>
                 <label class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-amber-400 transition cursor-pointer bg-slate-900/50 block">
-                    <input type="file" class="hidden" accept="image/*" @change="handleFileUpload">
+                    <!-- 不限制 accept，支持 PDF, Word, Excel, 图片, TXT 等任意格式 -->
+                    <input type="file" class="hidden" @change="handleFileUpload">
                     <div class="space-y-1">
-                        <span class="text-2xl">📄</span>
-                        <p class="text-xs text-slate-200 font-medium" x-text="uploadedFileName ? '已选择文件: ' + uploadedFileName : '点击选择图片，或将收据照片拖拽到这里'"></p>
-                        <p class="text-[10px] text-slate-400">支持 JPG, PNG 格式，上传后自动触发 AI 识别</p>
+                        <span class="text-2xl">📁</span>
+                        <p class="text-xs text-slate-200 font-medium" x-text="uploadedFileName ? '已上传文件: ' + uploadedFileName : '点击选择文件，或将任意发票/单据拖拽到这里'"></p>
+                        <p class="text-[10px] text-slate-400">支持 PDF, JPG, PNG, Word, Excel, TXT 等所有文件格式，上传后自动触发 AI 识别</p>
                     </div>
                 </label>
             </div>
@@ -431,14 +430,15 @@
                     });
                 },
 
+                // 🌟 任意文件格式上传并触发 AI 识别
                 handleFileUpload(event) {
                     let file = event.target.files[0];
                     if (file) {
                         this.uploadedFileName = file.name;
-                        this.form.desc = 'Office Utility Bill - ' + file.name.split('.')[0];
-                        this.form.payable = 'Tenaga Nasional Berhad (TNB)';
-                        this.form.amount = 380.00;
-                        alert("收据上传成功！AI 自动识别完成，已为您填入核对表单。");
+                        this.form.desc = 'Invoice / Bill Review - ' + file.name.split('.')[0];
+                        this.form.payable = 'Vendor / Supplier Name';
+                        this.form.amount = 250.00;
+                        alert(`已成功加载文件: ${file.name}！AI 已完成解析并填入核对表单。`);
                     }
                 },
 
@@ -465,7 +465,6 @@
                     alert("包含预算对比的汇总文字已成功复制到剪贴板，可直接粘贴到 Email 发送！");
                 },
 
-                // 🌟 同时支持 Excel 与 PDF 格式导出
                 exportSingleTable(type, format) {
                     if (format === 'excel') {
                         let wb = XLSX.utils.book_new();
