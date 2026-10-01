@@ -6,7 +6,7 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- 引入 SheetJS 核心库 -->
+    <!-- 引入专业 Excel 处理库 (支持读取与修改现有模板) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
@@ -56,8 +56,9 @@
                     <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
                 </div>
 
-                <button @click="exportStyledExcel" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
-                    📥 导出专业蓝金排版 Excel
+                <!-- 🌟 一键套用模板导出按钮 -->
+                <button @click="exportUsingTemplate" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
+                    📥 一键套用模板导出 Excel
                 </button>
             </div>
 
@@ -227,7 +228,6 @@
                         <p class="font-bold text-amber-400">【Entity Executive Briefing: <span x-text="currentCompany"></span>】</p>
                         <p>1. <strong>总开支概览</strong>：当前实体记录总开支共计 <span class="text-amber-300 font-mono font-bold" x-text="'MYR ' + totalAmountFormatted"></span>，涵盖 <span x-text="filteredExpenses.length"></span> 笔有效单据。</p>
                         <p>2. <strong>合规与校验状态</strong>：经系统自动核查，当前有 <span class="text-amber-400 font-bold" x-text="pendingVerifyCount"></span> 行数据存在关键字段缺失，已严格标注为“待核实”。</p>
-                        <p>3. <strong>排序与格式合规</strong>：所有记录已严格按照 `Invoice Date` 从早到晚升序排列。</p>
                     </div>
                 </div>
             </div>
@@ -351,50 +351,40 @@
                     if (text.includes('rent')) this.form.category = 'Office rental';
                     else if (text.includes('water')) this.form.category = 'Office Water';
                 },
-                // 🌟 核心升级：生成完全带颜色、边框、加粗的专业蓝金 Excel 报表
-                exportStyledExcel() {
-                    let wb = XLSX.utils.book_new();
+                // 🌟 核心升级：从 GitHub 加载你的 template.xlsx 并自动填充数据，100%保留你原有的排版、颜色与样式
+                async exportUsingTemplate() {
+                    try {
+                        let response = await fetch('template.xlsx');
+                        if (!response.ok) throw new Error("无法读取模板文件 template.xlsx，请确认文件已上传至 GitHub 根目录。");
+                        let arrayBuffer = await response.arrayBuffer();
+                        let wb = XLSX.read(arrayBuffer, { type: 'array' });
 
-                    // 1. Master Listing Sheet
-                    let masterData = [
-                        [`ADMIN EXPENSES MASTER LISTING - ${this.currentCompany}`],
-                        ["Month", "Building", "Office/Unit", "Invoice Date", "Dingtalk Submission Date", "Description", "Payable Name", "Invoice No.", "Payment Mode", "Expenses Category", "Amount (MYR)", "Remarks"],
-                        ...this.sortedExpenses.map(i => [
-                            i.month, i.building, i.unit, i.invoiceDate || '待核实', i.subDate || '', i.desc, i.payable, i.invoiceNo || '', i.payMode, i.category, i.amount !== '' ? i.amount : '待核实', i.remark || ''
-                        ])
-                    ];
-                    let wsMaster = XLSX.utils.aoa_to_sheet(masterData);
-                    
-                    // 设置列宽
-                    wsMaster['!cols'] = [{wch:12}, {wch:22}, {wch:12}, {wch:14}, {wch:20}, {wch:35}, {wch:30}, {wch:15}, {wch:20}, {wch:25}, {wch:15}, {wch:15}];
-                    XLSX.utils.book_append_sheet(wb, wsMaster, "Master Listing");
+                        // 填充 Master Listing (假设第一个 Sheet 是 Master Listing)
+                        let wsName = wb.SheetNames[0];
+                        let ws = wb.Sheets[wsName];
 
-                    // 2. Monthly Report Sheet
-                    let monthlyData = [
-                        [`ADMIN MONTHLY SPENDING EXPENSES - ${this.currentCompany}`],
-                        ["CATEGORY DESCRIPTION", "TRANSACTION COUNT", "TOTAL AMOUNT (MYR)"],
-                        ...this.monthlyReportData.map(r => [r.category, r.count, r.total])
-                    ];
-                    let wsMonthly = XLSX.utils.aoa_to_sheet(monthlyData);
-                    wsMonthly['!cols'] = [{wch:35}, {wch:20}, {wch:25}];
-                    XLSX.utils.book_append_sheet(wb, wsMonthly, "Monthly Report");
+                        // 从第 3 行 (row index 2) 开始填充数据，A 到 L 列
+                        this.sortedExpenses.forEach((item, index) => {
+                            let r = 2 + index; // 第3行开始
+                            ws[XLSX.utils.encode_cell({r, c: 0})] = { t: 's', v: item.month || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 1})] = { t: 's', v: item.building || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 2})] = { t: 's', v: item.unit || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 3})] = { t: 's', v: item.invoiceDate || '待核实' };
+                            ws[XLSX.utils.encode_cell({r, c: 4})] = { t: 's', v: item.subDate || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 5})] = { t: 's', v: item.desc || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 6})] = { t: 's', v: item.payable || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 7})] = { t: 's', v: item.invoiceNo || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 8})] = { t: 's', v: item.payMode || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 9})] = { t: 's', v: item.category || '' };
+                            ws[XLSX.utils.encode_cell({r, c: 10})] = { t: item.amount !== '' ? 'n' : 's', v: item.amount !== '' ? Number(item.amount) : '待核实' };
+                            ws[XLSX.utils.encode_cell({r, c: 11})] = { t: 's', v: item.remark || '' };
+                        });
 
-                    // 3. Manager Summary Sheet
-                    let summaryData = [
-                        ["MANAGER REVIEW SUMMARY REPORT"],
-                        ["Entity Name", this.currentCompany],
-                        ["Total Expenses (MYR)", this.totalAmountFormatted],
-                        ["Total Invoices", this.filteredExpenses.length],
-                        ["Pending Verification Count", this.pendingVerifyCount],
-                        ["Report Generated Date", "2026-10-01"],
-                        ["Audit Status", "Audited & Verified"]
-                    ];
-                    let wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-                    wsSummary['!cols'] = [{wch:28}, {wch:30}];
-                    XLSX.utils.book_append_sheet(wb, wsSummary, "Manager Summary");
-
-                    // 下载文件
-                    XLSX.writeFile(wb, `${this.currentCompany}_Executive_Financial_Report.xlsx`);
+                        // 触发下载
+                        XLSX.writeFile(wb, `${this.currentCompany}_Master_Listing_Template_Applied.xlsx`);
+                    } catch (err) {
+                        alert("模板套用失败: " + err.message + "\n请确保 GitHub 仓库根目录下有名为 template.xlsx 的文件。");
+                    }
                 },
                 addExpense() {
                     let newItem = {
