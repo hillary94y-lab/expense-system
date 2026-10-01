@@ -6,8 +6,8 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <!-- 引入高稳定性的 SheetJS 核心库，用于完美生成多 Tab Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
 
@@ -50,8 +50,9 @@
                     <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
                 </div>
 
+                <!-- 🌟 完美多 Tab 导出按钮 -->
                 <button @click="exportWithTemplateAndData" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
-                    📥 导出完美三合一模板（实时同步 Master Listing）
+                    📥 导出完美三合一 Excel 报表
                 </button>
             </div>
 
@@ -331,47 +332,64 @@
                         this.database[this.currentCompany].splice(realIndex, 1);
                     }
                 },
-                // 🚀 最终保障版导出：精准定位 Master Listing 标签页并强制写入
-                async exportWithTemplateAndData() {
+                // 🌟 使用 SheetJS 现场完美构建三合一 Excel 报表（100% 确保数据精准写入）
+                exportWithTemplateAndData() {
                     try {
-                        let response = await fetch('template.xlsx');
-                        if (!response.ok) throw new Error("未找到 template.xlsx 文件，请确认已上传到 GitHub 仓库根目录。");
-                        let arrayBuffer = await response.arrayBuffer();
+                        let wb = XLSX.utils.book_new();
 
-                        let workbook = new ExcelJS.Workbook();
-                        await workbook.xlsx.load(arrayBuffer);
+                        // 1. 构造 Master Listing 数据（从第 5 行开始：前 4 行留空给表头）
+                        let masterData = [
+                            ["ADMIN EXPENSES MASTER LISTING - " + this.currentCompany],
+                            [""],
+                            [""],
+                            ["Month", "Building", "Office/Unit", "Invoice Date", "Dingtalk Sub. Date", "Description", "Payable Name", "Invoice No.", "Payment Mode", "Expenses Category", "Amount (MYR)", "Remarks"]
+                        ];
 
-                        // 精准匹配工作表
-                        let worksheet = workbook.worksheets.find(ws => {
-                            let name = ws.name.toLowerCase();
-                            return name.includes('master') || name.includes('listing') || name.includes('明细');
-                        }) || workbook.worksheets[0];
-
-                        let itemsToWrite = this.sortedExpenses;
-
-                        itemsToWrite.forEach((item, index) => {
-                            let rowNum = 5 + index;
-                            let row = worksheet.getRow(rowNum);
-
-                            row.getCell('A').value = item.month || '';
-                            row.getCell('B').value = item.building || '';
-                            row.getCell('C').value = item.unit || '';
-                            row.getCell('D').value = item.invoiceDate || '待核实';
-                            row.getCell('E').value = item.subDate || '';
-                            row.getCell('F').value = item.desc || '';
-                            row.getCell('G').value = item.payable || '';
-                            row.getCell('H').value = item.invoiceNo || '';
-                            row.getCell('I').value = item.payMode || '';
-                            row.getCell('J').value = item.category || '';
-                            row.getCell('K').value = item.amount !== '' ? Number(item.amount) : '待核实';
-                            row.getCell('L').value = item.remark || '';
-                            
-                            row.commit();
+                        this.sortedExpenses.forEach(item => {
+                            masterData.push([
+                                item.month || '',
+                                item.building || '',
+                                item.unit || '',
+                                item.invoiceDate || '待核实',
+                                item.subDate || '',
+                                item.desc || '',
+                                item.payable || '',
+                                item.invoiceNo || '',
+                                item.payMode || '',
+                                item.category || '',
+                                item.amount !== '' ? Number(item.amount) : '待核实',
+                                item.remark || ''
+                            ]);
                         });
+                        let wsMaster = XLSX.utils.aoa_to_sheet(masterData);
+                        XLSX.utils.book_append_sheet(wb, wsMaster, "Master Listing");
 
-                        let buffer = await workbook.xlsx.writeBuffer();
-                        let blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                        saveAs(blob, `${this.currentCompany}_Admin_Expenses_Executive_Hub.xlsx`);
+                        // 2. 构造 Monthly Report 数据
+                        let monthlyData = [
+                            ["ADMIN MONTHLY SPENDING EXPENSES - " + this.currentCompany],
+                            [""],
+                            ["CATEGORY DESCRIPTION", "TRANSACTION COUNT", "TOTAL AMOUNT (MYR)"]
+                        ];
+                        this.monthlyReportData.forEach(row => {
+                            monthlyData.push([row.category, row.count, row.total]);
+                        });
+                        let wsMonthly = XLSX.utils.aoa_to_sheet(monthlyData);
+                        XLSX.utils.book_append_sheet(wb, wsMonthly, "Monthly Report");
+
+                        // 3. 构造 Manager Summary 数据
+                        let summaryData = [
+                            ["MANAGER REVIEW SUMMARY REPORT"],
+                            [""],
+                            ["Entity Executive Briefing:", this.currentCompany],
+                            ["总开支概览 (MYR):", this.totalAmountFormatted],
+                            ["有效单据总笔数:", this.filteredExpenses.length],
+                            ["待核实异常笔数:", this.pendingVerifyCount]
+                        ];
+                        let wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+                        XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
+
+                        // 4. 导出文件
+                        XLSX.writeFile(wb, `${this.currentCompany}_Admin_Expenses_Executive_Hub.xlsx`);
                     } catch (err) {
                         alert("导出失败: " + err.message);
                     }
