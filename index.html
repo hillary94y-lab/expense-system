@@ -69,19 +69,20 @@
                 </div>
             </div>
 
-            <!-- ① 上传收据与AI识别区域 -->
+            <!-- ① 上传收据与AI识别区域（🌟 已修复点击响应） -->
             <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
                 <h2 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
                     ① 上传收据 (AI 自动识别)
                 </h2>
-                <div class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-amber-400 transition cursor-pointer bg-slate-900/50">
-                    <p class="text-xs text-slate-300">点击选择图片，或将收据照片拖拽到这里</p>
-                </div>
-                <div class="flex justify-end">
-                    <button @click="simulateAIOCR" class="bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold text-xs px-4 py-2 rounded-lg transition border border-slate-600 flex items-center gap-1.5">
-                        🔍 AI 自动识别收据信息
-                    </button>
-                </div>
+                <!-- 真实可点击的上传框 -->
+                <label class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-amber-400 transition cursor-pointer bg-slate-900/50 block">
+                    <input type="file" class="hidden" accept="image/*" @change="handleFileUpload">
+                    <div class="space-y-1">
+                        <span class="text-2xl">📄</span>
+                        <p class="text-xs text-slate-200 font-medium" x-text="uploadedFileName ? '已选择文件: ' + uploadedFileName : '点击选择图片，或将收据照片拖拽到这里'"></p>
+                        <p class="text-[10px] text-slate-400">支持 JPG, PNG 格式，上传后自动触发 AI 识别</p>
+                    </div>
+                </label>
             </div>
 
             <!-- ② 核对 / 补充信息 -->
@@ -346,6 +347,7 @@
                 lang: 'zh',
                 selectedDate: todayStr,
                 newTaskText: '',
+                uploadedFileName: '',
                 fullCategoryList: [
                     'Office rental', 'Office Water', 'Office Electricity', 'Office Indah Water',
                     'Office Internet', 'Office Telephone Line', 'Office Additional Aircond Fee',
@@ -365,7 +367,6 @@
                     'Printing Expenses', 'Praying Expenses', 'Toll & Parking', 'Petrol',
                     'Vehiche Repair & Maintenance', 'Roadtax & Insurance'
                 ],
-                // 预设各项分类的基准预算（可根据实际情况调整）
                 categoryBudgets: {
                     'Office rental': 45000,
                     'Warehouse': 2000,
@@ -414,7 +415,7 @@
                     return Object.keys(map).map(cat => {
                         let budget = this.categoryBudgets[cat] || 0;
                         let total = map[cat].total;
-                        let variance = budget - total; // 预算减去实际开支（正数表示节省，负数表示超支）
+                        let variance = budget - total;
                         return {
                             category: cat,
                             count: map[cat].count,
@@ -425,18 +426,26 @@
                     });
                 },
 
-                simulateAIOCR() {
-                    this.form.desc = 'Monthly office electricity - Oct 26';
-                    this.form.payable = 'Tenaga Nasional Berhad (TNB)';
-                    this.form.amount = 450.50;
-                    alert("AI OCR 自动识别成功！已填充至核对表单。");
+                // 🌟 处理文件上传并触发 AI 模拟识别
+                handleFileUpload(event) {
+                    let file = event.target.files[0];
+                    if (file) {
+                        this.uploadedFileName = file.name;
+                        // 模拟 AI 自动解析并填充表单
+                        this.form.desc = 'Office Utility Bill - ' + file.name.split('.')[0];
+                        this.form.payable = 'Tenaga Nasional Berhad (TNB)';
+                        this.form.amount = 380.00;
+                        alert("收据上传成功！AI 自动识别完成，已为您填入核对表单。");
+                    }
                 },
+
                 addExpense() {
                     if (!this.database[this.currentCompany]) this.database[this.currentCompany] = [];
                     this.database[this.currentCompany].push({ ...this.form });
                     this.form.desc = '';
                     this.form.amount = '';
                     this.form.invoiceNo = '';
+                    this.uploadedFileName = '';
                 },
                 deleteExpenseItem(index) {
                     let actualItem = this.sortedExpenses[index];
@@ -444,7 +453,6 @@
                     if (realIdx !== -1) this.database[this.currentCompany].splice(realIdx, 1);
                 },
 
-                // 📋 复制汇总文字给 Top Management Review（包含 Budget 和 Variance）
                 copySummaryText() {
                     let text = `【Monthly Report & Budget Summary - ${this.currentCompany}】\n`;
                     this.monthlyReportData.forEach(r => {
@@ -454,7 +462,6 @@
                     alert("包含预算对比的汇总文字已成功复制到剪贴板，可直接粘贴到 Email 发送！");
                 },
 
-                // 📥 分别独立导出（Monthly Report 现在包含 Budget 与 Actual Usage）
                 exportSingleTable(type) {
                     let wb = XLSX.utils.book_new();
                     let ws;
@@ -504,7 +511,6 @@
                     }
                 },
 
-                // Copilot 日历相关
                 get selectedDateTasks() { return this.todayTasks.filter(t => t.date === this.selectedDate); },
                 get selectedDateCompletedCount() { return this.selectedDateTasks.filter(t => t.done).length; },
                 get selectedDatePendingCount() { return this.selectedDateTasks.filter(t => !t.done).length; },
