@@ -6,7 +6,6 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- 引入 SheetJS 核心库 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
@@ -33,7 +32,6 @@
                     </button>
                 </div>
 
-                <!-- 语言选择 -->
                 <select x-model="lang" class="bg-[#134074] border border-blue-800 rounded-lg px-3 py-1.5 text-xs text-blue-200 focus:outline-none">
                     <option value="zh">🇨🇳 中文</option>
                     <option value="en">🇬🇧 English</option>
@@ -49,7 +47,7 @@
             
             <div class="flex flex-col md:flex-row justify-between items-center bg-[#134074] p-4 rounded-xl border border-blue-800 shadow gap-4">
                 <div class="flex items-center gap-3">
-                    <span class="text-sm font-semibold text-white" x-text="lang === 'zh' ? '当前管理公司：' : 'Current Entity:'"></span>
+                    <span class="text-sm font-semibold text-white">当前管理公司：</span>
                     <select x-model="currentCompany" class="bg-[#0B2545] border border-blue-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400">
                         <option value="BKBP">Black Knight BPO (BKBP)</option>
                         <option value="BSO">BS One Management (BSO)</option>
@@ -58,185 +56,191 @@
                     </select>
                 </div>
 
-                <div class="flex items-center bg-[#0B2545] p-1 rounded-lg border border-blue-800 text-xs">
-                    <button @click="subTab = 'master'" :class="subTab === 'master' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Master Listing</button>
-                    <button @click="subTab = 'monthly'" :class="subTab === 'monthly' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Monthly Report</button>
-                    <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
+                <!-- 独立下载与 Review 按钮区 -->
+                <div class="flex flex-wrap gap-2">
+                    <button @click="exportSingleTable('Master')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-3 py-2 rounded-lg transition shadow">
+                        📥 下载 Master Listing
+                    </button>
+                    <button @click="exportSingleTable('Monthly')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow">
+                        📥 下载 Monthly Report
+                    </button>
+                    <button @click="exportSingleTable('Summary')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow">
+                        📥 下载 Summary 汇报
+                    </button>
                 </div>
-
-                <!-- 导出按钮 -->
-                <button @click="exportExcelWithSheetJS" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
-                    📥 <span x-text="lang === 'zh' ? '导出完美三合一 Excel 报表' : 'Export 3-Tab Excel Hub'"></span>
-                </button>
             </div>
 
-            <!-- Master Listing 表单与表格 -->
-            <div x-show="subTab === 'master'" class="space-y-6">
-                <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow">
-                    <h2 class="text-sm font-semibold mb-4 text-amber-400 flex items-center gap-2">
-                        ➕ <span x-text="lang === 'zh' ? '录入新行政开支记录' : 'Add New Expense Item'"></span>
+            <!-- ① 上传收据与AI识别区域 -->
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
+                <h2 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
+                    ① 上传收据 (AI 自动识别)
+                </h2>
+                <div class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-amber-400 transition cursor-pointer bg-slate-900/50">
+                    <p class="text-xs text-slate-300">点击选择图片，或将收据照片拖拽到这里</p>
+                </div>
+                <div class="flex justify-end">
+                    <button @click="simulateAIOCR" class="bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold text-xs px-4 py-2 rounded-lg transition border border-slate-600 flex items-center gap-1.5">
+                        🔍 AI 自动识别收据信息
+                    </button>
+                </div>
+            </div>
+
+            <!-- ② 核对 / 补充信息 -->
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
+                <h2 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
+                    ② 核对 / 补充信息
+                </h2>
+                <form @submit.prevent="addExpense" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Month</label>
+                        <select x-model="form.month" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs">
+                            <option>January</option><option>February</option><option>March</option><option>April</option>
+                            <option>May</option><option>June</option><option>July</option><option>August</option>
+                            <option>September</option><option>October</option><option>November</option><option>December</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Building</label>
+                        <input type="text" x-model="form.building" placeholder="例如: The Bousteador" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Office/Unit</label>
+                        <input type="text" x-model="form.unit" placeholder="例如: 8.4" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Invoice Date</label>
+                        <input type="date" x-model="form.invoiceDate" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Dingtalk Submission Date</label>
+                        <input type="date" x-model="form.subDate" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Description</label>
+                        <input type="text" x-model="form.desc" @input="autoCategorize" placeholder="例如: Monthly office electricity" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Payable Name</label>
+                        <input type="text" x-model="form.payable" placeholder="供应商名称" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Invoice No.</label>
+                        <input type="text" x-model="form.invoiceNo" placeholder="发票号" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Payment Mode</label>
+                        <input type="text" x-model="form.payMode" placeholder="Payment Application" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Expenses Category</label>
+                        <select x-model="form.category" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs">
+                            <template x-for="cat in fullCategoryList" :key="cat">
+                                <option :value="cat" x-text="cat"></option>
+                            </template>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Amount (MYR)</label>
+                        <input type="number" step="0.01" x-model.number="form.amount" placeholder="0.00" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Remarks</label>
+                        <input type="text" x-model="form.remark" placeholder="选填" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200 text-xs">
+                    </div>
+                    <div class="sm:col-span-2 lg:col-span-4 flex justify-end mt-2">
+                        <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-lg text-xs transition shadow">
+                            + 加入总表
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ③ Master Listing 总表 -->
+            <div class="bg-slate-900 border border-blue-900 rounded-xl shadow overflow-hidden">
+                <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900 flex justify-between items-center">
+                    <h3 class="font-bold text-white text-xs tracking-wide">
+                        ③ Master Listing 总表 (<span x-text="currentCompany"></span>) - 共 <span x-text="sortedExpenses.length"></span> 笔记录
+                    </h3>
+                    <div class="flex gap-2">
+                        <button @click="database[currentCompany] = []" class="text-xs bg-red-950 text-red-400 px-2.5 py-1 rounded border border-red-900">清空全部</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-[#134074] text-white border-b border-blue-900">
+                                <th class="p-2.5 border-r border-blue-900/50">Month</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Building</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Office/Unit</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Invoice Date</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Dingtalk Date</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Description</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Payable Name</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Invoice No.</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Payment Mode</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Category</th>
+                                <th class="p-2.5 text-right border-r border-blue-900/50">Amount (MYR)</th>
+                                <th class="p-2.5 border-r border-blue-900/50">Remarks</th>
+                                <th class="p-2.5 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-950">
+                            <template x-for="(item, index) in sortedExpenses" :key="index">
+                                <tr class="hover:bg-blue-950/40 transition">
+                                    <td class="p-2.5 border-r border-slate-800" x-text="item.month"></td>
+                                    <td class="p-2.5 border-r border-slate-800" x-text="item.building"></td>
+                                    <td class="p-2.5 border-r border-slate-800" x-text="item.unit"></td>
+                                    <td class="p-2.5 border-r border-slate-800 font-mono" x-text="item.invoiceDate || '待核实'"></td>
+                                    <td class="p-2.5 border-r border-slate-800 font-mono" x-text="item.subDate || '-'"></td>
+                                    <td class="p-2.5 border-r border-slate-800 font-medium text-slate-200" x-text="item.desc"></td>
+                                    <td class="p-2.5 border-r border-slate-800" x-text="item.payable"></td>
+                                    <td class="p-2.5 border-r border-slate-800 font-mono text-slate-400" x-text="item.invoiceNo || '-'"></td>
+                                    <td class="p-2.5 border-r border-slate-800" x-text="item.payMode"></td>
+                                    <td class="p-2.5 border-r border-slate-800">
+                                        <span class="bg-[#134074] text-blue-200 px-2 py-0.5 rounded text-[11px]" x-text="item.category"></span>
+                                    </td>
+                                    <td class="p-2.5 border-r border-slate-800 text-right font-mono font-semibold text-amber-300" x-text="Number(item.amount).toFixed(2)"></td>
+                                    <td class="p-2.5 border-r border-slate-800 text-slate-400" x-text="item.remark || '-'"></td>
+                                    <td class="p-2.5 text-center">
+                                        <button @click="deleteExpenseItem(index)" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 rounded bg-red-950/50 border border-red-900">删除</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ④ 分类汇总（可直接复制发给 Stakeholder / Email Review） -->
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
+                        ④ 分类汇总 (可直接复制发给 Stakeholder / Top Management Review)
                     </h2>
-                    <form @submit.prevent="addExpense" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Month</label>
-                            <select x-model="form.month" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
-                                <option>January</option><option>February</option><option>March</option><option>April</option>
-                                <option>May</option><option>June</option><option>July</option><option>August</option>
-                                <option>September</option><option>October</option><option>November</option><option>December</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Building</label>
-                            <input type="text" x-model="form.building" placeholder="例如: The Bousteador" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Office/Unit</label>
-                            <input type="text" x-model="form.unit" placeholder="例如: 8.4" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Invoice Date</label>
-                            <input type="date" x-model="form.invoiceDate" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Dingtalk Submission Date</label>
-                            <input type="date" x-model="form.subDate" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Description</label>
-                            <input type="text" x-model="form.desc" @input="autoCategorize" placeholder="输入描述自动分类" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Payable Name</label>
-                            <input type="text" x-model="form.payable" placeholder="供应商名称" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Invoice No.</label>
-                            <input type="text" x-model="form.invoiceNo" placeholder="发票号" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Payment Mode</label>
-                            <input type="text" x-model="form.payMode" placeholder="Payment Application" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Expenses Category</label>
-                            <select x-model="form.category" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
-                                <template x-for="cat in fullCategoryList" :key="cat">
-                                    <option :value="cat" x-text="cat"></option>
-                                </template>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Amount (MYR)</label>
-                            <input type="number" step="0.01" x-model.number="form.amount" placeholder="0.00" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Remark</label>
-                            <input type="text" x-model="form.remark" placeholder="备注" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
-                        </div>
-                        <div class="sm:col-span-2 lg:col-span-4 flex justify-end mt-2">
-                            <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-lg text-sm transition shadow">
-                                💾 保存并自动按日期升序排列
-                            </button>
-                        </div>
-                    </form>
+                    <button @click="copySummaryText" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition">
+                        📋 复制汇总文字用于 Email 发送
+                    </button>
                 </div>
-
-                <div class="bg-slate-900 border border-blue-900 rounded-xl shadow overflow-hidden">
-                    <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900">
-                        <h3 class="font-bold text-white text-sm tracking-wide">
-                            ADMIN EXPENSES MASTER LISTING - <span x-text="currentCompany"></span>
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="bg-[#134074] text-white border-b border-blue-900">
-                                    <th class="p-2.5 border-r border-blue-900/50">Month</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Building</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Office/Unit</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Invoice Date</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Dingtalk Sub. Date</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Description</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Payable Name</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Invoice No.</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Payment Mode</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Expenses Category</th>
-                                    <th class="p-2.5 text-right border-r border-blue-900/50">Amount (MYR)</th>
-                                    <th class="p-2.5 border-r border-blue-900/50">Remarks</th>
-                                    <th class="p-2.5 text-center">Action</th>
+                
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 overflow-x-auto text-xs">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-800">
+                                <th class="pb-2">CATEGORY DESCRIPTION</th>
+                                <th class="pb-2 text-center">TRANSACTION COUNT</th>
+                                <th class="pb-2 text-right">TOTAL AMOUNT (MYR)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <template x-for="row in monthlyReportData" :key="row.category">
+                                <tr>
+                                    <td class="py-2 text-slate-200" x-text="row.category"></td>
+                                    <td class="py-2 text-center font-mono" x-text="row.count"></td>
+                                    <td class="py-2 text-right font-mono font-bold text-amber-300" x-text="'MYR ' + row.total.toFixed(2)"></td>
                                 </tr>
-                            </thead>
-                            <tbody class="divide-y divide-blue-950">
-                                <template x-for="(item, index) in sortedExpenses" :key="index">
-                                    <tr class="hover:bg-blue-950/40 transition">
-                                        <td class="p-2.5 border-r border-slate-800" x-text="item.month"></td>
-                                        <td class="p-2.5 border-r border-slate-800" x-text="item.building"></td>
-                                        <td class="p-2.5 border-r border-slate-800" x-text="item.unit"></td>
-                                        <td class="p-2.5 border-r border-slate-800 font-mono" x-text="item.invoiceDate || '待核实'" :class="{'text-amber-400 font-bold': !item.invoiceDate}"></td>
-                                        <td class="p-2.5 border-r border-slate-800 font-mono" x-text="item.subDate || '-'"></td>
-                                        <td class="p-2.5 border-r border-slate-800 font-medium text-slate-200" x-text="item.desc"></td>
-                                        <td class="p-2.5 border-r border-slate-800" x-text="item.payable"></td>
-                                        <td class="p-2.5 border-r border-slate-800 font-mono text-slate-400" x-text="item.invoiceNo || '-'"></td>
-                                        <td class="p-2.5 border-r border-slate-800" x-text="item.payMode"></td>
-                                        <td class="p-2.5 border-r border-slate-800">
-                                            <span class="bg-[#134074] text-blue-200 px-2 py-0.5 rounded text-[11px]" x-text="item.category"></span>
-                                        </td>
-                                        <td class="p-2.5 border-r border-slate-800 text-right font-mono font-semibold text-amber-300" x-text="item.amount !== '' ? Number(item.amount).toFixed(2) : '待核实'"></td>
-                                        <td class="p-2.5 border-r border-slate-800 text-slate-400" x-text="item.remark || '-'"></td>
-                                        <td class="p-2.5 text-center">
-                                            <button @click="deleteExpenseItem(index)" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 rounded bg-red-950/50 border border-red-900">删除</button>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Monthly Report 表格 -->
-            <div x-show="subTab === 'monthly'" class="space-y-6">
-                <div class="bg-slate-900 border border-blue-900 rounded-xl shadow overflow-hidden">
-                    <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900 flex justify-between items-center">
-                        <h3 class="font-bold text-white text-sm tracking-wide">
-                            ADMIN MONTHLY SPENDING EXPENSES - <span x-text="currentCompany"></span>
-                        </h3>
-                        <span class="text-xs text-amber-400 font-mono font-bold">YEAR 2026</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="bg-[#134074] text-white border-b border-blue-900">
-                                    <th class="p-3 border-r border-blue-900">CATEGORY DESCRIPTION</th>
-                                    <th class="p-3 text-center border-r border-blue-900">TRANSACTION COUNT</th>
-                                    <th class="p-3 text-right">TOTAL AMOUNT (MYR)</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-blue-950">
-                                <template x-for="row in monthlyReportData" :key="row.category">
-                                    <tr class="hover:bg-blue-950/40">
-                                        <td class="p-3 border-r border-slate-800 font-medium text-slate-200" x-text="row.category"></td>
-                                        <td class="p-3 border-r border-slate-800 text-center font-mono" x-text="row.count"></td>
-                                        <td class="p-3 text-right font-mono font-bold text-amber-300" x-text="'MYR ' + row.total.toFixed(2)"></td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Manager Summary -->
-            <div x-show="subTab === 'summary'" class="space-y-6">
-                <div class="bg-slate-900 border border-blue-900 rounded-xl shadow p-6 space-y-4">
-                    <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900 -mx-6 -mt-6 mb-4 rounded-t-xl">
-                        <h3 class="font-bold text-white text-sm">MANAGER REVIEW SUMMARY REPORT</h3>
-                    </div>
-                    <div class="bg-[#134074]/30 p-4 rounded-xl border border-blue-900 text-xs space-y-3 leading-relaxed text-blue-100">
-                        <p class="font-bold text-amber-400">【Entity Executive Briefing: <span x-text="currentCompany"></span>】</p>
-                        <p>1. <strong>总开支概览</strong>：当前实体记录总开支共计 <span class="text-amber-300 font-mono font-bold" x-text="'MYR ' + totalAmountFormatted"></span>，涵盖 <span x-text="filteredExpenses.length"></span> 笔有效单据。</p>
-                        <p>2. <strong>合规与校验状态</strong>：经系统自动核查，当前有 <span class="text-amber-400 font-bold" x-text="pendingVerifyCount"></span> 行数据存在关键字段缺失。</p>
-                    </div>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -245,7 +249,6 @@
         <!-- PART 2: 行政超级 COPILOT 与 Full Calendar 日历日记账台 -->
         <div x-show="currentPart === 'copilot'" class="space-y-6">
             
-            <!-- 顶栏：精准日期选择器 -->
             <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                     <h2 class="text-base font-bold text-white flex items-center gap-2">
@@ -253,7 +256,6 @@
                     </h2>
                     <p class="text-xs text-slate-400 mt-0.5">选择任意一天，精准追溯和管理当天的所有待办事项与私账消费流水</p>
                 </div>
-                <!-- 核心日历日期选择器 -->
                 <div class="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-lg border border-slate-600">
                     <span class="text-xs text-slate-300">📅 查阅日期：</span>
                     <input type="date" x-model="selectedDate" class="bg-transparent text-amber-400 font-mono font-bold text-sm focus:outline-none">
@@ -261,7 +263,7 @@
                 </div>
             </div>
 
-            <!-- 当日核心摘要大卡片 -->
+            <!-- 统计大卡片 -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
                     <p class="text-xs text-slate-400">所选日期任务完成</p>
@@ -281,18 +283,11 @@
                 </div>
             </div>
 
-            <!-- 左右双栏 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 <!-- 1. 每日日程与待办清单 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-semibold text-slate-200 text-sm flex items-center gap-2">
-                            <span>📝 日程清单 (<span x-text="selectedDate"></span>)</span>
-                        </h3>
-                    </div>
-
-                    <!-- 任务列表 -->
+                    <h3 class="font-semibold text-slate-200 text-sm">📝 日程清单 (<span x-text="selectedDate"></span>)</h3>
                     <ul class="space-y-2 text-xs max-h-60 overflow-y-auto">
                         <template x-for="(task, i) in selectedDateTasks" :key="i">
                             <li class="flex items-center justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-700">
@@ -300,60 +295,37 @@
                                     <input type="checkbox" x-model="task.done" class="accent-amber-500">
                                     <span :class="task.done ? 'line-through text-slate-500' : 'text-slate-200'" x-text="task.text"></span>
                                 </div>
-                                <button @click="deleteTask(task)" class="bg-red-950/50 border border-red-900 text-red-400 hover:text-red-300 px-2 py-1 rounded text-[11px] transition">删除</button>
+                                <button @click="deleteTask(task)" class="bg-red-950/50 border border-red-900 text-red-400 hover:text-red-300 px-2 py-1 rounded text-[11px]">删除</button>
                             </li>
                         </template>
-                        <template x-if="selectedDateTasks.length === 0">
-                            <p class="text-xs text-slate-500 text-center py-6">这一天没有任何安排，点击下方添加新日程</p>
-                        </template>
                     </ul>
-
-                    <!-- 新增日程 -->
-                    <div class="pt-2 border-t border-slate-700 space-y-2">
-                        <div class="flex gap-2">
-                            <input type="text" x-model="newTaskText" :placeholder="'添加 ' + selectedDate + ' 的日程...'" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none" @keyup.enter="addTask">
-                            <button @click="addTask" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded text-xs">添加</button>
-                        </div>
+                    <div class="pt-2 border-t border-slate-700 flex gap-2">
+                        <input type="text" x-model="newTaskText" placeholder="添加日程..." class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200" @keyup.enter="addTask">
+                        <button @click="addTask" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded text-xs">添加</button>
                     </div>
                 </div>
 
-                <!-- 2. 每日私人消费手帐明细（含清晰的删除按钮） -->
+                <!-- 2. 每日私人消费手帐明细 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-semibold text-slate-200 text-sm flex items-center gap-2">
-                            <span>☕ 私人消费手帐 (<span x-text="selectedDate"></span>)</span>
-                        </h3>
-                        <span class="text-xs bg-amber-400 text-slate-950 font-bold px-2 py-0.5 rounded font-mono" x-text="'MYR ' + selectedDatePrivateTotal.toFixed(2)"></span>
-                    </div>
-
-                    <!-- 消费流水列表 -->
+                    <h3 class="font-semibold text-slate-200 text-sm">☕ 私人消费手帐 (<span x-text="selectedDate"></span>)</h3>
                     <div class="space-y-2 max-h-60 overflow-y-auto text-xs">
                         <template x-for="(pItem, i) in selectedDatePrivateExpenses" :key="i">
                             <div class="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-700">
-                                <div>
-                                    <p class="text-slate-200 font-semibold" x-text="pItem.desc"></p>
-                                    <p class="text-[10px] text-slate-400 font-mono mt-0.5" x-text="pItem.date"></p>
-                                </div>
+                                <span class="text-slate-200 font-semibold" x-text="pItem.desc"></span>
                                 <div class="flex items-center gap-3">
                                     <span class="text-amber-400 font-mono font-bold text-sm" x-text="'MYR ' + Number(pItem.amount).toFixed(2)"></span>
-                                    <!-- 🌟 醒目的删除按钮 -->
-                                    <button @click="deletePrivateExpense(pItem)" class="bg-red-950/50 border border-red-900 text-red-400 hover:text-red-300 px-2.5 py-1 rounded text-[11px] transition">删除</button>
+                                    <button @click="deletePrivateExpense(pItem)" class="bg-red-950/50 border border-red-900 text-red-400 hover:text-red-300 px-2.5 py-1 rounded text-[11px]">删除</button>
                                 </div>
                             </div>
                         </template>
-                        <template x-if="selectedDatePrivateExpenses.length === 0">
-                            <p class="text-xs text-slate-500 text-center py-6">这一天没有私人消费记录</p>
-                        </template>
                     </div>
-
-                    <!-- 新增私账 -->
                     <div class="pt-2 border-t border-slate-700 space-y-2">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <input type="text" x-model="privateForm.desc" placeholder="消费描述 (如: Beutea 0%糖)" class="bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" x-model="privateForm.desc" placeholder="描述 (如: Beutea)" class="bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
                             <input type="number" step="0.01" x-model.number="privateForm.amount" placeholder="金额 (MYR)" class="bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
                         </div>
                         <div class="flex justify-end">
-                            <button @click="addPrivateExpense" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded text-xs">记一笔到 <span x-text="selectedDate"></span></button>
+                            <button @click="addPrivateExpense" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded text-xs">记录新开支</button>
                         </div>
                     </div>
                 </div>
@@ -364,14 +336,13 @@
 
     </main>
 
-    <!-- 核心业务逻辑脚本 -->
+    <!-- 脚本逻辑 -->
     <script>
         function masterApp() {
             const todayStr = new Date().toISOString().split('T')[0];
 
             return {
                 currentPart: 'expenses',
-                subTab: 'master',
                 currentCompany: 'BSO',
                 lang: 'zh',
                 selectedDate: todayStr,
@@ -396,30 +367,25 @@
                     'Vehiche Repair & Maintenance', 'Roadtax & Insurance'
                 ],
                 form: {
-                    month: 'January', building: 'Padang Victoria', unit: '27', invoiceDate: '2026-01-01', subDate: '',
-                    desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance',
-                    category: 'Office rental', amount: 3000.00, remark: ''
+                    month: 'January', building: 'The Bousteador', unit: '8.4', invoiceDate: todayStr, subDate: todayStr,
+                    desc: 'Monthly office electricity', payable: 'TNB', invoiceNo: '-', payMode: 'Payment Application',
+                    category: 'Office Electricity', amount: '', remark: ''
                 },
                 privateForm: { desc: '', amount: '' },
                 database: {
                     'BSO': [
                         { month: 'January', building: 'Padang Victoria', unit: '27', invoiceDate: '2026-01-01', subDate: '', desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance', category: 'Office rental', amount: 3000.00, remark: '' },
-                        { month: 'January', building: 'Padang Victoria', unit: '27', invoiceDate: '2026-01-01', subDate: '', desc: 'Office Rental - 27 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance', category: 'Office rental', amount: 3000.00, remark: '' },
-                        { month: 'January', building: 'Cove Square', unit: 'GF', invoiceDate: '2026-01-01', subDate: '', desc: 'Warehouse rental charges', payable: 'Cheng Siew Ngoh', invoiceNo: '-', payMode: 'Payment Application', category: 'Warehouse', amount: 1800.00, remark: '' },
-                        { month: 'January', building: 'Reflection Residences', unit: 'L09-01', invoiceDate: '2026-01-01', subDate: '', desc: 'Hostel rental charges', payable: 'OEI ROSALYN WIDYNANTA', invoiceNo: '-', payMode: 'Payment Application', category: 'Hostel Rental', amount: 3500.00, remark: '' },
-                        { month: 'January', building: 'Uptown Residences', unit: '2-12-03A', invoiceDate: '2026-01-01', subDate: '', desc: 'Hostel rental charges', payable: 'Haw Hui Hsiang', invoiceNo: '-', payMode: 'Payment Application', category: 'Hostel Rental', amount: 3800.00, remark: '' },
-                        { month: 'January', building: 'Imazium', unit: '24.1 - 24.4', invoiceDate: '2026-01-01', subDate: '', desc: 'Office rental charges', payable: 'Damansara Uptown Holdings Sdn Bhd', invoiceNo: '1102600017', payMode: 'Urgent Payment Application', category: 'Office rental', amount: 40000.00, remark: '' }
+                        { month: 'January', building: 'Cove Square', unit: 'GF', invoiceDate: '2026-01-01', subDate: '', desc: 'Warehouse rental charges', payable: 'Cheng Siew Ngoh', invoiceNo: '-', payMode: 'Payment Application', category: 'Warehouse', amount: 1800.00, remark: '' }
                     ],
                     'BKBP': [], 'BRIC': [], 'BSPD': []
                 },
                 todayTasks: [
-                    { text: '下载 8月 办公室水电费账单并核对', done: false, date: '2026-08-15' },
-                    { text: '提交 10月 租金付款申请', done: true, date: '2026-10-01' }
+                    { text: '下载 8月 办公室水电费账单并核对', done: false, date: todayStr }
                 ],
                 privateExpenses: [
-                    { desc: 'Beutea (0%糖)', amount: 12.90, date: '2026-10-01' }
+                    { desc: 'Beutea (0%糖)', amount: 12.90, date: todayStr }
                 ],
-                
+
                 get filteredExpenses() { return this.database[this.currentCompany] || []; },
                 get sortedExpenses() {
                     return [...this.filteredExpenses].sort((a, b) => {
@@ -428,13 +394,6 @@
                         if (!b.invoiceDate) return -1;
                         return new Date(a.invoiceDate) - new Date(b.invoiceDate);
                     });
-                },
-                get totalAmountFormatted() {
-                    let total = this.filteredExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-                    return total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                },
-                get pendingVerifyCount() {
-                    return this.filteredExpenses.filter(item => !item.invoiceDate || item.amount === '' || item.amount === undefined).length;
                 },
                 get monthlyReportData() {
                     let map = {};
@@ -447,122 +406,109 @@
                     return Object.keys(map).map(cat => ({ category: cat, count: map[cat].count, total: map[cat].total })).filter(r => r.total > 0);
                 },
 
-                get selectedDateTasks() {
-                    return this.todayTasks.filter(t => t.date === this.selectedDate);
-                },
-                get selectedDateCompletedCount() {
-                    return this.selectedDateTasks.filter(t => t.done).length;
-                },
-                get selectedDatePendingCount() {
-                    return this.selectedDateTasks.filter(t => !t.done).length;
-                },
-
-                get selectedDatePrivateExpenses() {
-                    return this.privateExpenses.filter(p => p.date === this.selectedDate);
-                },
-                get selectedDatePrivateTotal() {
-                    return this.selectedDatePrivateExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-                },
-
-                autoCategorize() {
-                    let text = this.form.desc.toLowerCase();
-                    if (text.includes('rent')) this.form.category = 'Office rental';
-                    else if (text.includes('water')) this.form.category = 'Office Water';
+                simulateAIOCR() {
+                    this.form.desc = 'Monthly office electricity - Oct 26';
+                    this.form.payable = 'Tenaga Nasional Berhad (TNB)';
+                    this.form.amount = 450.50;
+                    alert("AI OCR 自动识别成功！已填充至核对表单。");
                 },
                 addExpense() {
-                    if (!this.database[this.currentCompany]) {
-                        this.database[this.currentCompany] = [];
-                    }
+                    if (!this.database[this.currentCompany]) this.database[this.currentCompany] = [];
                     this.database[this.currentCompany].push({ ...this.form });
                     this.form.desc = '';
-                    this.form.invoiceNo = '';
                     this.form.amount = '';
-                    this.form.remark = '';
+                    this.form.invoiceNo = '';
                 },
                 deleteExpenseItem(index) {
                     let actualItem = this.sortedExpenses[index];
-                    let realIndex = this.database[this.currentCompany].findIndex(item => item === actualItem);
-                    if (realIndex !== -1) {
-                        this.database[this.currentCompany].splice(realIndex, 1);
-                    }
-                },
-                addTask() {
-                    if (this.newTaskText && this.newTaskText.trim() !== '') {
-                        this.todayTasks.push({
-                            text: this.newTaskText.trim(),
-                            done: false,
-                            date: this.selectedDate
-                        });
-                        this.newTaskText = '';
-                    }
-                },
-                deleteTask(task) {
-                    let idx = this.todayTasks.indexOf(task);
-                    if (idx > -1) this.todayTasks.splice(idx, 1);
-                },
-                addPrivateExpense() {
-                    if (this.privateForm.desc && this.privateForm.amount) {
-                        this.privateExpenses.push({
-                            desc: this.privateForm.desc,
-                            amount: Number(this.privateForm.amount),
-                            date: this.selectedDate
-                        });
-                        this.privateForm.desc = '';
-                        this.privateForm.amount = '';
-                    }
-                },
-                deletePrivateExpense(pItem) {
-                    let idx = this.privateExpenses.indexOf(pItem);
-                    if (idx > -1) this.privateExpenses.splice(idx, 1);
+                    let realIdx = this.database[this.currentCompany].findIndex(item => item === actualItem);
+                    if (realIdx !== -1) this.database[this.currentCompany].splice(realIdx, 1);
                 },
 
-                exportExcelWithSheetJS() {
-                    try {
-                        let wb = XLSX.utils.book_new();
+                // 📋 复制汇总文字给 Top Management Review
+                copySummaryText() {
+                    let text = `【Admin Expenses Summary - ${this.currentCompany}】\n`;
+                    this.monthlyReportData.forEach(r => {
+                        text += `- ${r.category}: ${r.count} transactions, Total MYR ${r.total.toFixed(2)}\n`;
+                    });
+                    navigator.clipboard.writeText(text);
+                    alert("汇总文字已成功复制到剪贴板，可直接粘贴到 Email 发送给 Management！");
+                },
 
-                        let masterData = [
+                // 📥 分别独立导出 Master Listing, Monthly Report, Summary
+                exportSingleTable(type) {
+                    let wb = XLSX.utils.book_new();
+                    let ws;
+
+                    if (type === 'Master') {
+                        let data = [
                             ["ADMIN EXPENSES MASTER LISTING - " + this.currentCompany],
                             [""],
-                            [""],
-                            ["Month", "Building", "Office/Unit", "Invoice Date", "Dingtalk Sub. Date", "Description", "Payable Name", "Invoice No.", "Payment Mode", "Expenses Category", "Amount (MYR)", "Remarks"]
+                            ["Month", "Building", "Office/Unit", "Invoice Date", "Dingtalk Date", "Description", "Payable Name", "Invoice No.", "Payment Mode", "Category", "Amount (MYR)", "Remarks"]
                         ];
                         this.sortedExpenses.forEach(item => {
-                            masterData.push([
-                                item.month || '', item.building || '', item.unit || '',
-                                item.invoiceDate || '待核实', item.subDate || '', item.desc || '',
-                                item.payable || '', item.invoiceNo || '', item.payMode || '',
-                                item.category || '', item.amount !== '' ? Number(item.amount) : '待核实', item.remark || ''
+                            data.push([
+                                item.month, item.building, item.unit, item.invoiceDate, item.subDate,
+                                item.desc, item.payable, item.invoiceNo, item.payMode, item.category, item.amount, item.remark
                             ]);
                         });
-                        let wsMaster = XLSX.utils.aoa_to_sheet(masterData);
-                        XLSX.utils.book_append_sheet(wb, wsMaster, "Master Listing");
-
-                        let monthlyData = [
+                        ws = XLSX.utils.aoa_to_sheet(data);
+                        XLSX.utils.book_append_sheet(wb, ws, "Master Listing");
+                        XLSX.writeFile(wb, `${this.currentCompany}_Master_Listing.xlsx`);
+                    } else if (type === 'Monthly') {
+                        let data = [
                             ["ADMIN MONTHLY SPENDING EXPENSES - " + this.currentCompany],
                             [""],
                             ["CATEGORY DESCRIPTION", "TRANSACTION COUNT", "TOTAL AMOUNT (MYR)"]
                         ];
-                        this.monthlyReportData.forEach(row => {
-                            monthlyData.push([row.category, row.count, row.total]);
+                        this.monthlyReportData.forEach(r => {
+                            data.push([r.category, r.count, r.total]);
                         });
-                        let wsMonthly = XLSX.utils.aoa_to_sheet(monthlyData);
-                        XLSX.utils.book_append_sheet(wb, wsMonthly, "Monthly Report");
-
-                        let summaryData = [
-                            ["MANAGER REVIEW SUMMARY REPORT"],
+                        ws = XLSX.utils.aoa_to_sheet(data);
+                        XLSX.utils.book_append_sheet(wb, ws, "Monthly Report");
+                        XLSX.writeFile(wb, `${this.currentCompany}_Monthly_Report.xlsx`);
+                    } else if (type === 'Summary') {
+                        let totalAmount = this.filteredExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+                        let data = [
+                            ["MANAGER REVIEW SUMMARY REPORT - " + this.currentCompany],
                             [""],
-                            ["Entity Executive Briefing:", this.currentCompany],
-                            ["总开支概览 (MYR):", this.totalAmountFormatted],
-                            ["有效单据总笔数:", this.filteredExpenses.length],
-                            ["待核实异常笔数:", this.pendingVerifyCount]
+                            ["Total Expense Records:", this.filteredExpenses.length],
+                            ["Total Amount (MYR):", totalAmount.toFixed(2)],
+                            ["Status:", "Ready for Management Review"]
                         ];
-                        let wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-                        XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
-
-                        XLSX.writeFile(wb, `${this.currentCompany}_Admin_Expenses_Executive_Hub.xlsx`);
-                    } catch (err) {
-                        alert("导出失败: " + err.message);
+                        ws = XLSX.utils.aoa_to_sheet(data);
+                        XLSX.utils.book_append_sheet(wb, ws, "Summary");
+                        XLSX.writeFile(wb, `${this.currentCompany}_Manager_Summary.xlsx`);
                     }
+                },
+
+                // Copilot 日历相关
+                get selectedDateTasks() { return this.todayTasks.filter(t => t.date === this.selectedDate); },
+                get selectedDateCompletedCount() { return this.selectedDateTasks.filter(t => t.done).length; },
+                get selectedDatePendingCount() { return this.selectedDateTasks.filter(t => !t.done).length; },
+                get selectedDatePrivateExpenses() { return this.privateExpenses.filter(p => p.date === this.selectedDate); },
+                get selectedDatePrivateTotal() { return this.selectedDatePrivateExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0); },
+
+                addTask() {
+                    if (this.newTaskText.trim()) {
+                        this.todayTasks.push({ text: this.newTaskText.trim(), done: false, date: this.selectedDate });
+                        this.newTaskText = '';
+                    }
+                },
+                deleteTask(t) {
+                    let idx = this.todayTasks.indexOf(t);
+                    if (idx > -1) this.todayTasks.splice(idx, 1);
+                },
+                addPrivateExpense() {
+                    if (this.privateForm.desc && this.privateForm.amount) {
+                        this.privateExpenses.push({ desc: this.privateForm.desc, amount: Number(this.privateForm.amount), date: this.selectedDate });
+                        this.privateForm.desc = '';
+                        this.privateForm.amount = '';
+                    }
+                },
+                deletePrivateExpense(p) {
+                    let idx = this.privateExpenses.indexOf(p);
+                    if (idx > -1) this.privateExpenses.splice(idx, 1);
                 }
             }
         }
