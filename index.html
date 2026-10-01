@@ -1,58 +1,56 @@
-// 🚀 终极完美版：强制初始化行并使用绝对坐标写入 Master Listing
-                async exportWithTemplateAndData() {
-                    try {
-                        let response = await fetch('template.xlsx');
-                        if (!response.ok) throw new Error("未找到 template.xlsx 文件，请确认已上传到 GitHub 仓库根目录。");
-                        let arrayBuffer = await response.arrayBuffer();
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<script type="text/javascript" src="main.js"></script>
 
-                        let workbook = new ExcelJS.Workbook();
-                        await workbook.xlsx.load(arrayBuffer);
+	<!-- Add the CSS page -->
+	<link href="./style.css" type="text/css" rel="stylesheet">
+</head>
 
-                        // 精准锁定 Master Listing 工作表
-                        let worksheet = workbook.worksheets.find(ws => {
-                            let name = ws.name.toLowerCase();
-                            return name.includes('master') || name.includes('listing') || name.includes('明细');
-                        });
+<body>
+	<div class="bg">
+		<h2>Sample JS practice</h2><br>
+		<h4>Calling my simple javascript method.</h1>
+			<br>
+			<script>
+				let value = 'This is a string that I passed to JS function';
+				document.write(firstFunction(value));
+			</script>
+			<br>
+			I have completed printing the JS function value.
+			<br>
+			Adding an element to an array
+			<br>
+			<script>
+				let myList = ['item1', 'item2'];
+				document.write('Value of myList = ' + myList);
+			</script>
+			<br>
+			<script>
+				myList = addElement(myList,'item3');
+				document.write('After calling method = ' + myList);
+			</script>
+			<br>
+			Remove last item <br>
+			<script>
+				myList = removeElement(myList);
+				document.write('After calling removeMethod = ' + myList);
+			</script>
 
-                        // 如果没找到，兜底取第一个工作表
-                        if (!worksheet) {
-                            worksheet = workbook.worksheets[0];
-                        }
+		<h4>anonymouse function js examples</h4>
+		const cities = ['Orlando', 'Dubai', 'Edinburgh', 'Chennai', 'Accra', 'Denver', 'Eskisehir', 'Medellin', 'Yokohama'];
 
-                        console.log("成功定位到工作表:", worksheet.name);
+		//  Choose a method that will return undefined
+		cities.forEach(city => console.log('Have you visited ' + city + '?'));
 
-                        // 获取当前公司的排序开支数据
-                        let itemsToWrite = this.sortedExpenses;
+		<br>
+		<h4><a href="arrayfunctions.html">javascript array methods</a></h4>
+		<h4><a href="classes.html">javascript Classes</a></h4>
+		<h4><a href="images.html">HTML images</a></h4>
+		<h4><a href="sample.html">Sample HTML template</a></h4>
+		<h4><a href="githubsample.html">Revised github io link</a></h4>
 
-                        // 逐行强行写入数据（从第 5 行开始）
-                        itemsToWrite.forEach((item, index) => {
-                            let rowNum = 5 + index;
-                            
-                            // 关键：显式获取或创建该行，确保单元格被 ExcelJS 序列化写入
-                            let row = worksheet.getRow(rowNum);
+	</div>
+</body>
 
-                            row.getCell('A').value = item.month || '';
-                            row.getCell('B').value = item.building || '';
-                            row.getCell('C').value = item.unit || '';
-                            row.getCell('D').value = item.invoiceDate || '待核实';
-                            row.getCell('E').value = item.subDate || '';
-                            row.getCell('F').value = item.desc || '';
-                            row.getCell('G').value = item.payable || '';
-                            row.getCell('H').value = item.invoiceNo || '';
-                            row.getCell('I').value = item.payMode || '';
-                            row.getCell('J').value = item.category || '';
-                            row.getCell('K').value = item.amount !== '' ? Number(item.amount) : '待核实';
-                            row.getCell('L').value = item.remark || '';
-                            
-                            // 提交行的更改
-                            row.commit();
-                        });
-
-                        // 导出包含三个完整 Tab 的 Excel 文件
-                        let buffer = await workbook.xlsx.writeBuffer();
-                        let blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                        saveAs(blob, `${this.currentCompany}_Admin_Expenses_Executive_Hub.xlsx`);
-                    } catch (err) {
-                        alert("导出失败: " + err.message);
-                    }
-                }
+</html>
