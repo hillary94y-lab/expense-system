@@ -321,7 +321,9 @@
                 },
                 todayTasks: [{ text: '下载 8月 办公室水电费账单并核对', done: false }],
                 privateExpenses: [{ desc: 'Beutea (0%糖)', amount: 12.90, date: '2026-10-01' }],
+                
                 get filteredExpenses() { return this.database[this.currentCompany] || []; },
+                
                 get sortedExpenses() {
                     return [...this.filteredExpenses].sort((a, b) => {
                         if (!a.invoiceDate && !b.invoiceDate) return 0;
@@ -330,13 +332,16 @@
                         return new Date(a.invoiceDate) - new Date(b.invoiceDate);
                     });
                 },
+                
                 get totalAmountFormatted() {
                     let total = this.filteredExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
                     return total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 },
+                
                 get pendingVerifyCount() {
                     return this.filteredExpenses.filter(item => !item.invoiceDate || item.amount === '' || item.amount === undefined).length;
                 },
+                
                 get monthlyReportData() {
                     let map = {};
                     this.filteredExpenses.forEach(item => {
@@ -347,11 +352,35 @@
                     });
                     return Object.keys(map).map(cat => ({ category: cat, count: map[cat].count, total: map[cat].total })).filter(r => r.total > 0);
                 },
+                
                 autoCategorize() {
                     let text = this.form.desc.toLowerCase();
                     if (text.includes('rent')) this.form.category = 'Office rental';
                     else if (text.includes('water')) this.form.category = 'Office Water';
                 },
+
+                // 🌟 新增：添加开支记录方法
+                addExpense() {
+                    if (!this.database[this.currentCompany]) {
+                        this.database[this.currentCompany] = [];
+                    }
+                    this.database[this.currentCompany].push({ ...this.form });
+                    // 重置部分表单域
+                    this.form.desc = '';
+                    this.form.invoiceNo = '';
+                    this.form.amount = '';
+                    this.form.remark = '';
+                },
+
+                // 🌟 新增：删除开支记录方法
+                deleteExpenseItem(index) {
+                    let actualItem = this.sortedExpenses[index];
+                    let realIndex = this.database[this.currentCompany].findIndex(item => item === actualItem);
+                    if (realIndex !== -1) {
+                        this.database[this.currentCompany].splice(realIndex, 1);
+                    }
+                },
+
                 // 🌟 核心升级：精确锁定 Master Listing 工作表，保留 Monthly Report 和 Summary 的原样排版与公式
                 async exportWithTemplateAndData() {
                     try {
@@ -401,23 +430,6 @@
                     } catch (err) {
                         alert("导出失败: " + err.message);
                     }
-                },
-                addExpense() {
-                    let newItem = {
-                        month: this.form.month, building: this.form.building || '待核实', unit: this.form.unit || '待核实',
-                        invoiceDate: this.form.invoiceDate || '', subDate: this.form.subDate || '', desc: this.form.desc || '待核实',
-                        payable: this.form.payable || '待核实', invoiceNo: this.form.invoiceNo || '', payMode: this.form.payMode || 'Payment Application',
-                        category: this.form.category, amount: this.form.amount !== '' ? Number(this.form.amount) : '', remark: this.form.remark
-                    };
-                    if (!this.database[this.currentCompany]) this.database[this.currentCompany] = [];
-                    this.database[this.currentCompany].push(newItem);
-                    this.form.desc = '';
-                    this.form.amount = '';
-                },
-                deleteExpenseItem(index) {
-                    let target = this.sortedExpenses[index];
-                    let realIndex = this.database[this.currentCompany].indexOf(target);
-                    if (realIndex > -1) this.database[this.currentCompany].splice(realIndex, 1);
                 }
             }
         }
