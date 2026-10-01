@@ -6,9 +6,8 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- 引入支持完整样式保留的 ExcelJS 库 -->
+    <!-- 引入 ExcelJS 库以完美保留模板样式 -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-    <!-- 引入文件保存辅助库 -->
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
@@ -58,9 +57,9 @@
                     <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
                 </div>
 
-                <!-- 🌟 智能套用模板并自动填入最新数据的导出按钮 -->
+                <!-- 🌟 智能导出按钮 -->
                 <button @click="exportWithTemplateAndData" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
-                    📥 导出完美排版模板（自动填入最新开支数据）
+                    📥 导出完美排版模板（实时同步最新开支）
                 </button>
             </div>
 
@@ -278,7 +277,7 @@
 
     </main>
 
-    <!-- 核心业务逻辑脚本 (ExcelJS 完美保留模板样式与动态数据填充) -->
+    <!-- 核心业务逻辑脚本 -->
     <script>
         function masterApp() {
             return {
@@ -353,7 +352,7 @@
                     if (text.includes('rent')) this.form.category = 'Office rental';
                     else if (text.includes('water')) this.form.category = 'Office Water';
                 },
-                // 🌟 使用 ExcelJS 引擎：加载模板、保持深蓝表头与所有高级格式、把网页最新开支自动写入第 5 行开始的位置
+                // 🌟 核心升级：确保动态获取当前公司最新的 sortedExpenses 并精准写入 Master Listing 第 5 行起
                 async exportWithTemplateAndData() {
                     try {
                         let response = await fetch('template.xlsx');
@@ -363,11 +362,22 @@
                         let workbook = new ExcelJS.Workbook();
                         await workbook.xlsx.load(arrayBuffer);
 
-                        // 获取 Master Listing 工作表
+                        // 找到 Master Listing 工作表
                         let worksheet = workbook.worksheets.find(ws => ws.name.includes('Master') || ws.name.includes('Listing')) || workbook.worksheets[0];
 
-                        // 从第 5 行开始写入最新数据（Row 5 对应索引 5）
-                        this.sortedExpenses.forEach((item, index) => {
+                        // 清理旧数据行（从第 5 行开始向下清理，防止残留旧数据）
+                        for (let r = 5; r <= 150; r++) {
+                            let row = worksheet.getRow(r);
+                            for (let c = 1; c <= 12; c++) {
+                                row.getCell(c.toString()).value = null;
+                            }
+                            row.commit();
+                        }
+
+                        // 动态获取当前实体、按日期排序后的最新开支数据
+                        let itemsToWrite = this.sortedExpenses;
+
+                        itemsToWrite.forEach((item, index) => {
                             let rowNum = 5 + index;
                             let row = worksheet.getRow(rowNum);
 
@@ -390,7 +400,7 @@
                         // 导出文件
                         let buffer = await workbook.xlsx.writeBuffer();
                         let blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                        saveAs(blob, `${this.currentCompany}_Master_Listing_Updated.xlsx`);
+                        saveAs(blob, `${this.currentCompany}_Master_Listing_Live_Updated.xlsx`);
                     } catch (err) {
                         alert("导出失败: " + err.message);
                     }
@@ -404,6 +414,9 @@
                     };
                     if (!this.database[this.currentCompany]) this.database[this.currentCompany] = [];
                     this.database[this.currentCompany].push(newItem);
+                    // 清空表单部分字段
+                    this.form.desc = '';
+                    this.form.amount = '';
                 },
                 deleteExpenseItem(index) {
                     let target = this.sortedExpenses[index];
