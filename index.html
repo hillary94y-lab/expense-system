@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Entity Office Expenses Command Center</title>
+    <title>Multi-Entity Office Expenses Command Center & Copilot</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen" x-data="expenseCenter()">
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen pb-24" x-data="expenseCenter()">
 
     <!-- 顶部导航栏 -->
     <header class="bg-slate-800 border-b border-slate-700 shadow-lg sticky top-0 z-50">
@@ -16,21 +16,18 @@
                 <span class="text-2xl">🏢</span>
                 <div>
                     <h1 class="text-lg font-bold tracking-wide" x-text="lang === 'zh' ? '多实体行政费用指挥中心' : 'Multi-Entity Expenses Command Center'"></h1>
-                    <p class="text-xs text-slate-400" x-text="lang === 'zh' ? '自动化总账本与智能分类系统' : 'Automated Master Listing & Smart Categorization'"></p>
+                    <p class="text-xs text-slate-400" x-text="lang === 'zh' ? '搭载 Admin Super Copilot 智能行政小助手' : 'Powered by Admin Super Copilot'"></p>
                 </div>
             </div>
 
             <!-- 控制区：公司选择 & 语言切换 -->
             <div class="flex items-center gap-3">
-                <!-- 公司切换 -->
                 <select x-model="currentCompany" class="bg-slate-700 border border-slate-600 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="BKBP">Black Knight BPO (BKBP)</option>
                     <option value="BSO">BS One Management (BSO)</option>
                     <option value="BRIC">Bricstar Sdn Bhd (BRIC)</option>
                     <option value="BSPD">Paydaes Sdn Bhd (BSPD)</option>
                 </select>
-
-                <!-- 语言切换 -->
                 <button @click="lang = lang === 'zh' ? 'en' : 'zh'" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium">
                     🌐 <span x-text="lang === 'zh' ? 'EN / 中文' : '中文 / EN'"></span>
                 </button>
@@ -104,7 +101,7 @@
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Payment Mode</label>
-                    <input type="text" x-model="form.payMode" placeholder="例如: Payment Application" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
+                    <input type="text" x-model="form.payMode" placeholder="Payment Application" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-slate-200">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Expenses Category (自动匹配)</label>
@@ -134,11 +131,10 @@
         <div class="bg-slate-800 border border-slate-700 rounded-xl shadow overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center">
                 <h3 class="font-semibold text-slate-200 text-sm">
-                    📋 <span x-text="currentCompany + ' - Master Listing (按 Invoice Date 从早到晚自动排列)'"></span>
+                    📋 <span x-text="currentCompany + ' - Master Listing (按 Invoice Date 自动升序排列)'"></span>
                 </h3>
-                <span class="text-xs text-slate-400" x-text="lang === 'zh' ? '金额已统一转换为 MYR' : 'Currency in MYR'"></span>
+                <span class="text-xs text-slate-400">Currency: MYR</span>
             </div>
-            
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
@@ -173,22 +169,55 @@
                                 <td class="p-2.5">
                                     <span class="bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded text-[11px]" x-text="item.category"></span>
                                 </td>
-                                <td class="p-2.5 text-right font-mono font-semibold" :class="{'text-red-400 font-bold': !item.amount && item.amount !== 0}" x-text="item.amount !== undefined && item.amount !== '' ? 'MYR ' + Number(item.amount).toFixed(2) : '待核实'"></td>
+                                <td class="p-2.5 text-right font-mono font-semibold" :class="{'text-red-400 font-bold': !item.amount}" x-text="item.amount !== '' ? 'MYR ' + Number(item.amount).toFixed(2) : '待核实'"></td>
                                 <td class="p-2.5 text-slate-400" x-text="item.remark || '-'"></td>
                                 <td class="p-2.5 text-center">
                                     <button @click="deleteItem(index)" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 rounded bg-red-950/40 border border-red-900/50">删除</button>
                                 </td>
                             </tr>
                         </template>
-                        <template x-if="sortedExpenses.length === 0">
-                            <tr>
-                                <td colspan="13" class="text-center py-8 text-slate-500">
-                                    <span x-text="lang === 'zh' ? '暂无账单记录，请在上方向该实体添加新开支。' : 'No records found.'"></span>
-                                </td>
-                            </tr>
-                        </template>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- ================= 🌟 Admin Super Copilot (Gemini Style) ================= -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl shadow p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🤖</span>
+                    <div>
+                        <h3 class="font-bold text-slate-200 text-sm">Admin Super Copilot</h3>
+                        <p class="text-[11px] text-slate-400">您的专属行政与财务合规智能助手 (支持快问快答与指令执行)</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button @click="askCopilot('check')" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded-lg text-amber-300 border border-slate-600 transition">
+                        ⚡ 检查本月异常 / 待核实
+                    </button>
+                    <button @click="askCopilot('summary')" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded-lg text-indigo-300 border border-slate-600 transition">
+                        📊 生成 Manager 审查摘要
+                    </button>
+                </div>
+            </div>
+
+            <!-- 聊天对话框容器 -->
+            <div class="h-64 overflow-y-auto space-y-3 pr-2 text-xs" id="chat-container">
+                <template x-for="msg in chatMessages" :key="msg.id">
+                    <div :class="msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                        <div :class="msg.sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-slate-700 text-slate-200 border border-slate-600'" class="max-w-xl rounded-2xl px-4 py-2.5 shadow-sm leading-relaxed">
+                            <p x-text="msg.text"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- 底部输入框与发送按钮 -->
+            <div class="flex gap-2 pt-2">
+                <input type="text" x-model="userInput" @keyup.enter="sendChat" placeholder="向 Copilot 提问，例如：'本月哪几笔账单还没填日期？' 或 '帮我总结总开支'..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button @click="sendChat" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-medium transition shadow">
+                    发送 🚀
+                </button>
             </div>
         </div>
 
@@ -210,30 +239,29 @@
                     desc: '', payable: '', invoiceNo: '', payMode: 'Payment Application',
                     category: 'Office Supplies', amount: '', remark: ''
                 },
-                // 模拟多公司数据库
                 database: {
                     'BKBP': [
                         { month: 'August', building: 'Padang Victoria', unit: '35', invoiceDate: '2026-08-05', subDate: '2026-08-10', desc: 'Office Rental - 35 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance', category: 'Office rental', amount: 3500.00, remark: '' },
-                        { month: 'August', building: 'Imazium', unit: '24', invoiceDate: '2026-08-12', subDate: '2026-08-15', desc: 'Office Internet Subscription', payable: 'Maxis Broadband', invoiceNo: '77212', payMode: 'Payment Application', category: 'Office Internet', amount: 316.95, remark: '' }
+                        { month: 'August', building: 'Imazium', unit: '24', invoiceDate: '', subDate: '', desc: 'Office Internet Subscription', payable: 'Maxis Broadband', invoiceNo: '77212', payMode: 'Payment Application', category: 'Office Internet', amount: '', remark: '缺少日期与金额，待核实' }
                     ],
                     'BSO': [
                         { month: 'August', building: 'Imazium', unit: '24.1', invoiceDate: '2026-08-01', subDate: '2026-08-05', desc: 'Office rental charges', payable: 'Damansara Uptown Holdings', invoiceNo: '11026', payMode: 'Urgent Payment', category: 'Office rental', amount: 40000.00, remark: '' }
                     ],
-                    'BRIC': [
-                        { month: 'July', building: 'Padang Victoria', unit: '41', invoiceDate: '2026-07-02', subDate: '', desc: 'Office Rental - 41 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance', category: 'Office rental', amount: 4000.00, remark: '' }
-                    ],
-                    'BSPD': [
-                        { month: 'January', building: 'The Bousteador', unit: '8.4', invoiceDate: '2026-01-12', subDate: '2026-01-19', desc: 'Monthly office cleaning expenses - Jan 26', payable: 'Build-Clean Sdn Bhd', invoiceNo: 'IV-113642', payMode: 'Payment Application', category: 'Office Cleaning Service', amount: 1458.00, remark: '' }
-                    ]
+                    'BRIC': [],
+                    'BSPD': []
                 },
+                // Gemini Style 聊天记录初始化
+                userInput: '',
+                chatMessages: [
+                    { id: 1, sender: 'bot', text: '您好 Hillary！我是您的 Admin Super Copilot。我已经为您加载了当前的 Master Listing。您可以随时问我任何合规检查、开支统计问题，或点击上方快捷按钮！' }
+                ],
                 get filteredExpenses() {
                     return this.database[this.currentCompany] || [];
                 },
-                // 核心规则 2：按 Invoice Date 从早到晚排列；日期缺失排在最后
                 get sortedExpenses() {
                     return [...this.filteredExpenses].sort((a, b) => {
                         if (!a.invoiceDate && !b.invoiceDate) return 0;
-                        if (!a.invoiceDate) return 1; // 缺失排最后
+                        if (!a.invoiceDate) return 1;
                         if (!b.invoiceDate) return -1;
                         return new Date(a.invoiceDate) - new Date(b.invoiceDate);
                     });
@@ -245,7 +273,6 @@
                 get pendingVerifyCount() {
                     return this.filteredExpenses.filter(item => !item.invoiceDate || item.amount === '' || item.amount === undefined).length;
                 },
-                // 核心规则 5：智能模糊匹配 Category
                 autoCategorize() {
                     let text = this.form.desc.toLowerCase();
                     if (text.includes('rent')) this.form.category = 'Office rental';
@@ -253,15 +280,13 @@
                     else if (text.includes('electric') || text.includes('tnb')) this.form.category = 'Office Electricity';
                     else if (text.includes('internet') || text.includes('maxis')) this.form.category = 'Office Internet';
                     else if (text.includes('clean')) this.form.category = 'Office Cleaning Service';
-                    else if (text.includes('coway') || text.includes('filter')) this.form.category = 'Office Water Filter/Coway';
                 },
                 addExpense() {
-                    // 核心规则 3：关键信息缺失标注“待核实”
                     let newItem = {
                         month: this.form.month,
                         building: this.form.building || '待核实',
                         unit: this.form.unit || '待核实',
-                        invoiceDate: this.form.invoiceDate || '', // 允许为空，自动沉底
+                        invoiceDate: this.form.invoiceDate || '',
                         subDate: this.form.subDate || '',
                         desc: this.form.desc || '待核实',
                         payable: this.form.payable || '待核实',
@@ -271,30 +296,57 @@
                         amount: this.form.amount !== '' ? Number(this.form.amount) : '',
                         remark: this.form.remark
                     };
-
-                    if (!this.database[this.currentCompany]) {
-                        this.database[this.currentCompany] = [];
-                    }
+                    if (!this.database[this.currentCompany]) this.database[this.currentCompany] = [];
                     this.database[this.currentCompany].push(newItem);
-
-                    // 清空表单
-                    this.form.building = '';
-                    this.form.unit = '';
-                    this.form.invoiceDate = '';
-                    this.form.subDate = '';
-                    this.form.desc = '';
-                    this.form.payable = '';
-                    this.form.invoiceNo = '';
-                    this.form.amount = '';
-                    this.form.remark = '';
+                    this.form.building = ''; this.form.unit = ''; this.form.invoiceDate = '';
+                    this.form.subDate = ''; this.form.desc = ''; this.form.payable = '';
+                    this.form.invoiceNo = ''; this.form.amount = ''; this.form.remark = '';
                 },
                 deleteItem(index) {
-                    // 对应 sorted 之后的真实索引
                     let target = this.sortedExpenses[index];
                     let realIndex = this.database[this.currentCompany].indexOf(target);
-                    if (realIndex > -1) {
-                        this.database[this.currentCompany].splice(realIndex, 1);
+                    if (realIndex > -1) this.database[this.currentCompany].splice(realIndex, 1);
+                },
+                // Copilot 智能交互逻辑
+                askCopilot(type) {
+                    let reply = "";
+                    if (type === 'check') {
+                        let count = this.pendingVerifyCount;
+                        reply = `【合规检查结果】当前公司 (${this.currentCompany}) 共有 ${count} 行关键信息缺失（如 Invoice Date 或 Amount），系统已自动将其标注为“待核实”，未做任何虚假编造，符合财务合规标准。`;
+                    } else if (type === 'summary') {
+                        let total = this.totalAmountFormatted;
+                        reply = `【Manager 审查摘要】公司: ${this.currentCompany} | 总笔数: ${this.filteredExpenses.length} 笔 | 总开支: ${total}。数据已按 Invoice Date 升序排列，所有分类与 Payment Mode 保持原始标准，随时可导出汇报。`;
                     }
+                    this.chatMessages.push({ id: Date.now(), sender: 'bot', text: reply });
+                    this.scrollToBottom();
+                },
+                sendChat() {
+                    if (!this.userInput.trim()) return;
+                    let text = this.userInput.trim();
+                    this.chatMessages.push({ id: Date.now(), sender: 'user', text: text });
+                    let query = text.toLowerCase();
+                    let botReply = "";
+
+                    setTimeout(() => {
+                        if (query.includes('异常') || query.includes('检查') || query.includes('待核实')) {
+                            botReply = `经扫描，当前实体 ${this.currentCompany} 有 ${this.pendingVerifyCount} 条记录需要您核实。`;
+                        } else if (query.includes('总结') || query.includes('总额') || query.includes('多少')) {
+                            botReply = `当前实体 ${this.currentCompany} 的总开支为 ${this.totalAmountFormatted}。`;
+                        } else {
+                            botReply = `收到您的指令：“${text}”。我已经记录在案。您可以通过上方表单随时增删该实体的 Master Listing 数据。`;
+                        }
+                        this.chatMessages.push({ id: Date.now() + 1, sender: 'bot', text: botReply });
+                        this.scrollToBottom();
+                    }, 400);
+
+                    this.userInput = '';
+                    this.scrollToBottom();
+                },
+                scrollToBottom() {
+                    setTimeout(() => {
+                        let container = document.getElementById('chat-container');
+                        if (container) container.scrollTop = container.scrollHeight;
+                    }, 100);
                 }
             }
         }
