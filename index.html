@@ -6,7 +6,7 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- 引入 ExcelJS 库以完美保留模板样式 -->
+    <!-- 引入 ExcelJS 与 FileSaver 库 -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 </head>
@@ -57,7 +57,7 @@
                     <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
                 </div>
 
-                <!-- 🌟 智能导出按钮 -->
+                <!-- 🌟 完美同步开支的导出按钮 -->
                 <button @click="exportWithTemplateAndData" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
                     📥 导出完美排版模板（实时同步最新开支）
                 </button>
@@ -352,7 +352,7 @@
                     if (text.includes('rent')) this.form.category = 'Office rental';
                     else if (text.includes('water')) this.form.category = 'Office Water';
                 },
-                // 🌟 核心升级：确保动态获取当前公司最新的 sortedExpenses 并精准写入 Master Listing 第 5 行起
+                // 🌟 修复版：使用标准 Excel 字母列坐标 (A~L) 写入，百分之百兼容 ExcelJS
                 async exportWithTemplateAndData() {
                     try {
                         let response = await fetch('template.xlsx');
@@ -365,36 +365,33 @@
                         // 找到 Master Listing 工作表
                         let worksheet = workbook.worksheets.find(ws => ws.name.includes('Master') || ws.name.includes('Listing')) || workbook.worksheets[0];
 
-                        // 清理旧数据行（从第 5 行开始向下清理，防止残留旧数据）
+                        // 清理旧数据行（从第 5 行到第 150 行）
                         for (let r = 5; r <= 150; r++) {
                             let row = worksheet.getRow(r);
-                            for (let c = 1; c <= 12; c++) {
-                                row.getCell(c.toString()).value = null;
-                            }
-                            row.commit();
+                            ['A','B','C','D','E','F','G','H','I','J','K','L'].forEach(col => {
+                                row.getCell(col).value = null;
+                            });
                         }
 
-                        // 动态获取当前实体、按日期排序后的最新开支数据
+                        // 写入当前公司最新的排序开支数据
                         let itemsToWrite = this.sortedExpenses;
 
                         itemsToWrite.forEach((item, index) => {
                             let rowNum = 5 + index;
                             let row = worksheet.getRow(rowNum);
 
-                            row.getCell(1).value = item.month || '';
-                            row.getCell(2).value = item.building || '';
-                            row.getCell(3).value = item.unit || '';
-                            row.getCell(4).value = item.invoiceDate || '待核实';
-                            row.getCell(5).value = item.subDate || '';
-                            row.getCell(6).value = item.desc || '';
-                            row.getCell(7).value = item.payable || '';
-                            row.getCell(8).value = item.invoiceNo || '';
-                            row.getCell(9).value = item.payMode || '';
-                            row.getCell(10).value = item.category || '';
-                            row.getCell(11).value = item.amount !== '' ? Number(item.amount) : '待核实';
-                            row.getCell(12).value = item.remark || '';
-
-                            row.commit();
+                            row.getCell('A').value = item.month || '';
+                            row.getCell('B').value = item.building || '';
+                            row.getCell('C').value = item.unit || '';
+                            row.getCell('D').value = item.invoiceDate || '待核实';
+                            row.getCell('E').value = item.subDate || '';
+                            row.getCell('F').value = item.desc || '';
+                            row.getCell('G').value = item.payable || '';
+                            row.getCell('H').value = item.invoiceNo || '';
+                            row.getCell('I').value = item.payMode || '';
+                            row.getCell('J').value = item.category || '';
+                            row.getCell('K').value = item.amount !== '' ? Number(item.amount) : '待核实';
+                            row.getCell('L').value = item.remark || '';
                         });
 
                         // 导出文件
@@ -414,7 +411,6 @@
                     };
                     if (!this.database[this.currentCompany]) this.database[this.currentCompany] = [];
                     this.database[this.currentCompany].push(newItem);
-                    // 清空表单部分字段
                     this.form.desc = '';
                     this.form.amount = '';
                 },
