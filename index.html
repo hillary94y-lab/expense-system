@@ -57,9 +57,9 @@
                     <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
                 </div>
 
-                <!-- 🌟 完美同步开支的导出按钮 -->
+                <!-- 🌟 三合一完美模板同步导出按钮 -->
                 <button @click="exportWithTemplateAndData" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
-                    📥 导出完美排版模板（实时同步最新开支）
+                    📥 导出完美三合一模板（实时同步 Master Listing）
                 </button>
             </div>
 
@@ -352,7 +352,7 @@
                     if (text.includes('rent')) this.form.category = 'Office rental';
                     else if (text.includes('water')) this.form.category = 'Office Water';
                 },
-                // 🌟 修复版：使用标准 Excel 字母列坐标 (A~L) 写入，百分之百兼容 ExcelJS
+                // 🌟 核心升级：精确锁定 Master Listing 工作表，保留 Monthly Report 和 Summary 的原样排版与公式
                 async exportWithTemplateAndData() {
                     try {
                         let response = await fetch('template.xlsx');
@@ -362,8 +362,8 @@
                         let workbook = new ExcelJS.Workbook();
                         await workbook.xlsx.load(arrayBuffer);
 
-                        // 找到 Master Listing 工作表
-                        let worksheet = workbook.worksheets.find(ws => ws.name.includes('Master') || ws.name.includes('Listing')) || workbook.worksheets[0];
+                        // 精准匹配名为 "Master Listing"（或包含 Master / Listing）的工作表
+                        let worksheet = workbook.worksheets.find(ws => ws.name.toLowerCase().includes('master') || ws.name.toLowerCase().includes('listing')) || workbook.worksheets[0];
 
                         // 清理旧数据行（从第 5 行到第 150 行）
                         for (let r = 5; r <= 150; r++) {
@@ -394,10 +394,10 @@
                             row.getCell('L').value = item.remark || '';
                         });
 
-                        // 导出文件
+                        // 导出包含三个完整 Tab 的 Excel 文件
                         let buffer = await workbook.xlsx.writeBuffer();
                         let blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                        saveAs(blob, `${this.currentCompany}_Master_Listing_Live_Updated.xlsx`);
+                        saveAs(blob, `${this.currentCompany}_Admin_Expenses_Executive_Hub.xlsx`);
                     } catch (err) {
                         alert("导出失败: " + err.message);
                     }
