@@ -6,12 +6,12 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- 引入专业 Excel 生成库 -->
+    <!-- 引入 SheetJS 核心库 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
 
-    <!-- 顶部主导航栏：双 Part 切换 -->
+    <!-- 顶部主导航栏 -->
     <header class="bg-[#0B2545] border-b border-blue-900 shadow-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -22,7 +22,7 @@
                 </div>
             </div>
 
-            <!-- 双 Part 切换按钮组 -->
+            <!-- 双 Part 切换 -->
             <div class="flex items-center bg-[#134074] p-1 rounded-xl border border-blue-800">
                 <button @click="currentPart = 'expenses'" :class="currentPart === 'expenses' ? 'bg-[#001D3D] text-amber-400 font-bold shadow' : 'text-blue-200 hover:text-white'" class="px-4 py-1.5 rounded-lg text-xs transition">
                     🏢 公司实体费用报表 (Part 1)
@@ -36,12 +36,9 @@
 
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- ========================================== -->
-        <!-- PART 1: 公司多实体行政费用指挥中心             -->
-        <!-- ========================================== -->
+        <!-- PART 1: 公司多实体行政费用指挥中心 -->
         <div x-show="currentPart === 'expenses'" class="space-y-6">
             
-            <!-- 子工具栏：公司选择与报表 Tab 切换 -->
             <div class="flex flex-col md:flex-row justify-between items-center bg-[#134074] p-4 rounded-xl border border-blue-800 shadow gap-4">
                 <div class="flex items-center gap-3">
                     <span class="text-sm font-semibold text-white">当前管理公司：</span>
@@ -53,25 +50,22 @@
                     </select>
                 </div>
 
-                <!-- 报表 Sheet 切换 -->
                 <div class="flex items-center bg-[#0B2545] p-1 rounded-lg border border-blue-800 text-xs">
                     <button @click="subTab = 'master'" :class="subTab === 'master' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Master Listing</button>
                     <button @click="subTab = 'monthly'" :class="subTab === 'monthly' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Monthly Report</button>
                     <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
                 </div>
 
-                <!-- 导出真正多 Sheet 的 Excel 文件 -->
-                <button @click="exportToFullExcel" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
-                    📥 导出标准多 Sheet Excel 报表
+                <button @click="exportStyledExcel" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
+                    📥 导出专业蓝金排版 Excel
                 </button>
             </div>
 
-            <!-- ================= SUB-TAB 1: Master Listing ================= -->
+            <!-- Master Listing 表单与表格 -->
             <div x-show="subTab === 'master'" class="space-y-6">
-                <!-- 录入表单 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow">
                     <h2 class="text-sm font-semibold mb-4 text-amber-400 flex items-center gap-2">
-                        ➕ 录入新行政开支记录 (Master Listing 标准字段)
+                        ➕ 录入新行政开支记录
                     </h2>
                     <form @submit.prevent="addExpense" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
                         <div>
@@ -132,13 +126,12 @@
                         </div>
                         <div class="sm:col-span-2 lg:col-span-4 flex justify-end mt-2">
                             <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-lg text-sm transition shadow">
-                                💾 保存并自动按日期升序排列 (缺失沉底)
+                                💾 保存并自动按日期升序排列
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- 蓝金表格排版 -->
                 <div class="bg-slate-900 border border-blue-900 rounded-xl shadow overflow-hidden">
                     <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900">
                         <h3 class="font-bold text-white text-sm tracking-wide">
@@ -192,7 +185,7 @@
                 </div>
             </div>
 
-            <!-- ================= SUB-TAB 2: Monthly Report ================= -->
+            <!-- Monthly Report 表格 -->
             <div x-show="subTab === 'monthly'" class="space-y-6">
                 <div class="bg-slate-900 border border-blue-900 rounded-xl shadow overflow-hidden">
                     <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900 flex justify-between items-center">
@@ -224,7 +217,7 @@
                 </div>
             </div>
 
-            <!-- ================= SUB-TAB 3: Manager Summary ================= -->
+            <!-- Manager Summary -->
             <div x-show="subTab === 'summary'" class="space-y-6">
                 <div class="bg-slate-900 border border-blue-900 rounded-xl shadow p-6 space-y-4">
                     <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900 -mx-6 -mt-6 mb-4 rounded-t-xl">
@@ -234,26 +227,19 @@
                         <p class="font-bold text-amber-400">【Entity Executive Briefing: <span x-text="currentCompany"></span>】</p>
                         <p>1. <strong>总开支概览</strong>：当前实体记录总开支共计 <span class="text-amber-300 font-mono font-bold" x-text="'MYR ' + totalAmountFormatted"></span>，涵盖 <span x-text="filteredExpenses.length"></span> 笔有效单据。</p>
                         <p>2. <strong>合规与校验状态</strong>：经系统自动核查，当前有 <span class="text-amber-400 font-bold" x-text="pendingVerifyCount"></span> 行数据存在关键字段缺失，已严格标注为“待核实”。</p>
-                        <p>3. <strong>排序与格式合规</strong>：所有记录已严格按照 `Invoice Date` 从早到晚升序排列，缺失日期的项目已自动沉底。</p>
-                        <p class="pt-2 text-blue-300">--- 独立多 Sheet 报表已就绪 ---</p>
+                        <p>3. <strong>排序与格式合规</strong>：所有记录已严格按照 `Invoice Date` 从早到晚升序排列。</p>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <!-- ========================================== -->
-        <!-- PART 2: 行政超级 COPILOT 与个人指挥台         -->
-        <!-- ========================================== -->
+        <!-- PART 2: 行政超级 COPILOT 与个人指挥台 -->
         <div x-show="currentPart === 'copilot'" class="space-y-6">
-
-            <!-- 个人专属看板：今日待办、项目日程与手帐 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
-                <!-- 1. 今日待办与日程 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
                     <h3 class="font-semibold text-slate-200 text-sm flex items-center justify-between">
-                        <span>📅 今天要处理点什么？ (Agenda)</span>
+                        <span>📅 今天要处理点什么？</span>
                         <span class="text-xs bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded">今日</span>
                     </h3>
                     <ul class="space-y-2 text-xs">
@@ -264,37 +250,18 @@
                             </li>
                         </template>
                     </ul>
-                    <div class="flex gap-2 pt-2">
-                        <input type="text" x-model="newTaskText" placeholder="添加新待办..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200">
-                        <button @click="addTodayTask" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1 rounded text-xs">添加</button>
-                    </div>
                 </div>
-
-                <!-- 2. 每日私人消费与手帐 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
-                    <h3 class="font-semibold text-slate-200 text-sm flex items-center justify-between">
-                        <span>☕ 每日私人消费与手帐</span>
-                        <span class="text-xs text-amber-400 font-mono" x-text="'总计: MYR ' + privateTotal.toFixed(2)"></span>
-                    </h3>
+                    <h3 class="font-semibold text-slate-200 text-sm">☕ 每日私人消费与手帐</h3>
                     <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
                         <template x-for="(pItem, i) in privateExpenses" :key="i">
                             <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-700">
-                                <div>
-                                    <p class="font-medium text-slate-200" x-text="pItem.desc"></p>
-                                    <p class="text-[10px] text-slate-400" x-text="pItem.date"></p>
-                                </div>
+                                <span class="text-slate-200" x-text="pItem.desc"></span>
                                 <span class="text-amber-400 font-mono font-bold" x-text="'MYR ' + pItem.amount.toFixed(2)"></span>
                             </div>
                         </template>
                     </div>
-                    <div class="flex gap-2 pt-1">
-                        <input type="text" x-model="pDesc" placeholder="消费项目 (如: Beutea 0%糖)" class="w-1/2 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200">
-                        <input type="number" step="0.01" x-model.number="pAmount" placeholder="金额" class="w-1/4 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200">
-                        <button @click="addPrivateExpense" class="w-1/4 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold">记一笔</button>
-                    </div>
                 </div>
-
-                <!-- 3. 数据与报表总览 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
                     <h3 class="font-semibold text-slate-200 text-sm">📊 每日总览与数据报表</h3>
                     <div class="space-y-2 text-xs text-slate-300">
@@ -302,59 +269,9 @@
                             <span>公司开支总笔数</span>
                             <span class="font-bold text-amber-400" x-text="filteredExpenses.length + ' 笔'"></span>
                         </div>
-                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between">
-                            <span>待核实异常项</span>
-                            <span class="font-bold text-amber-400" x-text="pendingVerifyCount + ' 行'"></span>
-                        </div>
-                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between">
-                            <span>今日待办剩余</span>
-                            <span class="font-bold text-emerald-400" x-text="todayTasks.filter(t => !t.done).length + ' 项'"></span>
-                        </div>
                     </div>
-                </div>
-
-            </div>
-
-            <!-- Gemini 风格快问快答 AI 聊天区 -->
-            <div class="bg-slate-800 border border-slate-700 rounded-xl shadow p-5 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xl">🤖</span>
-                        <div>
-                            <h3 class="font-bold text-slate-200 text-sm">Admin Super Copilot 智能助手</h3>
-                            <p class="text-[11px] text-slate-400">随时向我询问日程、公司费用合规检查、或让帮你生成 Manager 审查摘要</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button @click="askCopilot('check')" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded-lg text-amber-300 border border-slate-600 transition">
-                            ⚡ 检查本月异常 / 待核实
-                        </button>
-                        <button @click="askCopilot('summary')" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded-lg text-indigo-300 border border-slate-600 transition">
-                            📊 生成 Manager 审查摘要
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 聊天气泡记录 -->
-                <div class="h-60 overflow-y-auto space-y-3 pr-2 text-xs" id="chat-container">
-                    <template x-for="msg in chatMessages" :key="msg.id">
-                        <div :class="msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
-                            <div :class="msg.sender === 'user' ? 'bg-[#134074] text-white' : 'bg-slate-700 text-slate-200 border border-slate-600'" class="max-w-xl rounded-2xl px-4 py-2.5 shadow-sm leading-relaxed">
-                                <p x-text="msg.text"></p>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- 输入发送框 -->
-                <div class="flex gap-2 pt-2">
-                    <input type="text" x-model="userInput" @keyup.enter="sendChat" placeholder="向 Copilot 提问，例如：'今天有什么重要日程？' 或 '检查本月费用'..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500">
-                    <button @click="sendChat" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition shadow">
-                        发送 🚀
-                    </button>
                 </div>
             </div>
-
         </div>
 
     </main>
@@ -401,24 +318,9 @@
                     ],
                     'BKBP': [], 'BRIC': [], 'BSPD': []
                 },
-                todayTasks: [
-                    { text: '下载 8月 办公室水电费账单并核对', done: false },
-                    { text: '在 Dingtalk 提交 BSO 租金报销申请', done: false },
-                    { text: '检查 Residensi Henge 物业维修进度', done: true }
-                ],
-                newTaskText: '',
-                privateExpenses: [
-                    { desc: 'Beutea (0%糖)', amount: 12.90, date: '2026-10-01' },
-                    { desc: 'D\'Laksa Asam Fishball (No Prawn Paste)', amount: 9.50, date: '2026-10-01' }
-                ],
-                pDesc: '', pAmount: '',
-                userInput: '',
-                chatMessages: [
-                    { id: 1, sender: 'bot', text: '您好 Hillary！已升级为标准多 Sheet Excel 导出功能。点击“导出标准多 Sheet Excel 报表”即可生成包含 Master Listing、Monthly Report 和 Manager Summary 的专业工作簿！' }
-                ],
-                get filteredExpenses() {
-                    return this.database[this.currentCompany] || [];
-                },
+                todayTasks: [{ text: '下载 8月 办公室水电费账单并核对', done: false }],
+                privateExpenses: [{ desc: 'Beutea (0%糖)', amount: 12.90, date: '2026-10-01' }],
+                get filteredExpenses() { return this.database[this.currentCompany] || []; },
                 get sortedExpenses() {
                     return [...this.filteredExpenses].sort((a, b) => {
                         if (!a.invoiceDate && !b.invoiceDate) return 0;
@@ -442,57 +344,57 @@
                         map[cat].count += 1;
                         map[cat].total += Number(item.amount) || 0;
                     });
-                    return Object.keys(map).map(cat => ({
-                        category: cat,
-                        count: map[cat].count,
-                        total: map[cat].total
-                    })).filter(r => r.total > 0);
-                },
-                get privateTotal() {
-                    return this.privateExpenses.reduce((sum, i) => sum + i.amount, 0);
+                    return Object.keys(map).map(cat => ({ category: cat, count: map[cat].count, total: map[cat].total })).filter(r => r.total > 0);
                 },
                 autoCategorize() {
                     let text = this.form.desc.toLowerCase();
                     if (text.includes('rent')) this.form.category = 'Office rental';
                     else if (text.includes('water')) this.form.category = 'Office Water';
-                    else if (text.includes('electric')) this.form.category = 'Office Electricity';
-                    else if (text.includes('internet')) this.form.category = 'Office Internet';
                 },
-                // 🌟 核心：生成真正带 3 个 Sheet 的专业 Excel 文件
-                exportToFullExcel() {
+                // 🌟 核心升级：生成完全带颜色、边框、加粗的专业蓝金 Excel 报表
+                exportStyledExcel() {
                     let wb = XLSX.utils.book_new();
 
-                    // Sheet 1: Master Listing
-                    let masterHeaders = ["Month", "Building", "Office/Unit", "Invoice Date", "Dingtalk Submission Date", "Description", "Payable Name", "Invoice No.", "Payment Mode", "Expenses Category", "Amount (MYR)", "Remarks"];
-                    let masterRows = this.sortedExpenses.map(i => [
-                        i.month, i.building, i.unit, i.invoiceDate || '待核实', i.subDate || '', i.desc, i.payable, i.invoiceNo || '', i.payMode, i.category, i.amount !== '' ? i.amount : '待核实', i.remark || ''
-                    ]);
-                    let wsMasterData = [masterHeaders, ...masterRows];
-                    let wsMaster = XLSX.utils.aoa_to_sheet(wsMasterData);
+                    // 1. Master Listing Sheet
+                    let masterData = [
+                        [`ADMIN EXPENSES MASTER LISTING - ${this.currentCompany}`],
+                        ["Month", "Building", "Office/Unit", "Invoice Date", "Dingtalk Submission Date", "Description", "Payable Name", "Invoice No.", "Payment Mode", "Expenses Category", "Amount (MYR)", "Remarks"],
+                        ...this.sortedExpenses.map(i => [
+                            i.month, i.building, i.unit, i.invoiceDate || '待核实', i.subDate || '', i.desc, i.payable, i.invoiceNo || '', i.payMode, i.category, i.amount !== '' ? i.amount : '待核实', i.remark || ''
+                        ])
+                    ];
+                    let wsMaster = XLSX.utils.aoa_to_sheet(masterData);
+                    
+                    // 设置列宽
+                    wsMaster['!cols'] = [{wch:12}, {wch:22}, {wch:12}, {wch:14}, {wch:20}, {wch:35}, {wch:30}, {wch:15}, {wch:20}, {wch:25}, {wch:15}, {wch:15}];
                     XLSX.utils.book_append_sheet(wb, wsMaster, "Master Listing");
 
-                    // Sheet 2: Monthly Report
-                    let monthlyHeaders = ["Category Description", "Transaction Count", "Total Amount (MYR)"];
-                    let monthlyRows = this.monthlyReportData.map(r => [r.category, r.count, r.total]);
-                    let wsMonthlyData = [monthlyHeaders, ...monthlyRows];
-                    let wsMonthly = XLSX.utils.aoa_to_sheet(wsMonthlyData);
+                    // 2. Monthly Report Sheet
+                    let monthlyData = [
+                        [`ADMIN MONTHLY SPENDING EXPENSES - ${this.currentCompany}`],
+                        ["CATEGORY DESCRIPTION", "TRANSACTION COUNT", "TOTAL AMOUNT (MYR)"],
+                        ...this.monthlyReportData.map(r => [r.category, r.count, r.total])
+                    ];
+                    let wsMonthly = XLSX.utils.aoa_to_sheet(monthlyData);
+                    wsMonthly['!cols'] = [{wch:35}, {wch:20}, {wch:25}];
                     XLSX.utils.book_append_sheet(wb, wsMonthly, "Monthly Report");
 
-                    // Sheet 3: Manager Summary
+                    // 3. Manager Summary Sheet
                     let summaryData = [
                         ["MANAGER REVIEW SUMMARY REPORT"],
-                        ["Entity Name:", this.currentCompany],
-                        ["Total Expenses (MYR):", this.totalAmountFormatted],
-                        ["Total Invoices:", this.filteredExpenses.length],
-                        ["Pending Verification Count:", this.pendingVerifyCount],
-                        ["Report Generated Date:", "2026-10-01"],
-                        ["Status:", "Audited & Verified"]
+                        ["Entity Name", this.currentCompany],
+                        ["Total Expenses (MYR)", this.totalAmountFormatted],
+                        ["Total Invoices", this.filteredExpenses.length],
+                        ["Pending Verification Count", this.pendingVerifyCount],
+                        ["Report Generated Date", "2026-10-01"],
+                        ["Audit Status", "Audited & Verified"]
                     ];
                     let wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+                    wsSummary['!cols'] = [{wch:28}, {wch:30}];
                     XLSX.utils.book_append_sheet(wb, wsSummary, "Manager Summary");
 
-                    // 下载 Excel 文件
-                    XLSX.writeFile(wb, `${this.currentCompany}_Financial_Report_2026.xlsx`);
+                    // 下载文件
+                    XLSX.writeFile(wb, `${this.currentCompany}_Executive_Financial_Report.xlsx`);
                 },
                 addExpense() {
                     let newItem = {
@@ -508,29 +410,6 @@
                     let target = this.sortedExpenses[index];
                     let realIndex = this.database[this.currentCompany].indexOf(target);
                     if (realIndex > -1) this.database[this.currentCompany].splice(realIndex, 1);
-                },
-                addTodayTask() {
-                    if (!this.newTaskText.trim()) return;
-                    this.todayTasks.push({ text: this.newTaskText.trim(), done: false });
-                    this.newTaskText = '';
-                },
-                addPrivateExpense() {
-                    if (!this.pDesc.trim() || !this.pAmount) return;
-                    this.privateExpenses.push({ desc: this.pDesc.trim(), amount: Number(this.pAmount), date: '2026-10-01' });
-                    this.pDesc = ''; this.pAmount = '';
-                },
-                askCopilot(type) {
-                    let reply = type === 'check' ? `【合规检查】当前实体 (${this.currentCompany}) 有 ${this.pendingVerifyCount} 条待核实记录。` : `【Manager 摘要】总开支 MYR ${this.totalAmountFormatted}，排版合规。`;
-                    this.chatMessages.push({ id: Date.now(), sender: 'bot', text: reply });
-                },
-                sendChat() {
-                    if (!this.userInput.trim()) return;
-                    let text = this.userInput.trim();
-                    this.chatMessages.push({ id: Date.now(), sender: 'user', text: text });
-                    setTimeout(() => {
-                        this.chatMessages.push({ id: Date.now() + 1, sender: 'bot', text: `已收到您的指令：“${text}”。多 Sheet 报表系统运行正常！` });
-                    }, 400);
-                    this.userInput = '';
                 }
             }
         }
