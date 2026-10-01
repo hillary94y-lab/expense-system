@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共享费用与分摊管理系统</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js 交互支持 -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans" x-data="expenseApp()">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-indigo-600 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                🏠 共享费用与分摊管理系统
+            </h1>
+            <div class="text-sm bg-indigo-700 px-3 py-1 rounded-full">
+                当前结算周期：2026年10月
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- 统计看板 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-sm text-slate-500">本期总支出</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">¥ <span x-text="totalExpense.toFixed(2)"></span></p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-sm text-slate-500">参与分摊成员数</p>
+                <p class="text-2xl font-bold text-indigo-600 mt-1" x-text="members.length + ' 位'"></p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-sm text-slate-500">待结算总额</p>
+                <p class="text-2xl font-bold text-amber-600 mt-1">¥ <span x-text="pendingAmount.toFixed(2)"></span></p>
+            </div>
+        </div>
+
+        <!-- 操作与表单区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- 左侧：新增费用表单 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-1">
+                <h2 class="text-lg font-semibold mb-4 text-slate-800 flex items-center gap-2">
+                    ➕ 记录新费用
+                </h2>
+                <form @submit.prevent="addExpense" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">费用标题</label>
+                        <input type="text" x-model="newExpense.title" required placeholder="例如：客厅防水层修缮" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">总金额 (¥)</label>
+                        <input type="number" step="0.01" x-model.number="newExpense.amount" required placeholder="0.00" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">费用类别</label>
+                        <select x-model="newExpense.category" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <template x-for="cat in categories" :key="cat">
+                                <option :value="cat" x-text="cat"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">垫付人</label>
+                        <select x-model="newExpense.payer" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <template x-for="member in members" :key="member">
+                                <option :value="member" x-text="member"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">分摊逻辑</label>
+                        <select x-model="newExpense.splitType" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="equal">平均分摊 (Equal Split)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition text-sm shadow-sm">
+                        确认添加并计算分摊
+                    </button>
+                </form>
+            </div>
+
+            <!-- 右侧：费用列表与分摊详情 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2 space-y-6">
+                <h2 class="text-lg font-semibold text-slate-800">📋 费用账单与分摊明细</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                                <th class="p-3">项目 / 类别</th>
+                                <th class="p-3">金额</th>
+                                <th class="p-3">垫付人</th>
+                                <th class="p-3">分摊逻辑</th>
+                                <th class="p-3">各方分摊明细</th>
+                                <th class="p-3 text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <template x-for="(item, index) in expenses" :key="index">
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-3">
+                                        <div class="font-medium text-slate-800" x-text="item.title"></div>
+                                        <span class="inline-block bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded mt-1" x-text="item.category"></span>
+                                    </td>
+                                    <td class="p-3 font-semibold text-slate-900" x-text="'¥ ' + item.amount.toFixed(2)"></td>
+                                    <td class="p-3" x-text="item.payer"></td>
+                                    <td class="p-3 text-slate-500" x-text="'平均分摊'"></td>
+                                    <td class="p-3 text-xs text-slate-600">
+                                        <template x-for="(share, member) in item.shares" :key="member">
+                                            <div x-text="member + ': ¥ ' + share.toFixed(2)"></div>
+                                        </template>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <button @click="deleteExpense(index)" class="text-red-500 hover:text-red-700 text-xs font-medium">删除</button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template x-if="expenses.length === 0">
+                                <tr>
+                                    <td colspan="6" class="text-center py-8 text-slate-400">暂无费用记录，请在左侧添加。</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 结算汇总建议 -->
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                    <h3 class="font-semibold text-indigo-900 mb-2 text-sm">💡 智能结算建议</h3>
+                    <p class="text-xs text-indigo-700 leading-relaxed">
+                        系统会实时根据添加的账单自动平摊给 Hillary、Steve、Ruina、Suki 四位成员。
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 前端交互逻辑脚本 -->
+    <script>
+        function expenseApp() {
+            return {
+                members: ['Hillary', 'Steve', 'Ruina', 'Suki'],
+                categories: ['物业管理费', '公用水电费', '维修与整改', '杂项开支'],
+                expenses: [
+                    {
+                        title: '5月大堂及走廊公摊电费',
+                        amount: 320.00,
+                        category: '公用水电费',
+                        payer: 'Hillary',
+                        splitType: 'equal',
+                        shares: { 'Hillary': 80, 'Steve': 80, 'Ruina': 80, 'Suki': 80 }
+                    }
+                ],
+                newExpense: {
+                    title: '',
+                    amount: '',
+                    category: '物业管理费',
+                    payer: 'Hillary',
+                    splitType: 'equal'
+                },
+                get totalExpense() {
+                    return this.expenses.reduce((sum, item) => sum + item.amount, 0);
+                },
+                get pendingAmount() {
+                    return this.totalExpense;
+                },
+                addExpense() {
+                    if (!this.newExpense.title || !this.newExpense.amount) return;
+
+                    let shares = {};
+                    const count = this.members.length;
+                    let perShare = this.newExpense.amount / count;
+                    this.members.forEach(m => {
+                        shares[m] = perShare;
+                    });
+
+                    this.expenses.push({
+                        title: this.newExpense.title,
+                        amount: parseFloat(this.newExpense.amount),
+                        category: this.newExpense.category,
+                        payer: this.newExpense.payer,
+                        splitType: this.newExpense.splitType,
+                        shares: shares
+                    });
+
+                    this.newExpense.title = '';
+                    this.newExpense.amount = '';
+                },
+                deleteExpense(index) {
+                    this.expenses.splice(index, 1);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
