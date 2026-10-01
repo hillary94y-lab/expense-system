@@ -6,7 +6,7 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- 引入 SheetJS 核心库，确保多 Tab 完美生成 -->
+    <!-- 引入 SheetJS 核心库 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
@@ -29,7 +29,7 @@
                         🏢 公司实体费用报表 (Part 1)
                     </button>
                     <button @click="currentPart = 'copilot'" :class="currentPart === 'copilot' ? 'bg-[#001D3D] text-amber-400 font-bold shadow' : 'text-blue-200 hover:text-white'" class="px-4 py-1.5 rounded-lg text-xs transition">
-                        🤖 行政 Copilot 与个人手帐 (Part 2)
+                        🤖 行政 Copilot 与日历手帐 (Part 2)
                     </button>
                 </div>
 
@@ -64,7 +64,7 @@
                     <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
                 </div>
 
-                <!-- 🌟 完美三合一导出按钮 -->
+                <!-- 导出按钮 -->
                 <button @click="exportExcelWithSheetJS" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
                     📥 <span x-text="lang === 'zh' ? '导出完美三合一 Excel 报表' : 'Export 3-Tab Excel Hub'"></span>
                 </button>
@@ -135,7 +135,7 @@
                         </div>
                         <div class="sm:col-span-2 lg:col-span-4 flex justify-end mt-2">
                             <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-lg text-sm transition shadow">
-                                💾 <span x-text="lang === 'zh' ? '保存并自动按日期升序排列' : 'Save & Auto-sort by Date'"></span>
+                                💾 保存并自动按日期升序排列
                             </button>
                         </div>
                     </form>
@@ -242,121 +242,124 @@
 
         </div>
 
-        <!-- PART 2: 行政超级 COPILOT 与个人指挥台（带年月筛选与完整看板） -->
+        <!-- PART 2: 行政超级 COPILOT 与 Full Calendar 日历日记账台 -->
         <div x-show="currentPart === 'copilot'" class="space-y-6">
             
-            <!-- 顶栏：数据与报表 + 年月筛选器 -->
+            <!-- 顶栏：精准日期选择器 -->
             <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                     <h2 class="text-base font-bold text-white flex items-center gap-2">
-                        📊 数据与报表 (Executive Summary)
+                        📅 行政 Copilot 日历日程与手帐中心
                     </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">支持按年月检索历史任务完成度与私人消费明细</p>
+                    <p class="text-xs text-slate-400 mt-0.5">选择任意一天，精准追溯和管理当天的所有待办事项与私账消费流水</p>
                 </div>
-                <!-- 年月选择器：可查任意历史月份 -->
-                <div class="flex items-center gap-2">
-                    <span class="text-xs text-slate-300">选择月份：</span>
-                    <input type="month" x-model="selectedYearMonth" class="bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-xs text-amber-400 font-mono focus:outline-none">
+                <!-- 核心日历日期选择器 -->
+                <div class="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-lg border border-slate-600">
+                    <span class="text-xs text-slate-300">📅 查阅日期：</span>
+                    <input type="date" x-model="selectedDate" class="bg-transparent text-amber-400 font-mono font-bold text-sm focus:outline-none">
+                    <button @click="selectedDate = new Date().toISOString().split('T')[0]" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-blue-300 px-2 py-1 rounded border border-slate-600">今天</button>
                 </div>
             </div>
 
-            <!-- 四大核心指标卡片 -->
+            <!-- 当日核心摘要大卡片 -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
-                    <p class="text-xs text-slate-400">任务完成情况</p>
-                    <p class="text-2xl font-bold text-white mt-1 font-mono" x-text="completedTasksCount + ' / ' + filteredTasks.length"></p>
+                    <p class="text-xs text-slate-400">所选日期任务完成</p>
+                    <p class="text-2xl font-bold text-white mt-1 font-mono" x-text="selectedDateCompletedCount + ' / ' + selectedDateTasks.length"></p>
                 </div>
                 <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
-                    <p class="text-xs text-slate-400">待办优选项</p>
-                    <p class="text-2xl font-bold text-amber-400 mt-1 font-mono" x-text="pendingTasksCount"></p>
+                    <p class="text-xs text-slate-400">当天待办剩余</p>
+                    <p class="text-2xl font-bold text-amber-400 mt-1 font-mono" x-text="selectedDatePendingCount"></p>
                 </div>
                 <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
-                    <p class="text-xs text-slate-400">当月私账记录数</p>
-                    <p class="text-2xl font-bold text-blue-400 mt-1 font-mono" x-text="filteredPrivateExpenses.length + ' 笔'"></p>
+                    <p class="text-xs text-slate-400">当天私账记账笔数</p>
+                    <p class="text-2xl font-bold text-blue-400 mt-1 font-mono" x-text="selectedDatePrivateExpenses.length + ' 笔'"></p>
                 </div>
                 <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
-                    <p class="text-xs text-slate-400">工作完整度</p>
-                    <p class="text-2xl font-bold text-emerald-400 mt-1 font-mono" x-text="taskCompletionRate + '%'"></p>
+                    <p class="text-xs text-slate-400">当天私账总消费</p>
+                    <p class="text-2xl font-bold text-emerald-400 mt-1 font-mono" x-text="'MYR ' + selectedDatePrivateTotal.toFixed(2)"></p>
                 </div>
             </div>
 
-            <!-- 详细内容管理区域：左侧待办日程，右侧私人消费手帐流水 -->
+            <!-- 左右双栏 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                <!-- 待办日程管理 -->
+                <!-- 1. 每日日程与待办清单 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
                     <div class="flex justify-between items-center">
                         <h3 class="font-semibold text-slate-200 text-sm flex items-center gap-2">
-                            <span>📅 日程与待办事项</span>
+                            <span>📝 日程清单 (<span x-text="selectedDate"></span>)</span>
                         </h3>
-                        <span class="text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded font-mono" x-text="selectedYearMonth"></span>
                     </div>
 
-                    <!-- 列表 -->
+                    <!-- 任务列表 -->
                     <ul class="space-y-2 text-xs max-h-60 overflow-y-auto">
-                        <template x-for="(task, i) in filteredTasks" :key="i">
+                        <template x-for="(task, i) in selectedDateTasks" :key="i">
                             <li class="flex items-center justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-700">
                                 <div class="flex items-center gap-2">
                                     <input type="checkbox" x-model="task.done" class="accent-amber-500">
                                     <span :class="task.done ? 'line-through text-slate-500' : 'text-slate-200'" x-text="task.text"></span>
                                 </div>
-                                <span class="text-[10px] text-slate-500 font-mono" x-text="task.date"></span>
+                                <button @click="deleteTask(task)" class="bg-red-950/50 border border-red-900 text-red-400 hover:text-red-300 px-2 py-1 rounded text-[11px] transition">删除</button>
                             </li>
                         </template>
-                        <template x-if="filteredTasks.length === 0">
-                            <p class="text-xs text-slate-500 text-center py-4">该月份暂无待办事项记录</p>
+                        <template x-if="selectedDateTasks.length === 0">
+                            <p class="text-xs text-slate-500 text-center py-6">这一天没有任何安排，点击下方添加新日程</p>
                         </template>
                     </ul>
 
                     <!-- 新增日程 -->
                     <div class="pt-2 border-t border-slate-700 space-y-2">
                         <div class="flex gap-2">
-                            <input type="text" x-model="newTaskText" placeholder="输入新的待办日程..." class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none" @keyup.enter="addTask">
-                            <input type="date" x-model="newTaskDate" class="bg-slate-700 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-200">
-                            <button @click="addTask" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs">添加</button>
+                            <input type="text" x-model="newTaskText" :placeholder="'添加 ' + selectedDate + ' 的日程...'" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none" @keyup.enter="addTask">
+                            <button @click="addTask" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded text-xs">添加</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- 私人消费与手帐明细 -->
+                <!-- 2. 每日私人消费手帐明细（含清晰的删除按钮） -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
                     <div class="flex justify-between items-center">
                         <h3 class="font-semibold text-slate-200 text-sm flex items-center gap-2">
-                            <span>☕ 本月私人消费手帐与明细</span>
+                            <span>☕ 私人消费手帐 (<span x-text="selectedDate"></span>)</span>
                         </h3>
-                        <span class="text-xs bg-amber-400 text-slate-950 font-bold px-2 py-0.5 rounded font-mono" x-text="'MYR ' + filteredPrivateTotal.toFixed(2)"></span>
+                        <span class="text-xs bg-amber-400 text-slate-950 font-bold px-2 py-0.5 rounded font-mono" x-text="'MYR ' + selectedDatePrivateTotal.toFixed(2)"></span>
                     </div>
 
-                    <!-- 明细流水列表 -->
+                    <!-- 消费流水列表 -->
                     <div class="space-y-2 max-h-60 overflow-y-auto text-xs">
-                        <template x-for="(pItem, i) in filteredPrivateExpenses" :key="i">
-                            <div class="flex justify-between items-center bg-slate-900 p-2.5 rounded border border-slate-700">
+                        <template x-for="(pItem, i) in selectedDatePrivateExpenses" :key="i">
+                            <div class="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-700">
                                 <div>
-                                    <p class="text-slate-200 font-medium" x-text="pItem.desc"></p>
-                                    <p class="text-[10px] text-slate-500 font-mono" x-text="pItem.date"></p>
+                                    <p class="text-slate-200 font-semibold" x-text="pItem.desc"></p>
+                                    <p class="text-[10px] text-slate-400 font-mono mt-0.5" x-text="pItem.date"></p>
                                 </div>
-                                <span class="text-amber-400 font-mono font-bold text-sm" x-text="'MYR ' + pItem.amount.toFixed(2)"></span>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-amber-400 font-mono font-bold text-sm" x-text="'MYR ' + Number(pItem.amount).toFixed(2)"></span>
+                                    <!-- 🌟 醒目的删除按钮 -->
+                                    <button @click="deletePrivateExpense(pItem)" class="bg-red-950/50 border border-red-900 text-red-400 hover:text-red-300 px-2.5 py-1 rounded text-[11px] transition">删除</button>
+                                </div>
                             </div>
                         </template>
-                        <template x-if="filteredPrivateExpenses.length === 0">
-                            <p class="text-xs text-slate-500 text-center py-4">这个月没有消费记录</p>
+                        <template x-if="selectedDatePrivateExpenses.length === 0">
+                            <p class="text-xs text-slate-500 text-center py-6">这一天没有私人消费记录</p>
                         </template>
                     </div>
 
-                    <!-- 新增私账明细 -->
+                    <!-- 新增私账 -->
                     <div class="pt-2 border-t border-slate-700 space-y-2">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <input type="text" x-model="privateForm.desc" placeholder="描述 (如: Beutea 0%糖)" class="sm:col-span-1 bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input type="text" x-model="privateForm.desc" placeholder="消费描述 (如: Beutea 0%糖)" class="bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
                             <input type="number" step="0.01" x-model.number="privateForm.amount" placeholder="金额 (MYR)" class="bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
-                            <input type="date" x-model="privateForm.date" class="bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
                         </div>
                         <div class="flex justify-end">
-                            <button @click="addPrivateExpense" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded text-xs">记录新开支</button>
+                            <button @click="addPrivateExpense" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded text-xs">记一笔到 <span x-text="selectedDate"></span></button>
                         </div>
                     </div>
                 </div>
 
             </div>
+
         </div>
 
     </main>
@@ -364,18 +367,15 @@
     <!-- 核心业务逻辑脚本 -->
     <script>
         function masterApp() {
-            // 获取当前年月默认值 (YYYY-MM)
-            const now = new Date();
-            const defaultYM = now.toISOString().slice(0, 7);
+            const todayStr = new Date().toISOString().split('T')[0];
 
             return {
                 currentPart: 'expenses',
                 subTab: 'master',
                 currentCompany: 'BSO',
                 lang: 'zh',
-                selectedYearMonth: defaultYM,
+                selectedDate: todayStr,
                 newTaskText: '',
-                newTaskDate: now.toISOString().split('T')[0],
                 fullCategoryList: [
                     'Office rental', 'Office Water', 'Office Electricity', 'Office Indah Water',
                     'Office Internet', 'Office Telephone Line', 'Office Additional Aircond Fee',
@@ -400,7 +400,7 @@
                     desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance',
                     category: 'Office rental', amount: 3000.00, remark: ''
                 },
-                privateForm: { desc: '', amount: '', date: now.toISOString().split('T')[0] },
+                privateForm: { desc: '', amount: '' },
                 database: {
                     'BSO': [
                         { month: 'January', building: 'Padang Victoria', unit: '27', invoiceDate: '2026-01-01', subDate: '', desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance', category: 'Office rental', amount: 3000.00, remark: '' },
@@ -447,27 +447,21 @@
                     return Object.keys(map).map(cat => ({ category: cat, count: map[cat].count, total: map[cat].total })).filter(r => r.total > 0);
                 },
 
-                // 筛选出符合当前选择年月的任务
-                get filteredTasks() {
-                    return this.todayTasks.filter(t => t.date && t.date.startsWith(this.selectedYearMonth));
+                get selectedDateTasks() {
+                    return this.todayTasks.filter(t => t.date === this.selectedDate);
                 },
-                get completedTasksCount() {
-                    return this.filteredTasks.filter(t => t.done).length;
+                get selectedDateCompletedCount() {
+                    return this.selectedDateTasks.filter(t => t.done).length;
                 },
-                get pendingTasksCount() {
-                    return this.filteredTasks.filter(t => !t.done).length;
-                },
-                get taskCompletionRate() {
-                    if (this.filteredTasks.length === 0) return 0;
-                    return Math.round((this.completedTasksCount / this.filteredTasks.length) * 100);
+                get selectedDatePendingCount() {
+                    return this.selectedDateTasks.filter(t => !t.done).length;
                 },
 
-                // 筛选出符合当前选择年月的私人消费明细
-                get filteredPrivateExpenses() {
-                    return this.privateExpenses.filter(p => p.date && p.date.startsWith(this.selectedYearMonth));
+                get selectedDatePrivateExpenses() {
+                    return this.privateExpenses.filter(p => p.date === this.selectedDate);
                 },
-                get filteredPrivateTotal() {
-                    return this.filteredPrivateExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+                get selectedDatePrivateTotal() {
+                    return this.selectedDatePrivateExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
                 },
 
                 autoCategorize() {
@@ -497,29 +491,35 @@
                         this.todayTasks.push({
                             text: this.newTaskText.trim(),
                             done: false,
-                            date: this.newTaskDate || this.selectedYearMonth + '-01'
+                            date: this.selectedDate
                         });
                         this.newTaskText = '';
                     }
+                },
+                deleteTask(task) {
+                    let idx = this.todayTasks.indexOf(task);
+                    if (idx > -1) this.todayTasks.splice(idx, 1);
                 },
                 addPrivateExpense() {
                     if (this.privateForm.desc && this.privateForm.amount) {
                         this.privateExpenses.push({
                             desc: this.privateForm.desc,
                             amount: Number(this.privateForm.amount),
-                            date: this.privateForm.date || new Date().toISOString().split('T')[0]
+                            date: this.selectedDate
                         });
                         this.privateForm.desc = '';
                         this.privateForm.amount = '';
                     }
                 },
+                deletePrivateExpense(pItem) {
+                    let idx = this.privateExpenses.indexOf(pItem);
+                    if (idx > -1) this.privateExpenses.splice(idx, 1);
+                },
 
-                // 🌟 使用 SheetJS 现场生成包含 Master Listing、Monthly Report、Summary 的完美多 Tab 报表
                 exportExcelWithSheetJS() {
                     try {
                         let wb = XLSX.utils.book_new();
 
-                        // 1. Master Listing
                         let masterData = [
                             ["ADMIN EXPENSES MASTER LISTING - " + this.currentCompany],
                             [""],
@@ -537,7 +537,6 @@
                         let wsMaster = XLSX.utils.aoa_to_sheet(masterData);
                         XLSX.utils.book_append_sheet(wb, wsMaster, "Master Listing");
 
-                        // 2. Monthly Report
                         let monthlyData = [
                             ["ADMIN MONTHLY SPENDING EXPENSES - " + this.currentCompany],
                             [""],
@@ -549,7 +548,6 @@
                         let wsMonthly = XLSX.utils.aoa_to_sheet(monthlyData);
                         XLSX.utils.book_append_sheet(wb, wsMonthly, "Monthly Report");
 
-                        // 3. Summary
                         let summaryData = [
                             ["MANAGER REVIEW SUMMARY REPORT"],
                             [""],
