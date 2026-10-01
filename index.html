@@ -21,7 +21,6 @@
                 </div>
             </div>
 
-            <!-- 双 Part 切换与语言选择 -->
             <div class="flex items-center gap-3">
                 <div class="flex items-center bg-[#134074] p-1 rounded-xl border border-blue-800">
                     <button @click="currentPart = 'expenses'" :class="currentPart === 'expenses' ? 'bg-[#001D3D] text-amber-400 font-bold shadow' : 'text-blue-200 hover:text-white'" class="px-4 py-1.5 rounded-lg text-xs transition">
@@ -62,7 +61,7 @@
                         📥 下载 Master Listing
                     </button>
                     <button @click="exportSingleTable('Monthly')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow">
-                        📥 下载 Monthly Report
+                        📥 下载 Monthly Report (含预算)
                     </button>
                     <button @click="exportSingleTable('Summary')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-2 rounded-lg transition shadow">
                         📥 下载 Summary 汇报
@@ -211,11 +210,11 @@
                 </div>
             </div>
 
-            <!-- ④ 分类汇总（可直接复制发给 Stakeholder / Email Review） -->
+            <!-- ④ 分类汇总（含预算对比） -->
             <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
-                        ④ 分类汇总 (可直接复制发给 Stakeholder / Top Management Review)
+                        ④ Monthly Report 预算与实际开支对比 (Stakeholder Review)
                     </h2>
                     <button @click="copySummaryText" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition">
                         📋 复制汇总文字用于 Email 发送
@@ -228,7 +227,9 @@
                             <tr class="text-slate-400 border-b border-slate-800">
                                 <th class="pb-2">CATEGORY DESCRIPTION</th>
                                 <th class="pb-2 text-center">TRANSACTION COUNT</th>
-                                <th class="pb-2 text-right">TOTAL AMOUNT (MYR)</th>
+                                <th class="pb-2 text-right">BUDGET (MYR)</th>
+                                <th class="pb-2 text-right">ACTUAL USAGE (MYR)</th>
+                                <th class="pb-2 text-right">VARIANCE (MYR)</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800">
@@ -236,7 +237,9 @@
                                 <tr>
                                     <td class="py-2 text-slate-200" x-text="row.category"></td>
                                     <td class="py-2 text-center font-mono" x-text="row.count"></td>
+                                    <td class="py-2 text-right font-mono text-slate-300" x-text="'MYR ' + row.budget.toFixed(2)"></td>
                                     <td class="py-2 text-right font-mono font-bold text-amber-300" x-text="'MYR ' + row.total.toFixed(2)"></td>
+                                    <td class="py-2 text-right font-mono font-semibold" :class="row.variance >= 0 ? 'text-emerald-400' : 'text-red-400'" x-text="'MYR ' + row.variance.toFixed(2)"></td>
                                 </tr>
                             </template>
                         </tbody>
@@ -246,9 +249,8 @@
 
         </div>
 
-        <!-- PART 2: 行政超级 COPILOT 与 Full Calendar 日历日记账台 -->
+        <!-- PART 2: 行政超级 COPILOT -->
         <div x-show="currentPart === 'copilot'" class="space-y-6">
-            
             <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                     <h2 class="text-base font-bold text-white flex items-center gap-2">
@@ -284,7 +286,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
                 <!-- 1. 每日日程与待办清单 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
                     <h3 class="font-semibold text-slate-200 text-sm">📝 日程清单 (<span x-text="selectedDate"></span>)</h3>
@@ -329,14 +330,12 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
 
     </main>
 
-    <!-- 脚本逻辑 -->
+    <!-- 核心逻辑脚本 -->
     <script>
         function masterApp() {
             const todayStr = new Date().toISOString().split('T')[0];
@@ -366,6 +365,15 @@
                     'Printing Expenses', 'Praying Expenses', 'Toll & Parking', 'Petrol',
                     'Vehiche Repair & Maintenance', 'Roadtax & Insurance'
                 ],
+                // 预设各项分类的基准预算（可根据实际情况调整）
+                categoryBudgets: {
+                    'Office rental': 45000,
+                    'Warehouse': 2000,
+                    'Hostel Rental': 8000,
+                    'Office Electricity': 1000,
+                    'Office Water': 300,
+                    'Office Internet': 500
+                },
                 form: {
                     month: 'January', building: 'The Bousteador', unit: '8.4', invoiceDate: todayStr, subDate: todayStr,
                     desc: 'Monthly office electricity', payable: 'TNB', invoiceNo: '-', payMode: 'Payment Application',
@@ -403,7 +411,18 @@
                         map[cat].count += 1;
                         map[cat].total += Number(item.amount) || 0;
                     });
-                    return Object.keys(map).map(cat => ({ category: cat, count: map[cat].count, total: map[cat].total })).filter(r => r.total > 0);
+                    return Object.keys(map).map(cat => {
+                        let budget = this.categoryBudgets[cat] || 0;
+                        let total = map[cat].total;
+                        let variance = budget - total; // 预算减去实际开支（正数表示节省，负数表示超支）
+                        return {
+                            category: cat,
+                            count: map[cat].count,
+                            budget: budget,
+                            total: total,
+                            variance: variance
+                        };
+                    });
                 },
 
                 simulateAIOCR() {
@@ -425,17 +444,17 @@
                     if (realIdx !== -1) this.database[this.currentCompany].splice(realIdx, 1);
                 },
 
-                // 📋 复制汇总文字给 Top Management Review
+                // 📋 复制汇总文字给 Top Management Review（包含 Budget 和 Variance）
                 copySummaryText() {
-                    let text = `【Admin Expenses Summary - ${this.currentCompany}】\n`;
+                    let text = `【Monthly Report & Budget Summary - ${this.currentCompany}】\n`;
                     this.monthlyReportData.forEach(r => {
-                        text += `- ${r.category}: ${r.count} transactions, Total MYR ${r.total.toFixed(2)}\n`;
+                        text += `- ${r.category}: Budget MYR ${r.budget.toFixed(2)} | Actual MYR ${r.total.toFixed(2)} | Variance MYR ${r.variance.toFixed(2)}\n`;
                     });
                     navigator.clipboard.writeText(text);
-                    alert("汇总文字已成功复制到剪贴板，可直接粘贴到 Email 发送给 Management！");
+                    alert("包含预算对比的汇总文字已成功复制到剪贴板，可直接粘贴到 Email 发送！");
                 },
 
-                // 📥 分别独立导出 Master Listing, Monthly Report, Summary
+                // 📥 分别独立导出（Monthly Report 现在包含 Budget 与 Actual Usage）
                 exportSingleTable(type) {
                     let wb = XLSX.utils.book_new();
                     let ws;
@@ -457,23 +476,26 @@
                         XLSX.writeFile(wb, `${this.currentCompany}_Master_Listing.xlsx`);
                     } else if (type === 'Monthly') {
                         let data = [
-                            ["ADMIN MONTHLY SPENDING EXPENSES - " + this.currentCompany],
+                            ["ADMIN MONTHLY REPORT & BUDGET COMPARISON - " + this.currentCompany],
                             [""],
-                            ["CATEGORY DESCRIPTION", "TRANSACTION COUNT", "TOTAL AMOUNT (MYR)"]
+                            ["CATEGORY DESCRIPTION", "TRANSACTION COUNT", "BUDGET (MYR)", "ACTUAL USAGE (MYR)", "VARIANCE (MYR)"]
                         ];
                         this.monthlyReportData.forEach(r => {
-                            data.push([r.category, r.count, r.total]);
+                            data.push([r.category, r.count, r.budget, r.total, r.variance]);
                         });
                         ws = XLSX.utils.aoa_to_sheet(data);
                         XLSX.utils.book_append_sheet(wb, ws, "Monthly Report");
-                        XLSX.writeFile(wb, `${this.currentCompany}_Monthly_Report.xlsx`);
+                        XLSX.writeFile(wb, `${this.currentCompany}_Monthly_Report_With_Budget.xlsx`);
                     } else if (type === 'Summary') {
-                        let totalAmount = this.filteredExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+                        let totalBudget = this.monthlyReportData.reduce((sum, r) => sum + r.budget, 0);
+                        let totalActual = this.monthlyReportData.reduce((sum, r) => sum + r.total, 0);
                         let data = [
                             ["MANAGER REVIEW SUMMARY REPORT - " + this.currentCompany],
                             [""],
                             ["Total Expense Records:", this.filteredExpenses.length],
-                            ["Total Amount (MYR):", totalAmount.toFixed(2)],
+                            ["Total Budget (MYR):", totalBudget.toFixed(2)],
+                            ["Total Actual Usage (MYR):", totalActual.toFixed(2)],
+                            ["Total Variance (MYR):", (totalBudget - totalActual).toFixed(2)],
                             ["Status:", "Ready for Management Review"]
                         ];
                         ws = XLSX.utils.aoa_to_sheet(data);
