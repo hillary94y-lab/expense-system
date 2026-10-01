@@ -6,9 +6,8 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- 引入 ExcelJS 与 FileSaver 库，完美保留模板格式与三合一 Tab -->
-    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <!-- 引入 SheetJS 核心库，确保多 Tab 完美生成 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
 
@@ -65,9 +64,9 @@
                     <button @click="subTab = 'summary'" :class="subTab === 'summary' ? 'bg-[#134074] text-amber-400 font-bold' : 'text-blue-200 hover:text-white'" class="px-3 py-1 rounded transition">Manager Summary</button>
                 </div>
 
-                <!-- 🌟 三合一高级模板同步导出按钮 -->
-                <button @click="exportWithTemplateAndData" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
-                    📥 <span x-text="lang === 'zh' ? '导出完美三合一模板（实时同步 Master Listing）' : 'Export 3-Tab Template Hub'"></span>
+                <!-- 🌟 完美三合一导出按钮 -->
+                <button @click="exportExcelWithSheetJS" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
+                    📥 <span x-text="lang === 'zh' ? '导出完美三合一 Excel 报表' : 'Export 3-Tab Excel Hub'"></span>
                 </button>
             </div>
 
@@ -243,67 +242,120 @@
 
         </div>
 
-        <!-- PART 2: 行政超级 COPILOT 与个人指挥台 -->
+        <!-- PART 2: 行政超级 COPILOT 与个人指挥台（带年月筛选与完整看板） -->
         <div x-show="currentPart === 'copilot'" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- 待办任务 -->
-                <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
-                    <h3 class="font-semibold text-slate-200 text-sm flex items-center justify-between">
-                        <span>📅 今天要处理点什么？</span>
-                        <span class="text-xs bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded">今日</span>
-                    </h3>
-                    <ul class="space-y-2 text-xs max-h-36 overflow-y-auto">
-                        <template x-for="(task, i) in todayTasks" :key="i">
+            
+            <!-- 顶栏：数据与报表 + 年月筛选器 -->
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        📊 数据与报表 (Executive Summary)
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">支持按年月检索历史任务完成度与私人消费明细</p>
+                </div>
+                <!-- 年月选择器：可查任意历史月份 -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-300">选择月份：</span>
+                    <input type="month" x-model="selectedYearMonth" class="bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-xs text-amber-400 font-mono focus:outline-none">
+                </div>
+            </div>
+
+            <!-- 四大核心指标卡片 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
+                    <p class="text-xs text-slate-400">任务完成情况</p>
+                    <p class="text-2xl font-bold text-white mt-1 font-mono" x-text="completedTasksCount + ' / ' + filteredTasks.length"></p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
+                    <p class="text-xs text-slate-400">待办优选项</p>
+                    <p class="text-2xl font-bold text-amber-400 mt-1 font-mono" x-text="pendingTasksCount"></p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
+                    <p class="text-xs text-slate-400">当月私账记录数</p>
+                    <p class="text-2xl font-bold text-blue-400 mt-1 font-mono" x-text="filteredPrivateExpenses.length + ' 笔'"></p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
+                    <p class="text-xs text-slate-400">工作完整度</p>
+                    <p class="text-2xl font-bold text-emerald-400 mt-1 font-mono" x-text="taskCompletionRate + '%'"></p>
+                </div>
+            </div>
+
+            <!-- 详细内容管理区域：左侧待办日程，右侧私人消费手帐流水 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- 待办日程管理 -->
+                <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-semibold text-slate-200 text-sm flex items-center gap-2">
+                            <span>📅 日程与待办事项</span>
+                        </h3>
+                        <span class="text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded font-mono" x-text="selectedYearMonth"></span>
+                    </div>
+
+                    <!-- 列表 -->
+                    <ul class="space-y-2 text-xs max-h-60 overflow-y-auto">
+                        <template x-for="(task, i) in filteredTasks" :key="i">
                             <li class="flex items-center justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-700">
-                                <span :class="task.done ? 'line-through text-slate-500' : 'text-slate-200'" x-text="task.text"></span>
-                                <input type="checkbox" x-model="task.done" class="accent-amber-500">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" x-model="task.done" class="accent-amber-500">
+                                    <span :class="task.done ? 'line-through text-slate-500' : 'text-slate-200'" x-text="task.text"></span>
+                                </div>
+                                <span class="text-[10px] text-slate-500 font-mono" x-text="task.date"></span>
                             </li>
                         </template>
+                        <template x-if="filteredTasks.length === 0">
+                            <p class="text-xs text-slate-500 text-center py-4">该月份暂无待办事项记录</p>
+                        </template>
                     </ul>
-                    <!-- 新增待办输入框 -->
+
+                    <!-- 新增日程 -->
                     <div class="pt-2 border-t border-slate-700 space-y-2">
                         <div class="flex gap-2">
-                            <input type="text" x-model="newTaskText" placeholder="输入新的待办日程..." class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-400" @keyup.enter="addTask">
-                            <button @click="addTask" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition">添加</button>
+                            <input type="text" x-model="newTaskText" placeholder="输入新的待办日程..." class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none" @keyup.enter="addTask">
+                            <input type="date" x-model="newTaskDate" class="bg-slate-700 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-200">
+                            <button @click="addTask" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs">添加</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- 每日私人消费与手帐 -->
-                <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
-                    <h3 class="font-semibold text-slate-200 text-sm">☕ 每日私人消费与手帐</h3>
-                    <div class="space-y-2 max-h-36 overflow-y-auto text-xs">
-                        <template x-for="(pItem, i) in privateExpenses" :key="i">
-                            <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-700">
-                                <span class="text-slate-200" x-text="pItem.desc"></span>
-                                <span class="text-amber-400 font-mono font-bold" x-text="'MYR ' + pItem.amount.toFixed(2)"></span>
+                <!-- 私人消费与手帐明细 -->
+                <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-semibold text-slate-200 text-sm flex items-center gap-2">
+                            <span>☕ 本月私人消费手帐与明细</span>
+                        </h3>
+                        <span class="text-xs bg-amber-400 text-slate-950 font-bold px-2 py-0.5 rounded font-mono" x-text="'MYR ' + filteredPrivateTotal.toFixed(2)"></span>
+                    </div>
+
+                    <!-- 明细流水列表 -->
+                    <div class="space-y-2 max-h-60 overflow-y-auto text-xs">
+                        <template x-for="(pItem, i) in filteredPrivateExpenses" :key="i">
+                            <div class="flex justify-between items-center bg-slate-900 p-2.5 rounded border border-slate-700">
+                                <div>
+                                    <p class="text-slate-200 font-medium" x-text="pItem.desc"></p>
+                                    <p class="text-[10px] text-slate-500 font-mono" x-text="pItem.date"></p>
+                                </div>
+                                <span class="text-amber-400 font-mono font-bold text-sm" x-text="'MYR ' + pItem.amount.toFixed(2)"></span>
                             </div>
                         </template>
+                        <template x-if="filteredPrivateExpenses.length === 0">
+                            <p class="text-xs text-slate-500 text-center py-4">这个月没有消费记录</p>
+                        </template>
                     </div>
-                    <!-- 新增私账输入框 -->
+
+                    <!-- 新增私账明细 -->
                     <div class="pt-2 border-t border-slate-700 space-y-2">
-                        <input type="text" x-model="privateForm.desc" placeholder="记录消费描述 (如: Beutea)" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1 text-xs text-slate-200">
-                        <div class="flex gap-2">
-                            <input type="number" step="0.01" x-model.number="privateForm.amount" placeholder="金额" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1 text-xs text-slate-200">
-                            <button @click="addPrivateExpense" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1 rounded text-xs">添加</button>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <input type="text" x-model="privateForm.desc" placeholder="描述 (如: Beutea 0%糖)" class="sm:col-span-1 bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
+                            <input type="number" step="0.01" x-model.number="privateForm.amount" placeholder="金额 (MYR)" class="bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
+                            <input type="date" x-model="privateForm.date" class="bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-slate-200">
+                        </div>
+                        <div class="flex justify-end">
+                            <button @click="addPrivateExpense" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded text-xs">记录新开支</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- 每日总览与数据报表 -->
-                <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
-                    <h3 class="font-semibold text-slate-200 text-sm">📊 每日总览与数据报表</h3>
-                    <div class="space-y-2 text-xs text-slate-300">
-                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between">
-                            <span>公司开支总笔数</span>
-                            <span class="font-bold text-amber-400" x-text="filteredExpenses.length + ' 笔'"></span>
-                        </div>
-                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between">
-                            <span>私人手帐总计</span>
-                            <span class="font-bold text-amber-400" x-text="'MYR ' + privateExpensesTotal.toFixed(2)"></span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -312,12 +364,18 @@
     <!-- 核心业务逻辑脚本 -->
     <script>
         function masterApp() {
+            // 获取当前年月默认值 (YYYY-MM)
+            const now = new Date();
+            const defaultYM = now.toISOString().slice(0, 7);
+
             return {
                 currentPart: 'expenses',
                 subTab: 'master',
                 currentCompany: 'BSO',
                 lang: 'zh',
+                selectedYearMonth: defaultYM,
                 newTaskText: '',
+                newTaskDate: now.toISOString().split('T')[0],
                 fullCategoryList: [
                     'Office rental', 'Office Water', 'Office Electricity', 'Office Indah Water',
                     'Office Internet', 'Office Telephone Line', 'Office Additional Aircond Fee',
@@ -342,7 +400,7 @@
                     desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance',
                     category: 'Office rental', amount: 3000.00, remark: ''
                 },
-                privateForm: { desc: '', amount: '' },
+                privateForm: { desc: '', amount: '', date: now.toISOString().split('T')[0] },
                 database: {
                     'BSO': [
                         { month: 'January', building: 'Padang Victoria', unit: '27', invoiceDate: '2026-01-01', subDate: '', desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance', category: 'Office rental', amount: 3000.00, remark: '' },
@@ -354,8 +412,13 @@
                     ],
                     'BKBP': [], 'BRIC': [], 'BSPD': []
                 },
-                todayTasks: [{ text: '下载 8月 办公室水电费账单并核对', done: false }],
-                privateExpenses: [{ desc: 'Beutea (0%糖)', amount: 12.90, date: '2026-10-01' }],
+                todayTasks: [
+                    { text: '下载 8月 办公室水电费账单并核对', done: false, date: '2026-08-15' },
+                    { text: '提交 10月 租金付款申请', done: true, date: '2026-10-01' }
+                ],
+                privateExpenses: [
+                    { desc: 'Beutea (0%糖)', amount: 12.90, date: '2026-10-01' }
+                ],
                 
                 get filteredExpenses() { return this.database[this.currentCompany] || []; },
                 get sortedExpenses() {
@@ -383,9 +446,30 @@
                     });
                     return Object.keys(map).map(cat => ({ category: cat, count: map[cat].count, total: map[cat].total })).filter(r => r.total > 0);
                 },
-                get privateExpensesTotal() {
-                    return this.privateExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+
+                // 筛选出符合当前选择年月的任务
+                get filteredTasks() {
+                    return this.todayTasks.filter(t => t.date && t.date.startsWith(this.selectedYearMonth));
                 },
+                get completedTasksCount() {
+                    return this.filteredTasks.filter(t => t.done).length;
+                },
+                get pendingTasksCount() {
+                    return this.filteredTasks.filter(t => !t.done).length;
+                },
+                get taskCompletionRate() {
+                    if (this.filteredTasks.length === 0) return 0;
+                    return Math.round((this.completedTasksCount / this.filteredTasks.length) * 100);
+                },
+
+                // 筛选出符合当前选择年月的私人消费明细
+                get filteredPrivateExpenses() {
+                    return this.privateExpenses.filter(p => p.date && p.date.startsWith(this.selectedYearMonth));
+                },
+                get filteredPrivateTotal() {
+                    return this.filteredPrivateExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+                },
+
                 autoCategorize() {
                     let text = this.form.desc.toLowerCase();
                     if (text.includes('rent')) this.form.category = 'Office rental';
@@ -410,7 +494,11 @@
                 },
                 addTask() {
                     if (this.newTaskText && this.newTaskText.trim() !== '') {
-                        this.todayTasks.push({ text: this.newTaskText.trim(), done: false });
+                        this.todayTasks.push({
+                            text: this.newTaskText.trim(),
+                            done: false,
+                            date: this.newTaskDate || this.selectedYearMonth + '-01'
+                        });
                         this.newTaskText = '';
                     }
                 },
@@ -419,60 +507,61 @@
                         this.privateExpenses.push({
                             desc: this.privateForm.desc,
                             amount: Number(this.privateForm.amount),
-                            date: new Date().toISOString().split('T')[0]
+                            date: this.privateForm.date || new Date().toISOString().split('T')[0]
                         });
                         this.privateForm.desc = '';
                         this.privateForm.amount = '';
                     }
                 },
-                // 🌟 完美结合高级模板排版与 Master Listing 动态填充
-                async exportWithTemplateAndData() {
+
+                // 🌟 使用 SheetJS 现场生成包含 Master Listing、Monthly Report、Summary 的完美多 Tab 报表
+                exportExcelWithSheetJS() {
                     try {
-                        let response = await fetch('template.xlsx');
-                        if (!response.ok) throw new Error("未找到 template.xlsx 文件，请确认已上传到 GitHub 仓库根目录。");
-                        let arrayBuffer = await response.arrayBuffer();
+                        let wb = XLSX.utils.book_new();
 
-                        let workbook = new ExcelJS.Workbook();
-                        await workbook.xlsx.load(arrayBuffer);
-
-                        // 精准锁定 Master Listing 工作表
-                        let worksheet = workbook.worksheets.find(ws => {
-                            let name = ws.name.toLowerCase();
-                            return name.includes('master') || name.includes('listing') || name.includes('明细');
-                        }) || workbook.worksheets[0];
-
-                        // 1. 清空旧数据行（从第 5 行到第 100 行）
-                        for (let r = 5; r <= 100; r++) {
-                            ['A','B','C','D','E','F','G','H','I','J','K','L'].forEach(col => {
-                                let cell = worksheet.getCell(`${col}${r}`);
-                                cell.value = null;
-                            });
-                        }
-
-                        // 2. 写入当前公司的最新排序开支数据（从第 5 行开始向下填充）
-                        let itemsToWrite = this.sortedExpenses;
-
-                        itemsToWrite.forEach((item, index) => {
-                            let rowNum = 5 + index;
-
-                            worksheet.getCell(`A${rowNum}`).value = item.month || '';
-                            worksheet.getCell(`B${rowNum}`).value = item.building || '';
-                            worksheet.getCell(`C${rowNum}`).value = item.unit || '';
-                            worksheet.getCell(`D${rowNum}`).value = item.invoiceDate || '待核实';
-                            worksheet.getCell(`E${rowNum}`).value = item.subDate || '';
-                            worksheet.getCell(`F${rowNum}`).value = item.desc || '';
-                            worksheet.getCell(`G${rowNum}`).value = item.payable || '';
-                            worksheet.getCell(`H${rowNum}`).value = item.invoiceNo || '';
-                            worksheet.getCell(`I${rowNum}`).value = item.payMode || '';
-                            worksheet.getCell(`J${rowNum}`).value = item.category || '';
-                            worksheet.getCell(`K${rowNum}`).value = item.amount !== '' ? Number(item.amount) : '待核实';
-                            worksheet.getCell(`L${rowNum}`).value = item.remark || '';
+                        // 1. Master Listing
+                        let masterData = [
+                            ["ADMIN EXPENSES MASTER LISTING - " + this.currentCompany],
+                            [""],
+                            [""],
+                            ["Month", "Building", "Office/Unit", "Invoice Date", "Dingtalk Sub. Date", "Description", "Payable Name", "Invoice No.", "Payment Mode", "Expenses Category", "Amount (MYR)", "Remarks"]
+                        ];
+                        this.sortedExpenses.forEach(item => {
+                            masterData.push([
+                                item.month || '', item.building || '', item.unit || '',
+                                item.invoiceDate || '待核实', item.subDate || '', item.desc || '',
+                                item.payable || '', item.invoiceNo || '', item.payMode || '',
+                                item.category || '', item.amount !== '' ? Number(item.amount) : '待核实', item.remark || ''
+                            ]);
                         });
+                        let wsMaster = XLSX.utils.aoa_to_sheet(masterData);
+                        XLSX.utils.book_append_sheet(wb, wsMaster, "Master Listing");
 
-                        // 3. 导出保留了完整三合一样式、边框、公式的 Excel 报表
-                        let buffer = await workbook.xlsx.writeBuffer();
-                        let blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                        saveAs(blob, `${this.currentCompany}_Admin_Expenses_Executive_Hub.xlsx`);
+                        // 2. Monthly Report
+                        let monthlyData = [
+                            ["ADMIN MONTHLY SPENDING EXPENSES - " + this.currentCompany],
+                            [""],
+                            ["CATEGORY DESCRIPTION", "TRANSACTION COUNT", "TOTAL AMOUNT (MYR)"]
+                        ];
+                        this.monthlyReportData.forEach(row => {
+                            monthlyData.push([row.category, row.count, row.total]);
+                        });
+                        let wsMonthly = XLSX.utils.aoa_to_sheet(monthlyData);
+                        XLSX.utils.book_append_sheet(wb, wsMonthly, "Monthly Report");
+
+                        // 3. Summary
+                        let summaryData = [
+                            ["MANAGER REVIEW SUMMARY REPORT"],
+                            [""],
+                            ["Entity Executive Briefing:", this.currentCompany],
+                            ["总开支概览 (MYR):", this.totalAmountFormatted],
+                            ["有效单据总笔数:", this.filteredExpenses.length],
+                            ["待核实异常笔数:", this.pendingVerifyCount]
+                        ];
+                        let wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+                        XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
+
+                        XLSX.writeFile(wb, `${this.currentCompany}_Admin_Expenses_Executive_Hub.xlsx`);
                     } catch (err) {
                         alert("导出失败: " + err.message);
                     }
