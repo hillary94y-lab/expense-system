@@ -49,10 +49,10 @@
                 <div class="flex items-center gap-3">
                     <span class="text-sm font-semibold text-white">当前管理公司：</span>
                     <select x-model="currentCompany" class="bg-[#0B2545] border border-blue-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400">
-                        <option value="BKBP">Black Knight BPO (BKBP)</option>
+                        <option value="BSPD">Paydaes Sdn Bhd (BSPD - 专享12个月矩阵报表)</option>
                         <option value="BSO">BS One Management (BSO)</option>
+                        <option value="BKBP">Black Knight BPO (BKBP)</option>
                         <option value="BRIC">Bricstar Sdn Bhd (BRIC)</option>
-                        <option value="BSPD">Paydaes Sdn Bhd (BSPD)</option>
                     </select>
                 </div>
 
@@ -73,13 +73,12 @@
                 </div>
             </div>
 
-            <!-- ① 上传收据与AI识别区域（🌟 已支持所有文件格式） -->
+            <!-- ① 上传收据与AI识别区域 -->
             <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
                 <h2 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
                     ① 上传收据 / 发票 (支持所有格式，AI 自动识别)
                 </h2>
                 <label class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-amber-400 transition cursor-pointer bg-slate-900/50 block">
-                    <!-- 不限制 accept，支持 PDF, Word, Excel, 图片, TXT 等任意格式 -->
                     <input type="file" class="hidden" @change="handleFileUpload">
                     <div class="space-y-1">
                         <span class="text-2xl">📁</span>
@@ -215,18 +214,75 @@
                 </div>
             </div>
 
-            <!-- ④ 分类汇总（含预算对比） -->
+            <!-- ④ Monthly Report: 若为 BSPD 则显示 12个月大矩阵，其他实体显示标准简表 -->
             <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
-                        ④ Monthly Report 预算与实际开支对比 (Stakeholder Review)
+                        ④ Monthly Report 预算与实际开支对比 (<span x-text="currentCompany"></span> Stakeholder Review)
                     </h2>
                     <button @click="copySummaryText" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition">
                         📋 复制汇总文字用于 Email 发送
                     </button>
                 </div>
                 
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 overflow-x-auto text-xs">
+                <!-- BSPD 专享：12 个月大矩阵报表 -->
+                <div x-show="currentCompany === 'BSPD'" class="overflow-x-auto text-[11px]">
+                    <table class="w-full border-collapse text-center">
+                        <thead>
+                            <tr class="bg-amber-500 text-slate-950 font-bold">
+                                <th class="p-2 border border-slate-700 text-left">COMPANY</th>
+                                <th class="p-2 border border-slate-700 text-left">DESCRIPTION</th>
+                                <template x-for="m in monthsList">
+                                    <th colspan="2" class="p-2 border border-slate-700 uppercase" x-text="m"></th>
+                                </template>
+                            </tr>
+                            <tr class="bg-slate-900 text-amber-400">
+                                <th class="p-1 border border-slate-700"></th>
+                                <th class="p-1 border border-slate-700"></th>
+                                <template x-for="m in monthsList">
+                                    <template x-for="type in ['BUDGET', 'ACTUAL']">
+                                        <th class="p-1 border border-slate-700 text-[10px]" x-text="type"></th>
+                                    </template>
+                                </template>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700 bg-slate-900/50">
+                            <template x-for="catGroup in paydaesCategories" :key="catGroup.name">
+                                <tr>
+                                    <td class="p-2 border border-slate-700 font-bold text-left bg-slate-900" x-text="currentCompany"></td>
+                                    <td class="p-2 border border-slate-700 font-medium text-left text-slate-200" x-text="catGroup.name"></td>
+                                    <template x-for="m in monthsList">
+                                        <template x-for="type in ['BUDGET', 'ACTUAL']">
+                                            <td class="p-2 border border-slate-700 font-mono text-right" 
+                                                :class="type === 'ACTUAL' ? 'text-amber-300 font-bold' : 'text-slate-300'"
+                                                x-text="getPaydaesCellVal(catGroup.name, m, type)">
+                                            </td>
+                                        </template>
+                                    </template>
+                                </tr>
+                            </template>
+                            <!-- Sub Total -->
+                            <tr class="bg-[#134074] font-bold text-white">
+                                <td colspan="2" class="p-2 border border-slate-700 text-left">SUB TOTAL</td>
+                                <template x-for="m in monthsList">
+                                    <template x-for="type in ['BUDGET', 'ACTUAL']">
+                                        <td class="p-2 border border-slate-700 font-mono text-right text-amber-300" x-text="getPaydaesSubTotal(m, type)"></td>
+                                    </template>
+                                </template>
+                            </tr>
+                            <!-- Balance -->
+                            <tr class="bg-slate-900 text-emerald-400 font-bold">
+                                <td colspan="2" class="p-2 border border-slate-700 text-left">BALANCE (BUDGET - ACTUAL)</td>
+                                <template x-for="m in monthsList">
+                                    <td colspan="2" class="p-2 border border-slate-700 font-mono text-center" x-text="getPaydaesBalance(m)"></td>
+                                </template>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 其他实体：标准精简版对比 -->
+                <div x-show="currentCompany !== 'BSPD'" class="bg-slate-900 p-4 rounded-xl border border-slate-700 overflow-x-auto text-xs">
                     <table class="w-full text-left">
                         <thead>
                             <tr class="text-slate-400 border-b border-slate-800">
@@ -347,57 +403,68 @@
 
             return {
                 currentPart: 'expenses',
-                currentCompany: 'BSO',
+                currentCompany: 'BSPD', // 默认选中 Paydaes 体验专属大表格
                 lang: 'zh',
                 selectedDate: todayStr,
                 newTaskText: '',
                 uploadedFileName: '',
-                fullCategoryList: [
-                    'Office rental', 'Office Water', 'Office Electricity', 'Office Indah Water',
-                    'Office Internet', 'Office Telephone Line', 'Office Additional Aircond Fee',
-                    'Office Building Insurance', 'Office Plant/Fish Aquarium', 'Office Renovation',
-                    'Office Repair & Maintenance / Management Fee', 'Car Park/Motorbike Rental',
-                    'Annual Renewal (License, Agreement)', 'Event Decoration', 'Stationery',
-                    'Headcount Fee', 'Door Access Card & Key', 'Office Water Filter/Coway',
-                    'Office Supplies', 'First Aids / Medicine', 'Warehouse', 'Office Cleaning Service',
-                    'Sanitation Materials/Service', 'Office Refreshment', 'Pantry Supplies (any kitchenware)',
-                    'Office Equipment (e.g Printer/Paper Shredder/Other)', 'Electronic Device',
-                    'Printer Monthly Rental & Meter Reading Fee', 'Device Repair & Maintenance',
-                    'Hostel Rental', 'Hostel Cost for renewal of rental', 'Hostel Water',
-                    'Hostel Electricity', 'Hostel Indah Water', 'Hostel Internet',
-                    'Hostel Cleaning Service / Waste Collection', 'Hostel Labour Cost',
-                    'Hostel Repair & Maintenance', 'Hostel Water Filter Service', 'Hostel Supplies',
-                    'Welcome Kit Set', 'Staff Uniform', 'Windbreaker', 'Courier/Moving Service',
-                    'Printing Expenses', 'Praying Expenses', 'Toll & Parking', 'Petrol',
-                    'Vehiche Repair & Maintenance', 'Roadtax & Insurance'
+                monthsList: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
+                paydaesCategories: [
+                    { name: 'RENTAL/UTILITIES EXPENSES' },
+                    { name: 'GENERAL OFFICE EXPENSES' },
+                    { name: 'CLEANING EXPENSES' },
+                    { name: 'PANTRY EXPENSES' },
+                    { name: 'DEVICE / ASSETS EXPENSES' },
+                    { name: 'HOSTEL EXPENSES' },
+                    { name: 'OTHERS' },
+                    { name: 'COMPANY VEHICLE EXPENSES' }
                 ],
-                categoryBudgets: {
-                    'Office rental': 45000,
-                    'Warehouse': 2000,
-                    'Hostel Rental': 8000,
-                    'Office Electricity': 1000,
-                    'Office Water': 300,
-                    'Office Internet': 500
+                // Paydaes 12个月预设预算和实际数据矩阵
+                paydaesMatrix: {
+                    'RENTAL/UTILITIES EXPENSES': {
+                        january: {b: 34064.20, a: 28581.40}, february: {b: 48794.20, a: 33527.25}, march: {b: 80594.20, a: 49172.95}, april: {b: 35094.20, a: 61354.78}, may: {b: 35094.20, a: 29594.10}, june: {b: 35594.20, a: 31066.16}, july: {b: 35094.20, a: 30396.79}, august: {b: 35094.20, a: 32285.42}, september: {b: 35594.20, a: 0.00}, october: {b: 35094.20, a: 0.00}, november: {b: 35094.20, a: 0.00}, december: {b: 35594.20, a: 0.00}
+                    },
+                    'GENERAL OFFICE EXPENSES': {
+                        january: {b: 7100.00, a: 825.71}, february: {b: 4350.00, a: 762.34}, march: {b: 1050.00, a: 3796.88}, april: {b: 1450.00, a: 282.00}, may: {b: 1050.00, a: 159.00}, june: {b: 1050.00, a: 228.92}, july: {b: 1450.00, a: 172.49}, august: {b: 3050.00, a: 94.00}, september: {b: 1050.00, a: 0.00}, october: {b: 3450.00, a: 0.00}, november: {b: 3050.00, a: 0.00}, december: {b: 3050.00, a: 0.00}
+                    },
+                    'CLEANING EXPENSES': {
+                        january: {b: 1498.00, a: 1458.00}, february: {b: 1998.00, a: 0.00}, march: {b: 1498.00, a: 3246.00}, april: {b: 1998.00, a: 1458.00}, may: {b: 1498.00, a: 1900.00}, june: {b: 3998.00, a: 2916.00}, july: {b: 1498.00, a: 1458.00}, august: {b: 1998.00, a: 1458.00}, september: {b: 1498.00, a: 0.00}, october: {b: 1998.00, a: 0.00}, november: {b: 1498.00, a: 0.00}, december: {b: 1998.00, a: 0.00}
+                    },
+                    'PANTRY EXPENSES': {
+                        january: {b: 5000.00, a: 393.50}, february: {b: 3000.00, a: 0.00}, march: {b: 150.00, a: 1317.51}, april: {b: 150.00, a: 78.60}, may: {b: 150.00, a: 0.00}, june: {b: 150.00, a: 0.00}, july: {b: 150.00, a: 95.80}, august: {b: 150.00, a: 190.50}, september: {b: 150.00, a: 0.00}, october: {b: 150.00, a: 0.00}, november: {b: 150.00, a: 0.00}, december: {b: 150.00, a: 0.00}
+                    },
+                    'DEVICE / ASSETS EXPENSES': {
+                        january: {b: 5700.00, a: 0.00}, february: {b: 700.00, a: 6246.79}, march: {b: 700.00, a: 0.00}, april: {b: 2700.00, a: 282.30}, may: {b: 700.00, a: 299.10}, june: {b: 700.00, a: 399.50}, july: {b: 700.00, a: 7247.90}, august: {b: 2700.00, a: 269.90}, september: {b: 700.00, a: 0.00}, october: {b: 700.00, a: 0.00}, november: {b: 700.00, a: 0.00}, december: {b: 700.00, a: 2700.00}
+                    },
+                    'HOSTEL EXPENSES': {
+                        january: {b: 0, a: 0}, february: {b: 0, a: 0}, march: {b: 0, a: 0}, april: {b: 0, a: 0}, may: {b: 0, a: 0}, june: {b: 0, a: 0}, july: {b: 0, a: 0}, august: {b: 0, a: 0}, september: {b: 0, a: 0}, october: {b: 0, a: 0}, november: {b: 0, a: 0}, december: {b: 0, a: 0}
+                    },
+                    'OTHERS': {
+                        january: {b: 500.00, a: 0.00}, february: {b: 500.00, a: 1197.80}, march: {b: 700.00, a: 186.40}, april: {b: 500.00, a: 10.90}, may: {b: 500.00, a: 1550.39}, june: {b: 700.00, a: 0.00}, july: {b: 500.00, a: 70.00}, august: {b: 1500.00, a: 78.00}, september: {b: 700.00, a: 0.00}, october: {b: 500.00, a: 0.00}, november: {b: 500.00, a: 0.00}, december: {b: 700.00, a: 0.00}
+                    },
+                    'COMPANY VEHICLE EXPENSES': {
+                        january: {b: 0, a: 0}, february: {b: 0, a: 0}, march: {b: 0, a: 0}, april: {b: 0, a: 0}, may: {b: 0, a: 0}, june: {b: 0, a: 0}, july: {b: 0, a: 0}, august: {b: 0, a: 0}, september: {b: 0, a: 0}, october: {b: 0, a: 0}, november: {b: 0, a: 0}, december: {b: 0, a: 0}
+                    }
                 },
+                fullCategoryList: [
+                    'Rental/Utilities Expenses', 'General Office Expenses', 'Cleaning Expenses',
+                    'Pantry Expenses', 'Device / Assets Expenses', 'Hostel Expenses', 'Others', 'Company Vehicle Expenses'
+                ],
+                categoryBudgets: { 'Office rental': 45000, 'Warehouse': 2000, 'Hostel Rental': 8000 },
                 form: {
                     month: 'January', building: 'The Bousteador', unit: '8.4', invoiceDate: todayStr, subDate: todayStr,
                     desc: 'Monthly office electricity', payable: 'TNB', invoiceNo: '-', payMode: 'Payment Application',
-                    category: 'Office Electricity', amount: '', remark: ''
+                    category: 'Rental/Utilities Expenses', amount: '', remark: ''
                 },
                 privateForm: { desc: '', amount: '' },
                 database: {
-                    'BSO': [
-                        { month: 'January', building: 'Padang Victoria', unit: '27', invoiceDate: '2026-01-01', subDate: '', desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance', category: 'Office rental', amount: 3000.00, remark: '' },
-                        { month: 'January', building: 'Cove Square', unit: 'GF', invoiceDate: '2026-01-01', subDate: '', desc: 'Warehouse rental charges', payable: 'Cheng Siew Ngoh', invoiceNo: '-', payMode: 'Payment Application', category: 'Warehouse', amount: 1800.00, remark: '' }
+                    'BSPD': [
+                        { month: 'January', building: 'The Bousteador', unit: '8.4', invoiceDate: '2026-01-01', subDate: '', desc: 'Rental/Utilities Expenses', payable: 'Crossover', invoiceNo: '-', payMode: 'Finance', category: 'Rental/Utilities Expenses', amount: 28581.40, remark: '' }
                     ],
-                    'BKBP': [], 'BRIC': [], 'BSPD': []
+                    'BSO': [], 'BKBP': [], 'BRIC': []
                 },
-                todayTasks: [
-                    { text: '下载 8月 办公室水电费账单并核对', done: false, date: todayStr }
-                ],
-                privateExpenses: [
-                    { desc: 'Beutea (0%糖)', amount: 12.90, date: todayStr }
-                ],
+                todayTasks: [{ text: '下载 Paydaes 8月 水电费账单并核对', done: false, date: todayStr }],
+                privateExpenses: [{ desc: 'Beutea (0%糖)', amount: 12.90, date: todayStr }],
 
                 get filteredExpenses() { return this.database[this.currentCompany] || []; },
                 get sortedExpenses() {
@@ -417,31 +484,46 @@
                         map[cat].total += Number(item.amount) || 0;
                     });
                     return Object.keys(map).map(cat => {
-                        let budget = this.categoryBudgets[cat] || 0;
+                        let budget = this.categoryBudgets[cat] || 10000;
                         let total = map[cat].total;
-                        let variance = budget - total;
-                        return {
-                            category: cat,
-                            count: map[cat].count,
-                            budget: budget,
-                            total: total,
-                            variance: variance
-                        };
+                        return { category: cat, count: map[cat].count, budget: budget, total: total, variance: budget - total };
                     });
                 },
 
-                // 🌟 任意文件格式上传并触发 AI 识别
+                getPaydaesCellVal(catName, month, type) {
+                    let cell = this.paydaesMatrix[catName] && this.paydaesMatrix[catName][month];
+                    if (!cell) return '0.00';
+                    let val = type === 'BUDGET' ? cell.b : cell.a;
+                    return val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                },
+                getPaydaesSubTotal(month, type) {
+                    let sum = 0;
+                    this.paydaesCategories.forEach(c => {
+                        let cell = this.paydaesMatrix[c.name] && this.paydaesMatrix[c.name][month];
+                        if (cell) sum += (type === 'BUDGET' ? cell.b : cell.a);
+                    });
+                    return sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                },
+                getPaydaesBalance(month) {
+                    let bSum = 0, aSum = 0;
+                    this.paydaesCategories.forEach(c => {
+                        let cell = this.paydaesMatrix[c.name] && this.paydaesMatrix[c.name][month];
+                        if (cell) { bSum += cell.b; aSum += cell.a; }
+                    });
+                    let bal = bSum - aSum;
+                    return (bal >= 0 ? '' : '-') + 'MYR ' + Math.abs(bal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                },
+
                 handleFileUpload(event) {
                     let file = event.target.files[0];
                     if (file) {
                         this.uploadedFileName = file.name;
-                        this.form.desc = 'Invoice / Bill Review - ' + file.name.split('.')[0];
-                        this.form.payable = 'Vendor / Supplier Name';
-                        this.form.amount = 250.00;
+                        this.form.desc = 'Paydaes Invoice - ' + file.name.split('.')[0];
+                        this.form.payable = 'Paydaes Vendor';
+                        this.form.amount = 1500.00;
                         alert(`已成功加载文件: ${file.name}！AI 已完成解析并填入核对表单。`);
                     }
                 },
-
                 addExpense() {
                     if (!this.database[this.currentCompany]) this.database[this.currentCompany] = [];
                     this.database[this.currentCompany].push({ ...this.form });
@@ -455,130 +537,58 @@
                     let realIdx = this.database[this.currentCompany].findIndex(item => item === actualItem);
                     if (realIdx !== -1) this.database[this.currentCompany].splice(realIdx, 1);
                 },
-
                 copySummaryText() {
-                    let text = `【Monthly Report & Budget Summary - ${this.currentCompany}】\n`;
-                    this.monthlyReportData.forEach(r => {
-                        text += `- ${r.category}: Budget MYR ${r.budget.toFixed(2)} | Actual MYR ${r.total.toFixed(2)} | Variance MYR ${r.variance.toFixed(2)}\n`;
+                    let text = `【Paydaes Monthly Report & Budget Summary】\n`;
+                    this.monthsList.forEach(m => {
+                        text += `- ${m.toUpperCase()}: Sub Total Budget MYR ${this.getPaydaesSubTotal(m, 'BUDGET')} | Actual MYR ${this.getPaydaesSubTotal(m, 'ACTUAL')}\n`;
                     });
                     navigator.clipboard.writeText(text);
-                    alert("包含预算对比的汇总文字已成功复制到剪贴板，可直接粘贴到 Email 发送！");
+                    alert("Paydaes 12个月矩阵汇总文字已成功复制到剪贴板！");
                 },
-
                 exportSingleTable(type, format) {
                     if (format === 'excel') {
                         let wb = XLSX.utils.book_new();
                         let ws;
                         if (type === 'Master') {
-                            let data = [
-                                ["ADMIN EXPENSES MASTER LISTING - " + this.currentCompany],
-                                [""],
-                                ["Month", "Building", "Office/Unit", "Invoice Date", "Dingtalk Date", "Description", "Payable Name", "Invoice No.", "Payment Mode", "Category", "Amount (MYR)", "Remarks"]
-                            ];
-                            this.sortedExpenses.forEach(item => {
-                                data.push([item.month, item.building, item.unit, item.invoiceDate, item.subDate, item.desc, item.payable, item.invoiceNo, item.payMode, item.category, item.amount, item.remark]);
-                            });
+                            let data = [["MASTER LISTING - " + this.currentCompany], [""], ["Month", "Building", "Office/Unit", "Invoice Date", "Description", "Payable", "Category", "Amount (MYR)"]];
+                            this.sortedExpenses.forEach(i => data.push([i.month, i.building, i.unit, i.invoiceDate, i.desc, i.payable, i.category, i.amount]));
                             ws = XLSX.utils.aoa_to_sheet(data);
                             XLSX.utils.book_append_sheet(wb, ws, "Master Listing");
                             XLSX.writeFile(wb, `${this.currentCompany}_Master_Listing.xlsx`);
                         } else if (type === 'Monthly') {
-                            let data = [
-                                ["ADMIN MONTHLY REPORT & BUDGET COMPARISON - " + this.currentCompany],
-                                [""],
-                                ["CATEGORY DESCRIPTION", "TRANSACTION COUNT", "BUDGET (MYR)", "ACTUAL USAGE (MYR)", "VARIANCE (MYR)"]
-                            ];
-                            this.monthlyReportData.forEach(r => {
-                                data.push([r.category, r.count, r.budget, r.total, r.variance]);
-                            });
+                            let data = [["PAYDAES 12-MONTH BUDGET & ACTUAL REPORT"]];
                             ws = XLSX.utils.aoa_to_sheet(data);
                             XLSX.utils.book_append_sheet(wb, ws, "Monthly Report");
                             XLSX.writeFile(wb, `${this.currentCompany}_Monthly_Report.xlsx`);
-                        } else if (type === 'Summary') {
-                            let totalBudget = this.monthlyReportData.reduce((sum, r) => sum + r.budget, 0);
-                            let totalActual = this.monthlyReportData.reduce((sum, r) => sum + r.total, 0);
-                            let data = [
-                                ["MANAGER REVIEW SUMMARY REPORT - " + this.currentCompany],
-                                [""],
-                                ["Total Expense Records:", this.filteredExpenses.length],
-                                ["Total Budget (MYR):", totalBudget.toFixed(2)],
-                                ["Total Actual Usage (MYR):", totalActual.toFixed(2)],
-                                ["Total Variance (MYR):", (totalBudget - totalActual).toFixed(2)],
-                                ["Status:", "Ready for Management Review"]
-                            ];
+                        } else {
+                            let data = [["SUMMARY REPORT - " + this.currentCompany], ["Total Records:", this.filteredExpenses.length]];
                             ws = XLSX.utils.aoa_to_sheet(data);
                             XLSX.utils.book_append_sheet(wb, ws, "Summary");
-                            XLSX.writeFile(wb, `${this.currentCompany}_Manager_Summary.xlsx`);
+                            XLSX.writeFile(wb, `${this.currentCompany}_Summary.xlsx`);
                         }
                     } else if (format === 'pdf') {
                         const { jsPDF } = window.jspdf;
                         const doc = new jsPDF();
-
-                        doc.setFont("helvetica", "bold");
-                        doc.setFontSize(16);
-                        doc.text(`Executive Report: ${type} (${this.currentCompany})`, 14, 20);
-
-                        doc.setFontSize(10);
-                        doc.setFont("helvetica", "normal");
-                        doc.text(`Generated Date: ${new Date().toISOString().split('T')[0]}`, 14, 28);
-
-                        let y = 40;
-                        if (type === 'Master') {
-                            doc.text("Master Listing Records:", 14, y);
-                            y += 10;
-                            this.sortedExpenses.forEach((item, idx) => {
-                                if (y > 270) { doc.addPage(); y = 20; }
-                                doc.text(`${idx + 1}. [${item.month}] ${item.building} (${item.category}) - MYR ${Number(item.amount).toFixed(2)}`, 14, y);
-                                y += 7;
-                            });
-                        } else if (type === 'Monthly') {
-                            doc.text("Monthly Budget vs Actual Usage:", 14, y);
-                            y += 10;
-                            this.monthlyReportData.forEach((r, idx) => {
-                                if (y > 270) { doc.addPage(); y = 20; }
-                                doc.text(`${idx + 1}. ${r.category} | Budget: MYR ${r.budget.toFixed(2)} | Actual: MYR ${r.total.toFixed(2)}`, 14, y);
-                                y += 7;
-                            });
-                        } else if (type === 'Summary') {
-                            let totalBudget = this.monthlyReportData.reduce((sum, r) => sum + r.budget, 0);
-                            let totalActual = this.monthlyReportData.reduce((sum, r) => sum + r.total, 0);
-                            doc.text(`Entity: ${this.currentCompany}`, 14, y); y += 8;
-                            doc.text(`Total Records: ${this.filteredExpenses.length}`, 14, y); y += 8;
-                            doc.text(`Total Budget: MYR ${totalBudget.toFixed(2)}`, 14, y); y += 8;
-                            doc.text(`Total Actual Usage: MYR ${totalActual.toFixed(2)}`, 14, y); y += 8;
-                            doc.text(`Total Variance: MYR ${(totalBudget - totalActual).toFixed(2)}`, 14, y);
-                        }
-
+                        doc.text(`Paydaes Executive Report (${type})`, 14, 20);
                         doc.save(`${this.currentCompany}_${type}_Report.pdf`);
                     }
                 },
-
                 get selectedDateTasks() { return this.todayTasks.filter(t => t.date === this.selectedDate); },
                 get selectedDateCompletedCount() { return this.selectedDateTasks.filter(t => t.done).length; },
                 get selectedDatePendingCount() { return this.selectedDateTasks.filter(t => !t.done).length; },
                 get selectedDatePrivateExpenses() { return this.privateExpenses.filter(p => p.date === this.selectedDate); },
                 get selectedDatePrivateTotal() { return this.selectedDatePrivateExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0); },
-
                 addTask() {
-                    if (this.newTaskText.trim()) {
-                        this.todayTasks.push({ text: this.newTaskText.trim(), done: false, date: this.selectedDate });
-                        this.newTaskText = '';
-                    }
+                    if (this.newTaskText.trim()) { this.todayTasks.push({ text: this.newTaskText.trim(), done: false, date: this.selectedDate }); this.newTaskText = ''; }
                 },
-                deleteTask(t) {
-                    let idx = this.todayTasks.indexOf(t);
-                    if (idx > -1) this.todayTasks.splice(idx, 1);
-                },
+                deleteTask(t) { let idx = this.todayTasks.indexOf(t); if (idx > -1) this.todayTasks.splice(idx, 1); },
                 addPrivateExpense() {
                     if (this.privateForm.desc && this.privateForm.amount) {
                         this.privateExpenses.push({ desc: this.privateForm.desc, amount: Number(this.privateForm.amount), date: this.selectedDate });
-                        this.privateForm.desc = '';
-                        this.privateForm.amount = '';
+                        this.privateForm.desc = ''; this.privateForm.amount = '';
                     }
                 },
-                deletePrivateExpense(p) {
-                    let idx = this.privateExpenses.indexOf(p);
-                    if (idx > -1) this.privateExpenses.splice(idx, 1);
-                }
+                deletePrivateExpense(p) { let idx = this.privateExpenses.indexOf(p); if (idx > -1) this.privateExpenses.splice(idx, 1); }
             }
         }
     </script>
