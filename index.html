@@ -6,11 +6,12 @@
     <title>Admin Expenses Command Center - Executive Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- 引入高稳定性的 SheetJS 核心库，用于完美生成多 Tab Excel -->
+    <!-- 引入高稳定的 SheetJS 核心库，用于完美生成多 Tab Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen pb-24" x-data="masterApp()">
 
+    <!-- 顶部主导航栏 -->
     <header class="bg-[#0B2545] border-b border-blue-900 shadow-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -20,22 +21,35 @@
                     <p class="text-xs text-blue-200">Professional Financial & Executive Hub</p>
                 </div>
             </div>
-            <div class="flex items-center bg-[#134074] p-1 rounded-xl border border-blue-800">
-                <button @click="currentPart = 'expenses'" :class="currentPart === 'expenses' ? 'bg-[#001D3D] text-amber-400 font-bold shadow' : 'text-blue-200 hover:text-white'" class="px-4 py-1.5 rounded-lg text-xs transition">
-                    🏢 公司实体费用报表 (Part 1)
-                </button>
-                <button @click="currentPart = 'copilot'" :class="currentPart === 'copilot' ? 'bg-[#001D3D] text-amber-400 font-bold shadow' : 'text-blue-200 hover:text-white'" class="px-4 py-1.5 rounded-lg text-xs transition">
-                    🤖 行政 Copilot 与个人手帐 (Part 2)
-                </button>
+
+            <!-- 双 Part 切换与语言选择 -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center bg-[#134074] p-1 rounded-xl border border-blue-800">
+                    <button @click="currentPart = 'expenses'" :class="currentPart === 'expenses' ? 'bg-[#001D3D] text-amber-400 font-bold shadow' : 'text-blue-200 hover:text-white'" class="px-4 py-1.5 rounded-lg text-xs transition">
+                        🏢 公司实体费用报表 (Part 1)
+                    </button>
+                    <button @click="currentPart = 'copilot'" :class="currentPart === 'copilot' ? 'bg-[#001D3D] text-amber-400 font-bold shadow' : 'text-blue-200 hover:text-white'" class="px-4 py-1.5 rounded-lg text-xs transition">
+                        🤖 行政 Copilot 与个人手帐 (Part 2)
+                    </button>
+                </div>
+
+                <!-- 语言切换 -->
+                <select x-model="lang" class="bg-[#134074] border border-blue-800 rounded-lg px-3 py-1.5 text-xs text-blue-200 focus:outline-none">
+                    <option value="zh">🇨🇳 中文</option>
+                    <option value="en">🇬🇧 English</option>
+                </select>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- PART 1: 公司多实体行政费用指挥中心 -->
         <div x-show="currentPart === 'expenses'" class="space-y-6">
+            
             <div class="flex flex-col md:flex-row justify-between items-center bg-[#134074] p-4 rounded-xl border border-blue-800 shadow gap-4">
                 <div class="flex items-center gap-3">
-                    <span class="text-sm font-semibold text-white">当前管理公司：</span>
+                    <span class="text-sm font-semibold text-white" x-text="lang === 'zh' ? '当前管理公司：' : 'Current Entity:'"></span>
                     <select x-model="currentCompany" class="bg-[#0B2545] border border-blue-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400">
                         <option value="BKBP">Black Knight BPO (BKBP)</option>
                         <option value="BSO">BS One Management (BSO)</option>
@@ -52,13 +66,16 @@
 
                 <!-- 🌟 完美多 Tab 导出按钮 -->
                 <button @click="exportWithTemplateAndData" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
-                    📥 导出完美三合一 Excel 报表
+                    📥 <span x-text="lang === 'zh' ? '导出完美三合一 Excel 报表' : 'Export 3-Tab Excel Hub'"></span>
                 </button>
             </div>
 
+            <!-- Master Listing 表单与表格 -->
             <div x-show="subTab === 'master'" class="space-y-6">
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow">
-                    <h2 class="text-sm font-semibold mb-4 text-amber-400 flex items-center gap-2">➕ 录入新行政开支记录</h2>
+                    <h2 class="text-sm font-semibold mb-4 text-amber-400 flex items-center gap-2">
+                        ➕ <span x-text="lang === 'zh' ? '录入新行政开支记录' : 'Add New Expense Item'"></span>
+                    </h2>
                     <form @submit.prevent="addExpense" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Month</label>
@@ -118,7 +135,7 @@
                         </div>
                         <div class="sm:col-span-2 lg:col-span-4 flex justify-end mt-2">
                             <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-lg text-sm transition shadow">
-                                💾 保存并自动按日期升序排列
+                                💾 <span x-text="lang === 'zh' ? '保存并自动按日期升序排列' : 'Save & Auto-sort by Date'"></span>
                             </button>
                         </div>
                     </form>
@@ -177,10 +194,13 @@
                 </div>
             </div>
 
+            <!-- Monthly Report 表格 -->
             <div x-show="subTab === 'monthly'" class="space-y-6">
                 <div class="bg-slate-900 border border-blue-900 rounded-xl shadow overflow-hidden">
                     <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900 flex justify-between items-center">
-                        <h3 class="font-bold text-white text-sm tracking-wide">ADMIN MONTHLY SPENDING EXPENSES - <span x-text="currentCompany"></span></h3>
+                        <h3 class="font-bold text-white text-sm tracking-wide">
+                            ADMIN MONTHLY SPENDING EXPENSES - <span x-text="currentCompany"></span>
+                        </h3>
                         <span class="text-xs text-amber-400 font-mono font-bold">YEAR 2026</span>
                     </div>
                     <div class="overflow-x-auto">
@@ -206,6 +226,7 @@
                 </div>
             </div>
 
+            <!-- Manager Summary -->
             <div x-show="subTab === 'summary'" class="space-y-6">
                 <div class="bg-slate-900 border border-blue-900 rounded-xl shadow p-6 space-y-4">
                     <div class="bg-[#0B2545] px-4 py-3 border-b border-blue-900 -mx-6 -mt-6 mb-4 rounded-t-xl">
@@ -218,10 +239,13 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
+        <!-- PART 2: 行政超级 COPILOT 与个人指挥台 -->
         <div x-show="currentPart === 'copilot'" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 待办任务 -->
                 <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
                     <h3 class="font-semibold text-slate-200 text-sm flex items-center justify-between">
                         <span>📅 今天要处理点什么？</span>
@@ -236,16 +260,55 @@
                         </template>
                     </ul>
                 </div>
+
+                <!-- 每日私人消费与手帐 -->
+                <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
+                    <h3 class="font-semibold text-slate-200 text-sm">☕ 每日私人消费与手帐</h3>
+                    <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
+                        <template x-for="(pItem, i) in privateExpenses" :key="i">
+                            <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-700">
+                                <span class="text-slate-200" x-text="pItem.desc"></span>
+                                <span class="text-amber-400 font-mono font-bold" x-text="'MYR ' + pItem.amount.toFixed(2)"></span>
+                            </div>
+                        </template>
+                    </div>
+                    <!-- 新增私人手帐输入框 -->
+                    <div class="pt-2 border-t border-slate-700 space-y-2">
+                        <input type="text" x-model="privateForm.desc" placeholder="记录消费描述 (如: Beutea)" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1 text-xs text-slate-200">
+                        <div class="flex gap-2">
+                            <input type="number" step="0.01" x-model.number="privateForm.amount" placeholder="金额" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1 text-xs text-slate-200">
+                            <button @click="addPrivateExpense" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1 rounded text-xs">添加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 每日总览与数据报表 -->
+                <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow space-y-3">
+                    <h3 class="font-semibold text-slate-200 text-sm">📊 每日总览与数据报表</h3>
+                    <div class="space-y-2 text-xs text-slate-300">
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between">
+                            <span>公司开支总笔数</span>
+                            <span class="font-bold text-amber-400" x-text="filteredExpenses.length + ' 笔'"></span>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between">
+                            <span>私人手帐总计</span>
+                            <span class="font-bold text-amber-400" x-text="'MYR ' + privateExpensesTotal.toFixed(2)"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
     </main>
 
+    <!-- 核心业务逻辑脚本 -->
     <script>
         function masterApp() {
             return {
                 currentPart: 'expenses',
                 subTab: 'master',
                 currentCompany: 'BSO',
+                lang: 'zh',
                 fullCategoryList: [
                     'Office rental', 'Office Water', 'Office Electricity', 'Office Indah Water',
                     'Office Internet', 'Office Telephone Line', 'Office Additional Aircond Fee',
@@ -270,6 +333,7 @@
                     desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance',
                     category: 'Office rental', amount: 3000.00, remark: ''
                 },
+                privateForm: { desc: '', amount: '' },
                 database: {
                     'BSO': [
                         { month: 'January', building: 'Padang Victoria', unit: '27', invoiceDate: '2026-01-01', subDate: '', desc: 'Office Rental - 25 Jalan Padang Victoria', payable: 'Crossover Capital', invoiceNo: '-', payMode: 'Finance', category: 'Office rental', amount: 3000.00, remark: '' },
@@ -310,6 +374,9 @@
                     });
                     return Object.keys(map).map(cat => ({ category: cat, count: map[cat].count, total: map[cat].total })).filter(r => r.total > 0);
                 },
+                get privateExpensesTotal() {
+                    return this.privateExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+                },
                 autoCategorize() {
                     let text = this.form.desc.toLowerCase();
                     if (text.includes('rent')) this.form.category = 'Office rental';
@@ -332,12 +399,22 @@
                         this.database[this.currentCompany].splice(realIndex, 1);
                     }
                 },
-                // 🌟 使用 SheetJS 现场完美构建三合一 Excel 报表（100% 确保数据精准写入）
+                addPrivateExpense() {
+                    if (this.privateForm.desc && this.privateForm.amount) {
+                        this.privateExpenses.push({
+                            desc: this.privateForm.desc,
+                            amount: Number(this.privateForm.amount),
+                            date: new Date().toISOString().split('T')[0]
+                        });
+                        this.privateForm.desc = '';
+                        this.privateForm.amount = '';
+                    }
+                },
+                // 🌟 完美多 Tab 报表导出
                 exportWithTemplateAndData() {
                     try {
                         let wb = XLSX.utils.book_new();
 
-                        // 1. 构造 Master Listing 数据（从第 5 行开始：前 4 行留空给表头）
                         let masterData = [
                             ["ADMIN EXPENSES MASTER LISTING - " + this.currentCompany],
                             [""],
@@ -364,7 +441,6 @@
                         let wsMaster = XLSX.utils.aoa_to_sheet(masterData);
                         XLSX.utils.book_append_sheet(wb, wsMaster, "Master Listing");
 
-                        // 2. 构造 Monthly Report 数据
                         let monthlyData = [
                             ["ADMIN MONTHLY SPENDING EXPENSES - " + this.currentCompany],
                             [""],
@@ -376,7 +452,6 @@
                         let wsMonthly = XLSX.utils.aoa_to_sheet(monthlyData);
                         XLSX.utils.book_append_sheet(wb, wsMonthly, "Monthly Report");
 
-                        // 3. 构造 Manager Summary 数据
                         let summaryData = [
                             ["MANAGER REVIEW SUMMARY REPORT"],
                             [""],
@@ -388,7 +463,6 @@
                         let wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
                         XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
 
-                        // 4. 导出文件
                         XLSX.writeFile(wb, `${this.currentCompany}_Admin_Expenses_Executive_Hub.xlsx`);
                     } catch (err) {
                         alert("导出失败: " + err.message);
