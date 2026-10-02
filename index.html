@@ -33,29 +33,33 @@
             </div>
             <div>
                 <div class="flex items-center space-x-2">
-                    <h1 class="font-bold text-lg tracking-wider bg-gradient-to-r from-white via-slate-200 to-amber-400 bg-clip-text text-transparent">CORP-FIN & EXEC COMMAND NEXUS</h1>
-                    <span class="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">SaaS Enterprise Edition</span>
+                    <h1 id="ui-title" class="font-bold text-lg tracking-wider bg-gradient-to-r from-white via-slate-200 to-amber-400 bg-clip-text text-transparent">CORP-FIN & EXEC COMMAND NEXUS</h1>
+                    <span id="ui-badge" class="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">SaaS Enterprise Edition</span>
                 </div>
-                <p class="text-xs text-slate-400">企业财务、Vendor 智控、Master Ledger 与行政领航中枢</p>
+                <p id="ui-subtitle" class="text-xs text-slate-400">企业财务、Vendor 智控、Master Ledger 与行政领航中枢 (LocalStorage 永久存储 & 双语已启用)</p>
             </div>
         </div>
         
         <div class="flex items-center space-x-3 mt-2 sm:mt-0">
-            <button class="bg-[#1E293B] hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
+            <button onclick="switchLang()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition font-bold">
+                <i class="fa-solid fa-language"></i>
+                <span id="lang-btn-text">中 / EN</span>
+            </button>
+            <button onclick="alertModal('每月固定支出清单功能已就绪 (Monthly Fixed Expenses List Ready)')" class="bg-[#1E293B] hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
                 <i class="fa-regular fa-file-lines text-amber-400"></i>
-                <span>每月固定支出清单</span>
+                <span data-i18n="nav_monthly">每月固定支出清单</span>
             </button>
-            <button class="bg-[#1E293B] hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
+            <button onclick="alertModal('12个月行政费用大表与智控功能已就绪 (12-Month Admin Budget & Control)')" class="bg-[#1E293B] hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
                 <i class="fa-solid fa-chart-pie text-emerald-400"></i>
-                <span>12个月行政费用大表与智控</span>
+                <span data-i18n="nav_budget">12个月行政费用大表与智控</span>
             </button>
-            <button class="bg-[#1E293B] hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
+            <button onclick="alertModal('Vendor 档案与银行信息功能已就绪 (Vendor Profiles & Banking)')" class="bg-[#1E293B] hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
                 <i class="fa-solid fa-folder-open text-blue-400"></i>
-                <span>Vendor 档案与银行信息</span>
+                <span data-i18n="nav_vendor">Vendor 档案与银行信息</span>
             </button>
-            <button class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold text-xs px-3.5 py-1.5 rounded-lg shadow-md shadow-amber-500/20 flex items-center space-x-1.5 transition">
+            <button onclick="alertModal('行政超级领航员 Copilot 随时待命 (Administrative Super Copilot Active)')" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold text-xs px-3.5 py-1.5 rounded-lg shadow-md shadow-amber-500/20 flex items-center space-x-1.5 transition">
                 <i class="fa-solid fa-robot"></i>
-                <span>行政超级领航员 (Copilot)</span>
+                <span data-i18n="nav_copilot">行政超级领航员 (Copilot)</span>
             </button>
         </div>
     </header>
@@ -64,16 +68,16 @@
     <div class="max-w-7xl mx-auto px-6 pt-6 pb-2 flex flex-wrap items-center justify-between">
         <div class="flex items-center space-x-2 text-slate-300 text-sm">
             <i class="fa-solid fa-compass text-amber-400"></i>
-            <span class="font-medium">Administrative Super Copilot (行政超级领航员)</span>
-            <span class="text-xs text-slate-500 ml-2">选择任意日期追溯日程、任务追踪、未完成文档缓存与私人消费日常记账</span>
+            <span class="font-medium" data-i18n="sub_header_title">Administrative Super Copilot (行政超级领航员)</span>
+            <span class="text-xs text-slate-500 ml-2" data-i18n="sub_header_desc">选择任意日期追溯日程、任务追踪、未完成文档缓存与私人消费日常记账</span>
         </div>
         <div class="flex items-center space-x-2 bg-[#131C2E] border border-slate-800 px-3 py-1.5 rounded-xl shadow-inner">
             <span class="text-xs text-slate-400 flex items-center space-x-1">
                 <i class="fa-regular fa-calendar text-amber-400"></i>
-                <span>查阅日期:</span>
+                <span data-i18n="date_label">查阅日期:</span>
             </span>
             <input type="date" id="global-date" value="2026-10-02" class="bg-[#1E293B] text-amber-400 text-xs font-mono px-2 py-1 rounded border border-slate-700 focus:outline-none focus:border-amber-500">
-            <button onclick="setToday()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1 rounded border border-slate-700 transition">今天</button>
+            <button onclick="setToday()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1 rounded border border-slate-700 transition" data-i18n="today_btn">今天</button>
         </div>
     </div>
 
@@ -86,22 +90,22 @@
                 <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
                     <h2 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
                         <i class="fa-solid fa-calendar-day text-amber-400"></i>
-                        <span>日程安排 (<span id="schedule-date-title" class="text-amber-400 font-mono">2026-10-02</span>)</span>
+                        <span><span data-i18n="w1_title">日程安排</span> (<span id="schedule-date-title" class="text-amber-400 font-mono">2026-10-02</span>)</span>
                     </h2>
                 </div>
                 
                 <div id="schedule-list" class="space-y-3 mb-4">
                     <div class="bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3.5 rounded-xl flex items-center justify-between transition group">
                         <span class="text-sm text-slate-200">与财务总监核对 10 月份固定 Vendor 账单</span>
-                        <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">删除</button>
+                        <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium" data-i18n="delete_btn">删除</button>
                     </div>
                 </div>
             </div>
             
             <div class="space-y-2 pt-2">
                 <div class="flex space-x-2">
-                    <input type="text" id="new-schedule-input" placeholder="添加当天日程安排..." class="flex-1 bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
-                    <button onclick="addSchedule()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm px-5 py-2.5 rounded-xl transition shadow-md shadow-amber-500/20">添加</button>
+                    <input type="text" id="new-schedule-input" data-i18n-placeholder="w1_placeholder" placeholder="添加当天日程安排..." class="flex-1 bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+                    <button onclick="addSchedule()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm px-5 py-2.5 rounded-xl transition shadow-md shadow-amber-500/20" data-i18n="add_btn">添加</button>
                 </div>
             </div>
         </section>
@@ -112,34 +116,34 @@
                 <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
                     <h2 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
                         <i class="fa-solid fa-bullseye text-rose-400"></i>
-                        <span>任务与项目跟踪 (Task Tracker)</span>
+                        <span data-i18n="w2_title">任务与项目跟踪 (Task Tracker)</span>
                     </h2>
                 </div>
                 
                 <div id="task-list" class="space-y-3 mb-4">
                     <div class="bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3.5 rounded-xl flex items-center justify-between transition">
                         <div class="flex items-start space-x-3">
-                            <input type="checkbox" checked class="mt-1 w-4 h-4 rounded bg-[#1E293B] border-slate-600 text-amber-500 focus:ring-0 cursor-pointer">
+                            <input type="checkbox" checked onchange="saveState()" class="mt-1 w-4 h-4 rounded bg-[#1E293B] border-slate-600 text-amber-500 focus:ring-0 cursor-pointer">
                             <div>
                                 <p class="text-sm text-slate-200 line-through text-slate-400">完成各实体 12 月份预算与实际开支对账</p>
                                 <p class="text-xs text-slate-500 mt-0.5 font-mono">起止: 2026-10-01 ~ 2026-10-05 | 分类: Finance</p>
                             </div>
                         </div>
-                        <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">删除</button>
+                        <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium" data-i18n="delete_btn">删除</button>
                     </div>
                 </div>
             </div>
             
             <div class="space-y-2 pt-2">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <input type="text" id="new-task-name" placeholder="新任务名称..." class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
-                    <input type="text" id="new-task-category" placeholder="分类 (选填)" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+                    <input type="text" id="new-task-name" data-i18n-placeholder="w2_name_placeholder" placeholder="新任务名称..." class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+                    <input type="text" id="new-task-category" data-i18n-placeholder="w2_cat_placeholder" placeholder="分类 (选填)" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <input type="date" id="new-task-start" value="2026-10-02" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500">
                     <input type="date" id="new-task-end" value="2026-10-02" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500">
                 </div>
-                <button onclick="addTask()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm py-2.5 rounded-xl transition shadow-md shadow-amber-500/20 mt-1">添加新任务</button>
+                <button onclick="addTask()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm py-2.5 rounded-xl transition shadow-md shadow-amber-500/20 mt-1" data-i18n="w2_add_btn">添加新任务</button>
             </div>
         </section>
 
@@ -149,10 +153,10 @@
                 <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
                     <h2 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
                         <i class="fa-solid fa-folder-closed text-amber-400"></i>
-                        <span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">文件与文档暂存箱 (未完成文档缓存)</span>
+                        <span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20" data-i18n="w3_title">文件与文档暂存箱 (未完成文档缓存)</span>
                     </h2>
                 </div>
-                <p class="text-xs text-slate-400 mb-3">今天没有完成的文档可以存在这里明天继续，完成了才存进云端。</p>
+                <p class="text-xs text-slate-400 mb-3" data-i18n="w3_desc">今天没有完成的文档可以存在这里明天继续，完成了才存进云端。</p>
                 
                 <div class="relative">
                     <textarea id="temp-doc-textarea" rows="4" class="w-full bg-[#1E293B] border border-slate-700/80 rounded-xl p-3.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-amber-500 leading-relaxed">【行政暂存箱】
@@ -164,9 +168,9 @@
             <div class="flex items-center justify-between pt-4 mt-2 border-t border-slate-800/60">
                 <span class="text-xs text-emerald-400 flex items-center space-x-1.5">
                     <i class="fa-solid fa-sparkles animate-pulse"></i>
-                    <span>自动暂存生效中</span>
+                    <span data-i18n="w3_status">自动暂存生效中 (LocalStorage 永久存储)</span>
                 </span>
-                <button onclick="clearTempDoc()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs px-3 py-1.5 rounded-lg transition">清空暂存</button>
+                <button onclick="clearTempDoc()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs px-3 py-1.5 rounded-lg transition" data-i18n="w3_clear_btn">清空暂存</button>
             </div>
         </section>
 
@@ -176,7 +180,7 @@
                 <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
                     <h2 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
                         <i class="fa-solid fa-mug-hot text-amber-500"></i>
-                        <span>每日消费 (私人) 与私人手帐 (记一笔)</span>
+                        <span data-i18n="w4_title">每日消费 (私人) 与私人手帐 (记一笔)</span>
                     </h2>
                 </div>
                 
@@ -188,7 +192,7 @@
                         </div>
                         <div class="flex items-center space-x-3">
                             <span class="text-sm font-mono font-bold text-amber-400">MYR 12.90</span>
-                            <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">删除</button>
+                            <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium" data-i18n="delete_btn">删除</button>
                         </div>
                     </div>
                 </div>
@@ -202,40 +206,160 @@
                         <option>SGD ($)</option>
                         <option>CNY (¥)</option>
                     </select>
-                    <input type="number" id="expense-amount" placeholder="金额" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+                    <input type="number" id="expense-amount" data-i18n-placeholder="w4_amount_placeholder" placeholder="金额" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <input type="text" id="expense-purpose" placeholder="Spending 用途" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
-                    <input type="text" id="expense-notes" placeholder="备注 (填选)" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+                    <input type="text" id="expense-purpose" data-i18n-placeholder="w4_purpose_placeholder" placeholder="Spending 用途" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+                    <input type="text" id="expense-notes" data-i18n-placeholder="w4_notes_placeholder" placeholder="备注 (选填)" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
                 </div>
-                <button onclick="addExpense()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm py-2.5 rounded-xl transition shadow-md shadow-amber-500/20 mt-1">记录新开支</button>
+                <button onclick="addExpense()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm py-2.5 rounded-xl transition shadow-md shadow-amber-500/20 mt-1" data-i18n="w4_add_btn">记录新开支</button>
             </div>
         </section>
 
     </main>
 
+    <!-- Modal Alert Toast -->
+    <div id="modal-toast" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-[#131C2E] border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl text-center transform scale-95 transition-transform duration-300" id="modal-content-box">
+            <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3 text-xl border border-amber-500/30">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 id="modal-title" class="font-bold text-base text-slate-100 mb-2">系统通知 / System Notification</h3>
+            <p id="modal-msg" class="text-xs text-slate-300 mb-5 leading-relaxed">提示信息...</p>
+            <button onclick="closeModal()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs px-6 py-2.5 rounded-xl transition shadow-md shadow-amber-500/20 w-full">确定 / Confirm</button>
+        </div>
+    </div>
+
     <footer class="text-center py-6 text-xs text-slate-500 border-t border-slate-800/80 mt-8">
-        CORP-FIN & EXEC COMMAND NEXUS &copy; 2026 &bull; Enterprise Operations Support
+        CORP-FIN & EXEC COMMAND NEXUS &copy; 2026 &bull; Enterprise Operations Support &bull; LocalStorage & Bilingual Engine
     </footer>
 
     <script>
+        // Bilingual Dictionary
+        const i18n = {
+            zh: {
+                ui_subtitle: "企业财务、Vendor 智控、Master Ledger 与行政领航中枢 (LocalStorage 永久存储 & 双语已启用)",
+                nav_monthly: "每月固定支出清单",
+                nav_budget: "12个月行政费用大表与智控",
+                nav_vendor: "Vendor 档案与银行信息",
+                nav_copilot: "行政超级领航员 (Copilot)",
+                sub_header_title: "Administrative Super Copilot (行政超级领航员)",
+                sub_header_desc: "选择任意日期追溯日程、任务追踪、未完成文档缓存与私人消费日常记账",
+                date_label: "查阅日期:",
+                today_btn: "今天",
+                w1_title: "日程安排",
+                w1_placeholder: "添加当天日程安排...",
+                add_btn: "添加",
+                delete_btn: "删除",
+                w2_title: "任务与项目跟踪 (Task Tracker)",
+                w2_name_placeholder: "新任务名称...",
+                w2_cat_placeholder: "分类 (选填)",
+                w2_add_btn: "添加新任务",
+                w3_title: "文件与文档暂存箱 (未完成文档缓存)",
+                w3_desc: "今天没有完成的文档可以存在这里明天继续，完成了才存进云端。",
+                w3_status: "自动暂存生效中 (LocalStorage 永久存储)",
+                w3_clear_btn: "清空暂存",
+                w4_title: "每日消费 (私人) 与私人手帐 (记一笔)",
+                w4_amount_placeholder: "金额",
+                w4_purpose_placeholder: "Spending 用途",
+                w4_notes_placeholder: "备注 (选填)",
+                w4_add_btn: "记录新开支"
+            },
+            en: {
+                ui_subtitle: "Corporate Finance, Vendor Control, Master Ledger & Executive Command Nexus (LocalStorage & Bilingual Active)",
+                nav_monthly: "Monthly Fixed Expenses",
+                nav_budget: "12-Month Admin Budget & Control",
+                nav_vendor: "Vendor Profiles & Banking",
+                nav_copilot: "Admin Super Copilot",
+                sub_header_title: "Administrative Super Copilot",
+                sub_header_desc: "Select any date to trace schedules, tasks, pending doc cache, and daily private expenses",
+                date_label: "Review Date:",
+                today_btn: "Today",
+                w1_title: "Schedule & Itinerary",
+                w1_placeholder: "Add schedule for selected date...",
+                add_btn: "Add",
+                delete_btn: "Delete",
+                w2_title: "Task & Project Tracker",
+                w2_name_placeholder: "New task name...",
+                w2_cat_placeholder: "Category (Optional)",
+                w2_add_btn: "Add Task",
+                w3_title: "Document Cache / Scratchpad",
+                w3_desc: "Keep unfinished documents here overnight before saving to cloud.",
+                w3_status: "Auto-saving active (LocalStorage Persistent)",
+                w3_clear_btn: "Clear Cache",
+                w4_title: "Daily Private Expenses & Notes",
+                w4_amount_placeholder: "Amount",
+                w4_purpose_placeholder: "Spending Purpose",
+                w4_notes_placeholder: "Notes (Optional)",
+                w4_add_btn: "Record Expense"
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function switchLang() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('lang-btn-text').textContent = currentLang === 'zh' ? '中 / EN' : 'EN / 中';
+            
+            // Apply translations
+            const dict = i18n[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.textContent = dict[key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (dict[key]) el.setAttribute('placeholder', dict[key]);
+            });
+            document.getElementById('ui-subtitle').textContent = dict.ui_subtitle;
+            saveState();
+        }
+
+        // Modal Control
+        function alertModal(msg) {
+            document.getElementById('modal-msg').textContent = msg;
+            const modal = document.getElementById('modal-toast');
+            const box = document.getElementById('modal-content-box');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('scale-95');
+                box.classList.add('scale-100');
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal-toast');
+            const box = document.getElementById('modal-content-box');
+            modal.classList.add('opacity-0');
+            box.classList.remove('scale-100');
+            box.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // Date Control & LocalStorage Persistence
         const globalDateInput = document.getElementById('global-date');
         const scheduleDateTitle = document.getElementById('schedule-date-title');
         
         globalDateInput.addEventListener('change', (e) => {
             scheduleDateTitle.textContent = e.target.value;
+            saveState();
         });
 
         function setToday() {
             const today = '2026-10-02';
             globalDateInput.value = today;
             scheduleDateTitle.textContent = today;
+            saveState();
         }
 
         function removeItem(btn) {
-            const item = btn.closest('div.bg-\\[\\#1E293B\\]\\/60') || btn.parentElement.parentElement;
+            const item = btn.closest('.bg-\\[\\#1E293B\\]\\/60') || btn.parentElement.parentElement;
             item.style.opacity = '0';
-            setTimeout(() => item.remove(), 200);
+            setTimeout(() => {
+                item.remove();
+                saveState();
+            }, 200);
         }
 
         function addSchedule() {
@@ -244,12 +368,14 @@
             const list = document.getElementById('schedule-list');
             const div = document.createElement('div');
             div.className = 'bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3.5 rounded-xl flex items-center justify-between transition group opacity-0 translate-y-2';
-            div.innerHTML = `<span class="text-sm text-slate-200">${escapeHtml(input.value)}</span><button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">删除</button>`;
+            const delText = currentLang === 'zh' ? '删除' : 'Delete';
+            div.innerHTML = `<span class="text-sm text-slate-200">${escapeHtml(input.value)}</span><button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">${delText}</button>`;
             list.appendChild(div);
             requestAnimationFrame(() => {
                 div.classList.remove('opacity-0', 'translate-y-2');
             });
             input.value = '';
+            saveState();
         }
 
         function addTask() {
@@ -262,15 +388,16 @@
             const list = document.getElementById('task-list');
             const div = document.createElement('div');
             div.className = 'bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3.5 rounded-xl flex items-center justify-between transition opacity-0 translate-y-2';
+            const delText = currentLang === 'zh' ? '删除' : 'Delete';
             div.innerHTML = `
                 <div class="flex items-start space-x-3">
-                    <input type="checkbox" class="mt-1 w-4 h-4 rounded bg-[#1E293B] border-slate-600 text-amber-500 focus:ring-0 cursor-pointer">
+                    <input type="checkbox" onchange="saveState()" class="mt-1 w-4 h-4 rounded bg-[#1E293B] border-slate-600 text-amber-500 focus:ring-0 cursor-pointer">
                     <div>
                         <p class="text-sm text-slate-200">${escapeHtml(name)}</p>
                         <p class="text-xs text-slate-500 mt-0.5 font-mono">起止: ${start} ~ ${end} | 分类: ${escapeHtml(category)}</p>
                     </div>
                 </div>
-                <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">删除</button>
+                <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">${delText}</button>
             `;
             list.appendChild(div);
             requestAnimationFrame(() => {
@@ -278,6 +405,7 @@
             });
             document.getElementById('new-task-name').value = '';
             document.getElementById('new-task-category').value = '';
+            saveState();
         }
 
         function addExpense() {
@@ -290,6 +418,7 @@
             const list = document.getElementById('expense-list');
             const div = document.createElement('div');
             div.className = 'bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3.5 rounded-xl flex items-center justify-between transition opacity-0 translate-y-2';
+            const delText = currentLang === 'zh' ? '删除' : 'Delete';
             div.innerHTML = `
                 <div>
                     <span class="text-sm font-medium text-slate-200">${escapeHtml(purpose)}</span>
@@ -297,7 +426,7 @@
                 </div>
                 <div class="flex items-center space-x-3">
                     <span class="text-sm font-mono font-bold text-amber-400">${currency} ${Number(amount).toFixed(2)}</span>
-                    <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">删除</button>
+                    <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-1 rounded-lg transition font-medium">${delText}</button>
                 </div>
             `;
             list.appendChild(div);
@@ -307,16 +436,58 @@
             document.getElementById('expense-amount').value = '';
             document.getElementById('expense-purpose').value = '';
             document.getElementById('expense-notes').value = '';
+            saveState();
         }
 
         function clearTempDoc() {
             document.getElementById('temp-doc-textarea').value = '';
+            saveState();
         }
 
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
+
+        // LocalStorage Save & Load State
+        function saveState() {
+            const state = {
+                lang: currentLang,
+                date: globalDateInput.value,
+                schedules: document.getElementById('schedule-list').innerHTML,
+                tasks: document.getElementById('task-list').innerHTML,
+                expenses: document.getElementById('expense-list').innerHTML,
+                tempDoc: document.getElementById('temp-doc-textarea').value
+            };
+            localStorage.setItem('command_nexus_state_v3', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('command_nexus_state_v3');
+            if (!saved) return;
+            try {
+                const state = JSON.parse(saved);
+                if (state.lang && state.lang !== currentLang) {
+                    switchLang();
+                }
+                if (state.date) {
+                    globalDateInput.value = state.date;
+                    scheduleDateTitle.textContent = state.date;
+                }
+                if (state.schedules) document.getElementById('schedule-list').innerHTML = state.schedules;
+                if (state.tasks) document.getElementById('task-list').innerHTML = state.tasks;
+                if (state.expenses) document.getElementById('expense-list').innerHTML = state.expenses;
+                if (state.tempDoc !== undefined) document.getElementById('temp-doc-textarea').value = state.tempDoc;
+            } catch (e) {
+                console.error("Failed to load state", e);
+            }
+        }
+
+        // Auto-save on textarea input
+        document.getElementById('temp-doc-textarea').addEventListener('input', saveState);
+
+        // Load state on startup
+        window.addEventListener('DOMContentLoaded', loadState);
     </script>
 </body>
 </html>
