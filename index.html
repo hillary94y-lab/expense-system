@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paydaes Operations & Admin Dashboard</title>
+    <title>CORP-FIN & EXEC COMMAND NEXUS</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
@@ -14,35 +14,42 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' }
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        accentgold: '#f59e0b',
+                        accentblue: '#3b82f6',
+                        darkborder: '#334155'
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+<body class="bg-darkbg text-gray-100 font-sans antialiased min-h-screen">
 
-    <!-- Top Navigation Bar with Language Switcher -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <!-- Top Navigation Bar -->
+    <header class="bg-cardbg border-b border-darkborder sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="bg-brand-600 text-white p-2 rounded-lg font-bold">
-                    <i class="fa-solid fa-building-shield"></i>
+                <div class="bg-accentgold text-gray-900 p-2 rounded-lg font-bold">
+                    <i class="fa-solid fa-bolt-lightning"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold text-gray-900" data-en="Paydaes Admin Hub" data-zh="Paydaes 行政管理中心">Paydaes Admin Hub</h1>
-                    <p class="text-xs text-gray-500" data-en="Operations Support & Management" data-zh="运营支持与管理系统">Operations Support & Management</p>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-base font-bold tracking-wider text-white">CORP-FIN & EXEC COMMAND NEXUS</h1>
+                        <span class="px-2 py-0.5 text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded font-semibold">SaaS Enterprise Edition</span>
+                    </div>
+                    <p class="text-xs text-gray-400" data-en="Corporate Finance, Vendor Control, Master Ledger & Exec Copilot (LocalStorage Active)" data-zh="企业财务、Vendor 智控、Master Ledger 与行政领航中枢 (LocalStorage 永久存储已启用)">Corporate Finance, Vendor Control, Master Ledger & Exec Copilot</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
                 <!-- Language Switcher -->
-                <button onclick="toggleLanguage()" class="flex items-center space-x-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-300 hover:bg-gray-100 transition">
+                <button onclick="toggleLanguage()" class="flex items-center space-x-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-darkborder bg-gray-800 text-gray-200 hover:bg-gray-700 transition">
                     <i class="fa-solid fa-globe"></i>
                     <span id="langLabel">华文 / EN</span>
                 </button>
-                <div class="text-sm font-medium text-gray-700">
-                    <i class="fa-regular fa-user mr-1 text-brand-600"></i> Hillary (Paydaes)
+                <div class="text-xs font-medium text-gray-300 bg-gray-800 px-3 py-1.5 rounded-lg border border-darkborder">
+                    <i class="fa-regular fa-user mr-1 text-amber-400"></i> Hillary (Paydaes)
                 </div>
             </div>
         </div>
@@ -52,23 +59,26 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
 
         <!-- PART 1: 固定支出 (Fixed Expenses & Management) -->
-        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-gray-100 gap-4">
+        <section class="bg-cardbg rounded-xl shadow-lg border border-darkborder p-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-darkborder gap-4">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900" data-en="Part 1 - Fixed Expenses & Management" data-zh="Part 1 - 固定支出与管理">Part 1 - 固定支出与管理</h2>
-                    <p class="text-sm text-gray-500" data-en="Monthly recurring checklist and management company details" data-zh="每月固定支出清单及管理公司详情">Monthly recurring checklist and management company details</p>
+                    <h2 class="text-lg font-bold text-white flex items-center">
+                        <i class="fa-solid fa-calendar-check mr-2 text-amber-400"></i>
+                        <span data-en="Part 1 - Monthly Recurring Checklist & Management Co" data-zh="Part 1 - 固定支出与管理公司清单">Part 1 - Monthly Recurring Checklist & Management Co</span>
+                    </h2>
+                    <p class="text-xs text-gray-400" data-en="Monthly recurring checklist with year, month and current management company" data-zh="包含年、月及当前管理公司的每月固定支出检查清单">Monthly recurring checklist with year, month and current management company</p>
                 </div>
                 <!-- Management Company & Year/Month Controls -->
                 <div class="flex flex-wrap items-center gap-3">
-                    <div class="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                        <span class="text-xs font-semibold text-gray-600" data-en="Management Co:" data-zh="当前管理公司:">Management Co:</span>
-                        <input type="text" id="mgmtCompanyInput" value="GHRA Facility Management Sdn Bhd" class="text-xs bg-transparent font-medium text-gray-900 focus:outline-none w-48">
+                    <div class="flex items-center space-x-2 bg-gray-900 px-3 py-1.5 rounded-lg border border-darkborder">
+                        <span class="text-xs font-semibold text-gray-400" data-en="Management Co:" data-zh="当前管理公司:">Management Co:</span>
+                        <input type="text" id="mgmtCompanyInput" value="GHRA Facility Management Sdn Bhd" class="text-xs bg-transparent font-medium text-amber-300 focus:outline-none w-56">
                     </div>
-                    <select id="expenseYear" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
+                    <select id="expenseYear" class="text-xs bg-gray-900 text-gray-200 border border-darkborder rounded-lg px-2.5 py-1.5 font-medium">
                         <option value="2026">2026</option>
                         <option value="2025">2025</option>
                     </select>
-                    <select id="expenseMonth" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 font-medium">
+                    <select id="expenseMonth" class="text-xs bg-gray-900 text-gray-200 border border-darkborder rounded-lg px-2.5 py-1.5 font-medium">
                         <option value="10">October (10月)</option>
                         <option value="11">November (11月)</option>
                         <option value="12">December (12月)</option>
@@ -80,7 +90,7 @@
             <div class="mt-6 overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider border-b border-gray-200">
+                        <tr class="bg-gray-900/50 text-gray-400 text-xs uppercase tracking-wider border-b border-darkborder">
                             <th class="py-3 px-4" data-en="Checklist Item" data-zh="检查项目">Checklist Item</th>
                             <th class="py-3 px-4" data-en="Management Company" data-zh="管理公司">Management Company</th>
                             <th class="py-3 px-4" data-en="Period (Year/Month)" data-zh="周期 (年/月)">Period (Year/Month)</th>
@@ -88,20 +98,20 @@
                             <th class="py-3 px-4 text-right" data-en="Actions" data-zh="操作">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 text-sm">
+                    <tbody class="divide-y divide-darkborder text-sm text-gray-300">
                         <tr>
-                            <td class="py-3 px-4 font-medium" data-en="Office Rental & Facilities Fee" data-zh="办公室租金与设施费">Office Rental & Facilities Fee</td>
-                            <td class="py-3 px-4 text-gray-600">The Bousteador Management</td>
-                            <td class="py-3 px-4 text-gray-600">2026 / 10</td>
-                            <td class="py-3 px-4"><span class="px-2.5 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium" data-en="Paid" data-zh="已支付">Paid</span></td>
-                            <td class="py-3 px-4 text-right"><button class="text-brand-600 hover:text-brand-700 text-xs font-semibold" data-en="Edit" data-zh="编辑">Edit</button></td>
+                            <td class="py-3 px-4 font-medium text-white" data-en="Office Rental & Facilities Fee" data-zh="办公室租金与设施费">Office Rental & Facilities Fee</td>
+                            <td class="py-3 px-4 text-gray-300">The Bousteador Management</td>
+                            <td class="py-3 px-4 text-gray-400">2026 / 10</td>
+                            <td class="py-3 px-4"><span class="px-2.5 py-1 text-xs bg-green-900/40 text-green-400 border border-green-700/50 rounded-full font-medium" data-en="Paid" data-zh="已支付">Paid</span></td>
+                            <td class="py-3 px-4 text-right"><button class="text-amber-400 hover:text-amber-300 text-xs font-semibold" data-en="Edit" data-zh="编辑">Edit</button></td>
                         </tr>
                         <tr>
-                            <td class="py-3 px-4 font-medium" data-en="High-Speed Internet & Fiber Line" data-zh="高速宽带与光纤专线">High-Speed Internet & Fiber Line</td>
-                            <td class="py-3 px-4 text-gray-600">Time DotCom Berhad</td>
-                            <td class="py-3 px-4 text-gray-600">2026 / 10</td>
-                            <td class="py-3 px-4"><span class="px-2.5 py-1 text-xs bg-amber-100 text-amber-700 rounded-full font-medium" data-en="Pending" data-zh="待处理">Pending</span></td>
-                            <td class="py-3 px-4 text-right"><button class="text-brand-600 hover:text-brand-700 text-xs font-semibold" data-en="Edit" data-zh="编辑">Edit</button></td>
+                            <td class="py-3 px-4 font-medium text-white" data-en="High-Speed Internet & Fiber Line" data-zh="高速宽带与光纤专线">High-Speed Internet & Fiber Line</td>
+                            <td class="py-3 px-4 text-gray-300">Time DotCom Berhad</td>
+                            <td class="py-3 px-4 text-gray-400">2026 / 10</td>
+                            <td class="py-3 px-4"><span class="px-2.5 py-1 text-xs bg-amber-900/40 text-amber-400 border border-amber-700/50 rounded-full font-medium" data-en="Pending" data-zh="待处理">Pending</span></td>
+                            <td class="py-3 px-4 text-right"><button class="text-amber-400 hover:text-amber-300 text-xs font-semibold" data-en="Edit" data-zh="编辑">Edit</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -109,42 +119,45 @@
         </section>
 
         <!-- PART 2: 行政费用 (Administrative Expenses & AI Invoice Parsing) -->
-        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+        <section class="bg-cardbg rounded-xl shadow-lg border border-darkborder p-6">
+            <div class="flex items-center justify-between pb-4 border-b border-darkborder">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900" data-en="Part 2 - Administrative Expenses & AI Copilot" data-zh="Part 2 - 行政费用与 AI 智能收据">Part 2 - 行政费用与 AI 智能收据</h2>
-                    <p class="text-sm text-gray-500" data-en="AI Smart Invoice Extraction & Detailed Budget Allocation Report" data-zh="AI 智能发票提取与明细预算分配报告">AI Smart Invoice Extraction & Detailed Budget Allocation Report</p>
+                    <h2 class="text-lg font-bold text-white flex items-center">
+                        <i class="fa-solid fa-receipt mr-2 text-amber-400"></i>
+                        <span data-en="Part 2 - Administrative Expenses & AI Smart Invoice" data-zh="Part 2 - 行政费用与 AI 智能收据">Part 2 - Administrative Expenses & AI Smart Invoice</span>
+                    </h2>
+                    <p class="text-xs text-gray-400" data-en="AI smart extraction, accurate classification & detailed 2026 budget report" data-zh="AI 智能识别发票内容、精准分类与 2026 年度明细预算报表">AI smart extraction, accurate classification & detailed 2026 budget report</p>
                 </div>
             </div>
 
             <!-- AI Smart Invoice Upload / Simulation Box -->
-            <div class="mt-6 p-4 bg-brand-50 rounded-xl border border-brand-200 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="mt-6 p-4 bg-gray-900/60 rounded-xl border border-darkborder flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex items-center space-x-3">
-                    <div class="bg-brand-600 text-white p-3 rounded-lg"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div class="bg-amber-500/20 text-amber-400 p-3 rounded-lg border border-amber-500/30"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
                     <div>
-                        <h4 class="text-sm font-bold text-gray-900" data-en="AI Smart Invoice Scanner" data-zh="AI 智能收据与发票解析器">AI Smart Invoice Scanner</h4>
-                        <p class="text-xs text-gray-600" data-en="Upload or drop invoice to auto-extract details, match categories & apply budget." data-zh="上传或拖入发票，自动提取内容、精准归类并匹配预算。">Upload or drop invoice to auto-extract details, match categories & apply budget.</p>
+                        <h4 class="text-sm font-bold text-white" data-en="AI Smart Invoice Copilot" data-zh="AI 智能发票与收据解析领航">AI Smart Invoice Copilot</h4>
+                        <p class="text-xs text-gray-400" data-en="Upload invoice to auto-extract text contents, match categories & apply budget." data-zh="上传收据/发票，自动深度解析内容、完成分类并关联预算。">Upload invoice to auto-extract text contents, match categories & apply budget.</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
                     <input type="file" id="invoiceFile" class="hidden" onchange="simulateAIProcessing()">
-                    <button onclick="document.getElementById('invoiceFile').click()" class="px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-700 transition shadow-sm" data-en="Upload Invoice" data-zh="上传发票文件">Upload Invoice</button>
+                    <button onclick="document.getElementById('invoiceFile').click()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-gray-950 text-xs font-bold rounded-lg transition shadow-sm" data-en="Upload Invoice" data-zh="上传发票文件">Upload Invoice</button>
                 </div>
             </div>
 
             <!-- AI Parsing Result Feedback -->
-            <div id="aiResultBox" class="hidden mt-4 p-3 bg-white border border-gray-200 rounded-lg text-xs space-y-1 text-gray-700">
-                <p class="font-bold text-brand-700"><i class="fa-solid fa-check-circle mr-1"></i> <span data-en="AI successfully parsed and categorized invoice:" data-zh="AI 已成功解析并归类发票：">AI successfully parsed and categorized invoice:</span></p>
-                <p><span class="font-semibold" data-en="Vendor:" data-zh="供应商:">Vendor:</span> <span id="resVendor">Office Depot M Sdn Bhd</span> | <span class="font-semibold" data-en="Category:" data-zh="分类:">Category:</span> <span id="resCategory">Stationery & Printing Supplies</span> | <span class="font-semibold" data-en="Amount:" data-zh="金额:">Amount:</span> RM 450.00</p>
+            <div id="aiResultBox" class="hidden mt-4 p-3 bg-gray-900 border border-amber-500/40 rounded-lg text-xs space-y-1 text-gray-300">
+                <p class="font-bold text-amber-400"><i class="fa-solid fa-check-circle mr-1"></i> <span data-en="AI successfully parsed and categorized invoice:" data-zh="AI 已成功智能识别并归类发票：">AI successfully parsed and categorized invoice:</span></p>
+                <p><span class="text-gray-400" data-en="Vendor:" data-zh="供应商:">Vendor:</span> <span class="text-white font-medium" id="resVendor">Office Depot M Sdn Bhd</span> | <span class="text-gray-400" data-en="Category:" data-zh="分类:">Category:</span> <span class="text-white font-medium" id="resCategory">Stationery & Printing Supplies</span> | <span class="text-gray-400" data-en="Amount:" data-zh="金额:">Amount:</span> <span class="text-amber-400 font-bold">RM 450.00</span></p>
             </div>
 
             <!-- YEAR 2026 MONTHLY ADMIN EXPENSES REPORT WITH BUDGET -->
             <div class="mt-8">
-                <h3 class="text-md font-bold text-gray-900 mb-3" data-en="YEAR 2026 MONTHLY ADMIN EXPENSES REPORT (Detailed Category & Budget)" data-zh="2026 年度行政费用明细报告 (含各实体预算)">YEAR 2026 MONTHLY ADMIN EXPENSES REPORT (Detailed Category & Budget)</h3>
+                <h3 class="text-sm font-bold text-white mb-3" data-en="YEAR 2026 MONTHLY ADMIN EXPENSES REPORT (Detailed Category & Budget)" data-zh="2026 年度行政费用明细大表与智控 (含各 Entity 预算)">YEAR 2026 MONTHLY ADMIN EXPENSES REPORT (Detailed Category & Budget)</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider border-b border-gray-200">
+                            <tr class="bg-gray-900/50 text-gray-400 text-xs uppercase tracking-wider border-b border-darkborder">
                                 <th class="py-3 px-4" data-en="Entity / Department" data-zh="实体 / 部门">Entity / Department</th>
                                 <th class="py-3 px-4" data-en="Category" data-zh="费用分类">Category</th>
                                 <th class="py-3 px-4 text-right" data-en="Allocated Budget" data-zh="分配预算 (Budget)">Allocated Budget</th>
@@ -152,27 +165,27 @@
                                 <th class="py-3 px-4 text-right" data-en="Variance" data-zh="差异/结余">Variance</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
+                        <tbody class="divide-y divide-darkborder text-sm text-gray-300">
                             <tr>
-                                <td class="py-3 px-4 font-medium">Paydaes HQ</td>
-                                <td class="py-3 px-4 text-gray-600" data-en="Stationery & Printing Supplies" data-zh="文具与打印耗材">Stationery & Printing Supplies</td>
-                                <td class="py-3 px-4 text-right font-semibold">RM 5,000.00</td>
-                                <td class="py-3 px-4 text-right text-brand-600 font-medium">RM 3,850.00</td>
-                                <td class="py-3 px-4 text-right text-green-600 font-medium">+RM 1,150.00</td>
+                                <td class="py-3 px-4 font-medium text-white">Paydaes HQ</td>
+                                <td class="py-3 px-4 text-gray-300" data-en="Stationery & Printing Supplies" data-zh="文具与打印耗材">Stationery & Printing Supplies</td>
+                                <td class="py-3 px-4 text-right font-semibold text-white">RM 5,000.00</td>
+                                <td class="py-3 px-4 text-right text-amber-400 font-medium">RM 3,850.00</td>
+                                <td class="py-3 px-4 text-right text-green-400 font-medium">+RM 1,150.00</td>
                             </tr>
                             <tr>
-                                <td class="py-3 px-4 font-medium">Paydaes HQ</td>
-                                <td class="py-3 px-4 text-gray-600" data-en="Office Pantry & Refreshments" data-zh="茶水间与茶点日常">Office Pantry & Refreshments</td>
-                                <td class="py-3 px-4 text-right font-semibold">RM 8,000.00</td>
-                                <td class="py-3 px-4 text-right text-brand-600 font-medium">RM 7,200.00</td>
-                                <td class="py-3 px-4 text-right text-green-600 font-medium">+RM 800.00</td>
+                                <td class="py-3 px-4 font-medium text-white">Paydaes HQ</td>
+                                <td class="py-3 px-4 text-gray-300" data-en="Office Pantry & Refreshments" data-zh="茶水间与茶点日常">Office Pantry & Refreshments</td>
+                                <td class="py-3 px-4 text-right font-semibold text-white">RM 8,000.00</td>
+                                <td class="py-3 px-4 text-right text-amber-400 font-medium">RM 7,200.00</td>
+                                <td class="py-3 px-4 text-right text-green-400 font-medium">+RM 800.00</td>
                             </tr>
                             <tr>
-                                <td class="py-3 px-4 font-medium">Operations Support</td>
-                                <td class="py-3 px-4 text-gray-600" data-en="Facility Maintenance & Repair" data-zh="设施维护与维修保养">Facility Maintenance & Repair</td>
-                                <td class="py-3 px-4 text-right font-semibold">RM 15,000.00</td>
-                                <td class="py-3 px-4 text-right text-brand-600 font-medium">RM 12,400.00</td>
-                                <td class="py-3 px-4 text-right text-green-600 font-medium">+RM 2,600.00</td>
+                                <td class="py-3 px-4 font-medium text-white">Operations Support</td>
+                                <td class="py-3 px-4 text-gray-300" data-en="Facility Maintenance & Repair" data-zh="设施维护与维修保养">Facility Maintenance & Repair</td>
+                                <td class="py-3 px-4 text-right font-semibold text-white">RM 15,000.00</td>
+                                <td class="py-3 px-4 text-right text-amber-400 font-medium">RM 12,400.00</td>
+                                <td class="py-3 px-4 text-right text-green-400 font-medium">+RM 2,600.00</td>
                             </tr>
                         </tbody>
                     </table>
@@ -181,19 +194,22 @@
         </section>
 
         <!-- PART 3: Vendor Directory Table (供应商智控表) -->
-        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+        <section class="bg-cardbg rounded-xl shadow-lg border border-darkborder p-6">
+            <div class="flex items-center justify-between pb-4 border-b border-darkborder">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900" data-en="Part 3 - Vendor Directory Table" data-zh="Part 3 - 供应商智控表">Part 3 - 供应商智控表</h2>
-                    <p class="text-sm text-gray-500" data-en="Vendor IDs auto-generated based on company name initial (e.g., Rhambus -> R001)" data-zh="Vendor ID 根据公司名称首字母自动生成（例：Rhambus -> R001）">Vendor IDs auto-generated based on company name initial</p>
+                    <h2 class="text-lg font-bold text-white flex items-center">
+                        <i class="fa-solid fa-address-book mr-2 text-amber-400"></i>
+                        <span data-en="Part 3 - Vendor Directory Table" data-zh="Part 3 - 供应商智控表">Part 3 - Vendor Directory Table</span>
+                    </h2>
+                    <p class="text-xs text-gray-400" data-en="Vendor IDs auto-generated based on company name initial (e.g., Rhambus -> R001)" data-zh="Vendor ID 根据公司名称首字母自动生成（例：Rhambus -> R001）">Vendor IDs auto-generated based on company name initial</p>
                 </div>
-                <button onclick="addVendorRow()" class="px-3 py-1.5 bg-brand-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-700 transition" data-en="+ Add Vendor" data-zh="+ 添加供应商">+ Add Vendor</button>
+                <button onclick="addVendorRow()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-gray-950 text-xs font-bold rounded-lg transition" data-en="+ Add Vendor" data-zh="+ 添加供应商">+ Add Vendor</button>
             </div>
 
             <div class="mt-6 overflow-x-auto">
                 <table class="w-full text-left border-collapse" id="vendorTable">
                     <thead>
-                        <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider border-b border-gray-200">
+                        <tr class="bg-gray-900/50 text-gray-400 text-xs uppercase tracking-wider border-b border-darkborder">
                             <th class="py-3 px-4" data-en="Vendor ID" data-zh="供应商编号 (Vendor ID)">Vendor ID</th>
                             <th class="py-3 px-4" data-en="Vendor Company Name" data-zh="供应商公司名称">Vendor Company Name</th>
                             <th class="py-3 px-4" data-en="Service Category" data-zh="服务类别">Service Category</th>
@@ -201,20 +217,20 @@
                             <th class="py-3 px-4 text-right" data-en="Action" data-zh="操作">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 text-sm">
+                    <tbody class="divide-y divide-darkborder text-sm text-gray-300">
                         <tr>
-                            <td class="py-3 px-4 font-mono font-bold text-brand-700">R001</td>
-                            <td class="py-3 px-4 font-medium"><input type="text" value="Rhambus Trading" oninput="updateVendorId(this)" class="bg-transparent border-b border-transparent hover:border-gray-300 focus:border-brand-600 focus:outline-none w-full"></td>
-                            <td class="py-3 px-4 text-gray-600">Office Supplies</td>
-                            <td class="py-3 px-4 text-gray-600">Mr. Alex</td>
-                            <td class="py-3 px-4 text-right"><button onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 text-xs font-semibold" data-en="Delete" data-zh="删除">Delete</button></td>
+                            <td class="py-3 px-4 font-mono font-bold text-amber-400">R001</td>
+                            <td class="py-3 px-4 font-medium text-white"><input type="text" value="Rhambus Trading" oninput="updateVendorId(this)" class="bg-transparent border-b border-transparent hover:border-darkborder focus:border-amber-400 focus:outline-none w-full text-white"></td>
+                            <td class="py-3 px-4 text-gray-300">Office Supplies</td>
+                            <td class="py-3 px-4 text-gray-300">Mr. Alex</td>
+                            <td class="py-3 px-4 text-right"><button onclick="this.closest('tr').remove()" class="text-red-400 hover:text-red-300 text-xs font-semibold" data-en="Delete" data-zh="删除">Delete</button></td>
                         </tr>
                         <tr>
-                            <td class="py-3 px-4 font-mono font-bold text-brand-700">P001</td>
-                            <td class="py-3 px-4 font-medium"><input type="text" value="Paydaes Logistics" oninput="updateVendorId(this)" class="bg-transparent border-b border-transparent hover:border-gray-300 focus:border-brand-600 focus:outline-none w-full"></td>
-                            <td class="py-3 px-4 text-gray-600">Courier & Transport</td>
-                            <td class="py-3 px-4 text-gray-600">Ms. Suki</td>
-                            <td class="py-3 px-4 text-right"><button onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 text-xs font-semibold" data-en="Delete" data-zh="删除">Delete</button></td>
+                            <td class="py-3 px-4 font-mono font-bold text-amber-400">P001</td>
+                            <td class="py-3 px-4 font-medium text-white"><input type="text" value="Paydaes Logistics" oninput="updateVendorId(this)" class="bg-transparent border-b border-transparent hover:border-darkborder focus:border-amber-400 focus:outline-none w-full text-white"></td>
+                            <td class="py-3 px-4 text-gray-300">Courier & Transport</td>
+                            <td class="py-3 px-4 text-gray-300">Ms. Suki</td>
+                            <td class="py-3 px-4 text-right"><button onclick="this.closest('tr').remove()" class="text-red-400 hover:text-red-300 text-xs font-semibold" data-en="Delete" data-zh="删除">Delete</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -222,52 +238,56 @@
         </section>
 
         <!-- PART 4: Administrative Super Copilot (行政超级领航员) -->
-        <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-8">
-            <div class="pb-4 border-b border-gray-100">
-                <h2 class="text-xl font-bold text-gray-900" data-en="Part 4 - Administrative Super Copilot" data-zh="Part 4 - 行政超级领航员">Part 4 - 行政超级领航员</h2>
-                <p class="text-sm text-gray-500" data-en="Separated daily expenses, personal notes, tasks with start/end dates & doc cache" data-zh="独立拆分的每日消费、私人手帐、带起止日期的任务与文档暂存箱">Separated expenses, personal planner, tracked tasks & document staging</p>
+        <section class="bg-cardbg rounded-xl shadow-lg border border-darkborder p-6 space-y-8">
+            <div class="pb-4 border-b border-darkborder flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center">
+                        <i class="fa-solid fa-robot mr-2 text-amber-400"></i>
+                        <span data-en="Part 4 - Administrative Super Copilot" data-zh="Part 4 - 行政超级领航员">Part 4 - Administrative Super Copilot</span>
+                    </h2>
+                    <p class="text-xs text-gray-400" data-en="Daily expenses, personal notes, tasks with start/end dates & document staging box" data-zh="独立拆分的每日消费、私人手帐、带起止日期的任务跟踪与文档暂存箱">Daily expenses, personal notes, tasks with start/end dates & document staging box</p>
+                </div>
             </div>
 
             <!-- 1. 每日消费 (Daily Expenses) & 私人手帐 (Personal Notes) - Separated -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Daily Expenses Box -->
-                <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-                    <h3 class="font-bold text-gray-900 text-sm flex items-center">
-                        <i class="fa-solid fa-receipt mr-2 text-brand-600"></i> <span data-en="Daily Expenses Tracker" data-zh="每日消费账目记录">Daily Expenses Tracker</span>
+                <div class="p-4 bg-gray-900/60 rounded-xl border border-darkborder space-y-3">
+                    <h3 class="font-bold text-white text-sm flex items-center">
+                        <i class="fa-solid fa-mug-hot mr-2 text-amber-400"></i> <span data-en="Daily Expenses Tracker" data-zh="每日消费账目记录 (私人口袋)">Daily Expenses Tracker</span>
                     </h3>
                     <div class="flex gap-2">
-                        <input type="text" id="expenseItemDesc" placeholder="Item description (e.g., Coffee)" class="text-xs border rounded-lg px-3 py-2 flex-1 bg-white">
-                        <input type="number" id="expenseItemAmt" placeholder="RM" class="text-xs border rounded-lg px-3 py-2 w-24 bg-white">
-                        <button onclick="addDailyExpense()" class="px-3 py-2 bg-brand-600 text-white text-xs font-semibold rounded-lg" data-en="Add" data-zh="添加">Add</button>
+                        <input type="text" id="expenseItemDesc" placeholder="Item description (e.g., Coffee)" class="text-xs border border-darkborder rounded-lg px-3 py-2 flex-1 bg-gray-900 text-white focus:outline-none focus:border-amber-400">
+                        <input type="number" id="expenseItemAmt" placeholder="RM" class="text-xs border border-darkborder rounded-lg px-3 py-2 w-24 bg-gray-900 text-white focus:outline-none focus:border-amber-400">
+                        <button onclick="addDailyExpense()" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-gray-950 text-xs font-bold rounded-lg" data-en="Add" data-zh="添加">Add</button>
                     </div>
-                    <ul id="expenseList" class="text-xs text-gray-700 space-y-1.5 pt-1">
-                        <li>☕ CHAGEE Tea (0% Sugar) - RM 13.90</li>
-                        <li>🥗 Lunch Salad - RM 18.50</li>
+                    <ul id="expenseList" class="text-xs text-gray-300 space-y-1.5 pt-1">
+                        <li>☕ Beutea (0%糖) (下午茶) - <span class="text-amber-400 font-bold">MYR 12.90</span></li>
                     </ul>
                 </div>
 
                 <!-- Personal Notes Box -->
-                <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-                    <h3 class="font-bold text-gray-900 text-sm flex items-center">
-                        <i class="fa-solid fa-book-bookmark mr-2 text-brand-600"></i> <span data-en="Personal Notebook & Planner" data-zh="私人手帐与备忘">Personal Notebook & Planner</span>
+                <div class="p-4 bg-gray-900/60 rounded-xl border border-darkborder space-y-3">
+                    <h3 class="font-bold text-white text-sm flex items-center">
+                        <i class="fa-solid fa-book-bookmark mr-2 text-amber-400"></i> <span data-en="Personal Notebook & Planner" data-zh="私人手帐与备忘录">Personal Notebook & Planner</span>
                     </h3>
-                    <textarea id="personalNote" rows="3" placeholder="Write down personal notes or reminders here..." class="text-xs border rounded-lg p-3 w-full bg-white focus:outline-none focus:ring-1 focus:ring-brand-600">Remember to check Reformer Pilates schedule for next week & pick up Lego display gifts.</textarea>
-                    <button onclick="savePersonalNote()" class="px-3 py-1.5 bg-gray-800 text-white text-xs font-semibold rounded-lg" data-en="Save Note" data-zh="保存手帐">Save Note</button>
+                    <textarea id="personalNote" rows="3" placeholder="Write down personal notes or reminders here..." class="text-xs border border-darkborder rounded-lg p-3 w-full bg-gray-900 text-white focus:outline-none focus:border-amber-400">Remember to check Reformer Pilates schedule for next week & pick up Lego display gifts.</textarea>
+                    <button onclick="savePersonalNote()" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 border border-darkborder text-xs font-semibold rounded-lg" data-en="Save Note" data-zh="保存手帐">Save Note</button>
                 </div>
             </div>
 
             <!-- 2. 任务与项目跟踪 (Tasks & Project Tracking with Start & End Date) -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-bold text-gray-900 text-sm flex items-center">
-                        <i class="fa-solid fa-bars-progress mr-2 text-brand-600"></i> <span data-en="Tasks & Project Tracking (with Start & End Dates)" data-zh="任务与项目跟踪 (含起止日期)">Tasks & Project Tracking (with Start & End Dates)</span>
+                    <h3 class="font-bold text-white text-sm flex items-center">
+                        <i class="fa-solid fa-bars-progress mr-2 text-amber-400"></i> <span data-en="Tasks & Project Tracking (with Start & End Dates)" data-zh="任务与项目跟踪 (含起止日期与分类)">Tasks & Project Tracking (with Start & End Dates)</span>
                     </h3>
-                    <button onclick="addTaskRow()" class="text-xs text-brand-600 font-semibold hover:underline" data-en="+ Add Task" data-zh="+ 添加任务">+ Add Task</button>
+                    <button onclick="addTaskRow()" class="text-xs text-amber-400 font-semibold hover:underline" data-en="+ Add Task" data-zh="+ 添加任务">+ Add Task</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse" id="taskTable">
                         <thead>
-                            <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider border-b border-gray-200">
+                            <tr class="bg-gray-900/50 text-gray-400 text-xs uppercase tracking-wider border-b border-darkborder">
                                 <th class="py-2.5 px-3" data-en="Task / Project Name" data-zh="任务与项目名称">Task / Project Name</th>
                                 <th class="py-2.5 px-3" data-en="Start Date" data-zh="开始日期">Start Date</th>
                                 <th class="py-2.5 px-3" data-en="End Date" data-zh="结束日期">End Date</th>
@@ -275,20 +295,13 @@
                                 <th class="py-2.5 px-3 text-right" data-en="Action" data-zh="操作">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
+                        <tbody class="divide-y divide-darkborder text-sm text-gray-300">
                             <tr>
-                                <td class="py-2.5 px-3 font-medium">IT Asset Management & Brother Label Integration</td>
-                                <td class="py-2.5 px-3 text-xs text-gray-600">2026-07-01</td>
-                                <td class="py-2.5 px-3 text-xs text-gray-600">2026-07-31</td>
-                                <td class="py-2.5 px-3"><span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full font-medium" data-en="Completed" data-zh="已完成">Completed</span></td>
-                                <td class="py-2.5 px-3 text-right"><button onclick="this.closest('tr').remove()" class="text-red-500 text-xs" data-en="Delete" data-zh="删除">Delete</button></td>
-                            </tr>
-                            <tr>
-                                <td class="py-2.5 px-3 font-medium">Shanghai Year-End Trip Planning & Disneyland</td>
-                                <td class="py-2.5 px-3 text-xs text-gray-600">2026-12-01</td>
-                                <td class="py-2.5 px-3 text-xs text-gray-600">2026-12-30</td>
-                                <td class="py-2.5 px-3"><span class="px-2 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full font-medium" data-en="In Progress" data-zh="进行中">In Progress</span></td>
-                                <td class="py-2.5 px-3 text-right"><button onclick="this.closest('tr').remove()" class="text-red-500 text-xs" data-en="Delete" data-zh="删除">Delete</button></td>
+                                <td class="py-2.5 px-3 font-medium text-white">完成各实体 12 月份预算与实际开支对账</td>
+                                <td class="py-2.5 px-3 text-xs text-gray-400">2026-10-01</td>
+                                <td class="py-2.5 px-3 text-xs text-gray-400">2026-10-05</td>
+                                <td class="py-2.5 px-3"><span class="px-2 py-0.5 text-xs bg-amber-900/40 text-amber-400 border border-amber-700/50 rounded-full font-medium" data-en="In Progress" data-zh="进行中">In Progress</span></td>
+                                <td class="py-2.5 px-3 text-right"><button onclick="this.closest('tr').remove()" class="text-red-400 text-xs hover:text-red-300" data-en="Delete" data-zh="删除">Delete</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -296,24 +309,20 @@
             </div>
 
             <!-- 3. 文件与文档暂存箱 (Staging Area for Unfinished Documents) -->
-            <div class="space-y-3 pt-4 border-t border-gray-100">
+            <div class="space-y-3 pt-4 border-t border-darkborder">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-bold text-gray-900 text-sm flex items-center">
-                        <i class="fa-solid fa-box-archive mr-2 text-brand-600"></i> <span data-en="Document Staging Box (Unfinished Documents)" data-zh="文件与文档暂存箱 (未完成文档缓存)">Document Staging Box (Unfinished Documents)</span>
+                    <h3 class="font-bold text-white text-sm flex items-center">
+                        <i class="fa-solid fa-box-archive mr-2 text-amber-400"></i> <span data-en="Document Staging Box (Unfinished Documents Cache)" data-zh="文件与文档暂存箱 (未完成文档缓存)">Document Staging Box (Unfinished Documents Cache)</span>
                     </h3>
                     <div class="flex gap-2">
-                        <input type="text" id="docNameInput" placeholder="Document title..." class="text-xs border rounded-lg px-3 py-1.5 bg-white">
-                        <button onclick="addStagedDoc()" class="px-3 py-1.5 bg-brand-600 text-white text-xs font-semibold rounded-lg" data-en="Add Staged Doc" data-zh="添加暂存文档">Add Staged Doc</button>
+                        <input type="text" id="docNameInput" placeholder="Document title..." class="text-xs border border-darkborder rounded-lg px-3 py-1.5 bg-gray-900 text-white focus:outline-none focus:border-amber-400">
+                        <button onclick="addStagedDoc()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-gray-950 text-xs font-bold rounded-lg" data-en="Add Staged Doc" data-zh="添加暂存文档">Add Staged Doc</button>
                     </div>
                 </div>
                 <div id="stagedDocList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
-                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between text-xs">
-                        <span class="font-medium text-gray-800"><i class="fa-regular fa-file-word mr-1.5 text-blue-600"></i> Paydaes_Ops_Policy_Draft_v2.docx</span>
-                        <button onclick="this.closest('div').remove()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between text-xs">
-                        <span class="font-medium text-gray-800"><i class="fa-regular fa-file-excel mr-1.5 text-green-600"></i> Inventory_Template_2026.xlsx</span>
-                        <button onclick="this.closest('div').remove()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                    <div class="p-3 bg-gray-900/60 border border-darkborder rounded-lg flex items-center justify-between text-xs">
+                        <span class="font-medium text-gray-200"><i class="fa-regular fa-file-lines mr-1.5 text-amber-400"></i> 待核对 10 月份 TNB 电费账单编号</span>
+                        <button onclick="this.closest('div').remove()" class="text-gray-500 hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </div>
             </div>
@@ -322,7 +331,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-16 py-6 text-center text-xs text-gray-500">
+    <footer class="bg-cardbg border-t border-darkborder mt-16 py-6 text-center text-xs text-gray-400">
         <p>&copy; 2026 Paydaes Operations Support Department. All rights reserved.</p>
     </footer>
 
@@ -371,11 +380,11 @@
             const tbody = document.querySelector('#vendorTable tbody');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="py-3 px-4 font-mono font-bold text-brand-700">NEW</td>
-                <td class="py-3 px-4 font-medium"><input type="text" placeholder="Enter company name..." oninput="updateVendorId(this)" class="bg-transparent border-b border-transparent hover:border-gray-300 focus:border-brand-600 focus:outline-none w-full"></td>
-                <td class="py-3 px-4 text-gray-600"><input type="text" placeholder="Category" class="bg-transparent border-b border-transparent focus:outline-none w-full"></td>
-                <td class="py-3 px-4 text-gray-600"><input type="text" placeholder="Contact" class="bg-transparent border-b border-transparent focus:outline-none w-full"></td>
-                <td class="py-3 px-4 text-right"><button onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 text-xs font-semibold">Delete</button></td>
+                <td class="py-3 px-4 font-mono font-bold text-amber-400">NEW</td>
+                <td class="py-3 px-4 font-medium text-white"><input type="text" placeholder="Enter company name..." oninput="updateVendorId(this)" class="bg-transparent border-b border-transparent hover:border-darkborder focus:border-amber-400 focus:outline-none w-full text-white"></td>
+                <td class="py-3 px-4 text-gray-300"><input type="text" placeholder="Category" class="bg-transparent border-b border-transparent focus:outline-none w-full text-white"></td>
+                <td class="py-3 px-4 text-gray-300"><input type="text" placeholder="Contact" class="bg-transparent border-b border-transparent focus:outline-none w-full text-white"></td>
+                <td class="py-3 px-4 text-right"><button onclick="this.closest('tr').remove()" class="text-red-400 hover:text-red-300 text-xs font-semibold">Delete</button></td>
             `;
             tbody.appendChild(tr);
         }
@@ -386,7 +395,7 @@
             if(desc && amt) {
                 const list = document.getElementById('expenseList');
                 const li = document.createElement('li');
-                li.textContent = `📌 ${desc} - RM ${parseFloat(amt).toFixed(2)}`;
+                li.innerHTML = `📌 ${desc} - <span class="text-amber-400 font-bold">MYR ${parseFloat(amt).toFixed(2)}</span>`;
                 list.appendChild(li);
                 document.getElementById('expenseItemDesc').value = '';
                 document.getElementById('expenseItemAmt').value = '';
@@ -401,11 +410,11 @@
             const tbody = document.querySelector('#taskTable tbody');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="py-2.5 px-3 font-medium"><input type="text" placeholder="Task name..." class="bg-transparent border-b focus:outline-none w-full text-sm"></td>
-                <td class="py-2.5 px-3"><input type="date" class="text-xs border rounded px-2 py-1"></td>
-                <td class="py-2.5 px-3"><input type="date" class="text-xs border rounded px-2 py-1"></td>
-                <td class="py-2.5 px-3"><span class="px-2 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full font-medium">Pending</span></td>
-                <td class="py-2.5 px-3 text-right"><button onclick="this.closest('tr').remove()" class="text-red-500 text-xs">Delete</button></td>
+                <td class="py-2.5 px-3 font-medium text-white"><input type="text" placeholder="Task name..." class="bg-transparent border-b border-darkborder focus:outline-none w-full text-sm text-white"></td>
+                <td class="py-2.5 px-3"><input type="date" class="text-xs border border-darkborder bg-gray-900 text-white rounded px-2 py-1"></td>
+                <td class="py-2.5 px-3"><input type="date" class="text-xs border border-darkborder bg-gray-900 text-white rounded px-2 py-1"></td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 text-xs bg-amber-900/40 text-amber-400 border border-amber-700/50 rounded-full font-medium">Pending</span></td>
+                <td class="py-2.5 px-3 text-right"><button onclick="this.closest('tr').remove()" class="text-red-400 text-xs">Delete</button></td>
             `;
             tbody.appendChild(tr);
         }
@@ -415,8 +424,8 @@
             if(name) {
                 const list = document.getElementById('stagedDocList');
                 const div = document.createElement('div');
-                div.className = "p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between text-xs";
-                div.innerHTML = `<span class="font-medium text-gray-800"><i class="fa-regular fa-file mr-1.5 text-brand-600"></i> ${name}</span><button onclick="this.closest('div').remove()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>`;
+                div.className = "p-3 bg-gray-900/60 border border-darkborder rounded-lg flex items-center justify-between text-xs";
+                div.innerHTML = `<span class="font-medium text-gray-200"><i class="fa-regular fa-file-lines mr-1.5 text-amber-400"></i> ${name}</span><button onclick="this.closest('div').remove()" class="text-gray-500 hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>`;
                 list.appendChild(div);
                 document.getElementById('docNameInput').value = '';
             }
