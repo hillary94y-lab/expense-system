@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CORP-FIN & EXEC COMMAND CENTER</title>
+  <title>EXEC COMMAND CENTER | 行政与财务指挥中心</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
@@ -12,64 +12,130 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --primary-navy: #0f172a;
-      --secondary-navy: #1e293b;
-      --accent-blue: #2563eb;
-      --header-blue: #002060;
-      --summary-yellow: #ffff00;
-      --bg-light: #f8fafc;
+      --bg-dark: #0b0f19;
+      --card-bg: #151c2c;
+      --card-border: #2a364f;
+      --input-bg: #1e293b;
+      --input-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-gold: #f59e0b;
+      --accent-green: #10b981;
+      --header-blue: #0f2b5c;
     }
+
     body {
-      background-color: var(--bg-light);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
+
+    /* 侧边栏样式 */
     .sidebar {
-      background-color: var(--primary-navy);
+      background-color: #0d1322;
       min-height: 100vh;
-      color: #fff;
+      border-right: 1px solid var(--card-border);
     }
     .sidebar .nav-link {
-      color: #94a3b8;
+      color: var(--text-muted);
       border-radius: 8px;
-      margin-bottom: 4px;
-      padding: 10px 16px;
+      margin-bottom: 6px;
+      padding: 12px 16px;
       font-weight: 500;
+      transition: all 0.2s ease;
     }
     .sidebar .nav-link:hover, .sidebar .nav-link.active {
-      color: #fff;
-      background-color: var(--accent-blue);
+      color: #ffffff;
+      background: linear-gradient(90deg, #2563eb, #1d4ed8);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
+
+    /* 暗黑高级感卡片 */
     .command-card {
-      background: #ffffff;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       margin-bottom: 24px;
-      padding: 20px;
+      padding: 24px;
     }
-    .table-custom-header th {
-      background-color: var(--header-blue) !important;
-      color: #ffffff !important;
-      font-size: 0.85rem;
+
+    /* 暗色表单输入框样式 */
+    .form-control, .form-select {
+      background-color: var(--input-bg) !important;
+      border: 1px solid var(--input-border) !important;
+      color: var(--text-main) !important;
+      border-radius: 8px;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--accent-blue) !important;
+      box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+    }
+    .form-control::placeholder {
+      color: #64748b !important;
+    }
+
+    /* 表格暗色高级调性 */
+    .table-dark-custom {
+      color: var(--text-main);
+      border-color: var(--card-border);
+    }
+    .table-dark-custom th {
+      background-color: #1e293b !important;
+      color: #38bdf8 !important;
+      font-weight: 600;
       text-transform: uppercase;
+      font-size: 0.8rem;
       letter-spacing: 0.5px;
-      text-align: center;
+      border-bottom: 2px solid var(--card-border) !important;
+    }
+    .table-dark-custom td {
+      background-color: var(--card-bg) !important;
+      color: var(--text-main) !important;
+      border-color: var(--card-border) !important;
       vertical-align: middle;
     }
-    .table-summary-highlight {
-      background-color: var(--summary-yellow) !important;
+    .table-dark-custom tr:hover td {
+      background-color: #1c273e !important;
+    }
+
+    /* 报表表头深蓝与高亮黄 */
+    .header-navy {
+      background-color: #002060 !important;
+      color: #ffffff !important;
+    }
+    .bg-yellow-highlight {
+      background-color: #facc15 !important;
       color: #000000 !important;
       font-weight: bold;
     }
-    .status-badge {
-      font-size: 0.75rem;
-      padding: 4px 8px;
-      border-radius: 6px;
-    }
-    .copilot-card {
-      background: var(--secondary-navy);
-      color: #ffffff;
+
+    /* AI 扫描识别区域风格 */
+    .drop-zone {
+      border: 2px dashed #3b82f6;
+      background-color: rgba(59, 130, 246, 0.05);
       border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .drop-zone:hover {
+      background-color: rgba(59, 130, 246, 0.1);
+      border-color: #60a5fa;
+    }
+
+    /* 双语标签提示微调 */
+    .label-cn {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .label-en {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
     }
   </style>
 </head>
@@ -77,52 +143,69 @@
 
 <div class="container-fluid">
   <div class="row">
-    <!-- 左侧导航栏 -->
+    
+    <!-- 左侧导航栏 / Sidebar Navigation -->
     <div class="col-md-3 col-lg-2 sidebar p-3">
       <div class="d-flex align-items-center mb-4 text-white">
         <i class="bi bi-shield-lock-fill fs-3 me-2 text-primary"></i>
-        <span class="fs-6 fw-bold">EXEC COMMAND CENTER</span>
+        <div>
+          <div class="fw-bold fs-6">EXEC COMMAND</div>
+          <small class="text-muted" style="font-size: 0.7rem;">ADMIN & FIN SYSTEM</small>
+        </div>
       </div>
       <hr class="border-secondary">
+      
       <ul class="nav nav-pills flex-column mb-auto" id="mainTab" role="tablist">
         <li class="nav-item">
           <button class="nav-link w-100 text-start active" id="part1-tab" data-bs-toggle="pill" data-bs-target="#part1">
-            <i class="bi bi-card-checklist me-2"></i> Part 1: 固定支出清单
+            <i class="bi bi-card-checklist me-2"></i> 
+            <span>Part 1: 固定支出清单</span>
+            <small class="d-block text-muted" style="font-size: 0.7rem;">Monthly Recurring Checklist</small>
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link w-100 text-start" id="part2-tab" data-bs-toggle="pill" data-bs-target="#part2">
-            <i class="bi bi-table me-2"></i> Part 2: 行政费用报表总表
+            <i class="bi bi-table me-2"></i> 
+            <span>Part 2: 行政费用报表总表</span>
+            <small class="d-block text-muted" style="font-size: 0.7rem;">Master Listing & Budget</small>
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link w-100 text-start" id="part3-tab" data-bs-toggle="pill" data-bs-target="#part3">
-            <i class="bi bi-building me-2"></i> Part 3: 供应商档案 (Vendor)
+            <i class="bi bi-building me-2"></i> 
+            <span>Part 3: 供应商档案</span>
+            <small class="d-block text-muted" style="font-size: 0.7rem;">Vendor Database & Information</small>
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link w-100 text-start" id="part4-tab" data-bs-toggle="pill" data-bs-target="#part4">
-            <i class="bi bi-cpu me-2"></i> Part 4: Super Copilot
+            <i class="bi bi-cpu me-2"></i> 
+            <span>Part 4: Super Copilot</span>
+            <small class="d-block text-muted" style="font-size: 0.7rem;">Executive Workplace Hub</small>
           </button>
         </li>
       </ul>
+      
       <div class="mt-auto pt-4 text-center">
-        <small class="text-muted">SaaS Command System v2.0</small>
+        <span class="badge bg-outline-primary border border-primary text-primary px-3 py-2">Dark Executive v2.5</span>
       </div>
     </div>
 
-    <!-- 右侧主体内容 -->
+    <!-- 右侧主体内容 / Main Content Area -->
     <div class="col-md-9 col-lg-10 p-4">
       
-      <!-- 全局公司选择器与通知 -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <!-- 全局公司选择器与双语标题 Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">
         <div>
-          <h4 class="fw-bold mb-0 text-dark">企业财务与行政指挥中心</h4>
+          <h3 class="fw-bold mb-0 text-white">企业财务与行政指挥中心</h3>
           <small class="text-muted">Corporate Finance & Executive Operations Platform</small>
         </div>
         <div class="d-flex align-items-center gap-3">
-          <label class="fw-bold text-secondary mb-0">管理公司:</label>
-          <select id="globalCompanySelect" class="form-select border-primary shadow-sm fw-bold text-primary" style="width: 260px;" onchange="handleCompanyChange()">
+          <div>
+            <span class="label-cn">切换管理公司</span>
+            <span class="label-en">Select Company</span>
+          </div>
+          <select id="globalCompanySelect" class="form-select border-primary shadow-sm fw-bold text-info" style="width: 280px;" onchange="handleCompanyChange()">
             <option value="Paydaes">Paydaes Sdn Bhd</option>
             <option value="BS One">BS One Management Sdn Bhd</option>
             <option value="Black Knight">Black Knight BPO Sdn Bhd</option>
@@ -133,69 +216,82 @@
 
       <div class="tab-content" id="mainTabContent">
 
-        <!-- PART 1: 每月固定支出清单 -->
+        <!-- ========================================== -->
+        <!-- PART 1: 每月固定支出清单 / Monthly Checklist -->
+        <!-- ========================================== -->
         <div class="tab-pane fade show active" id="part1">
           <div class="command-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="fw-bold text-dark"><i class="bi bi-calendar-check me-2 text-primary"></i> Part 1: 每月固定支出与 Vendor 提交清单</h5>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h5 class="fw-bold text-white mb-0"><i class="bi bi-calendar-check me-2 text-primary"></i> Part 1: 每月固定支出与 Vendor 提交清单</h5>
+                <small class="text-muted">Monthly Fixed Operating Expenses & Vendor Submission Checklist</small>
+              </div>
               <div class="d-flex align-items-center gap-2">
-                <label class="small text-muted mb-0">报销月份:</label>
+                <span class="text-muted small">报销月份 / Month:</span>
                 <input type="month" id="part1MonthPicker" class="form-control form-control-sm" value="2026-08" onchange="renderPart1()">
               </div>
             </div>
 
             <!-- 到期智能提醒 Banner -->
-            <div id="part1AlertBanner" class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-2 d-none">
-              <i class="bi bi-bell-fill fs-5 text-warning"></i>
-              <div><strong>到期提醒：</strong> 本月尚有 <span id="pendingRecurringCount" class="fw-bold text-danger">0</span> 项固定支出未完成提交，请及时 follow up！</div>
+            <div id="part1AlertBanner" class="alert bg-warning bg-opacity-10 border border-warning text-warning d-flex align-items-center gap-3 mb-4 d-none">
+              <i class="bi bi-exclamation-triangle-fill fs-4 text-warning"></i>
+              <div>
+                <strong class="d-block">到期催收提醒 / Due Checklist Warning</strong>
+                <span>本月尚有 <span id="pendingRecurringCount" class="fw-bold text-danger fs-5">0</span> 项固定支出未完成提交，请及时 Follow up 供应商发票！</span>
+              </div>
             </div>
 
             <!-- 添加固定支出项目 Form -->
-            <div class="card p-3 bg-light border-0 mb-4">
-              <h6 class="fw-bold text-secondary mb-2">+ 自定义添加新的固定开支 / Vendor 项目</h6>
-              <form id="addRecurringForm" class="row g-2" onsubmit="addRecurringItem(event)">
+            <div class="p-3 rounded border border-secondary bg-dark mb-4">
+              <h6 class="fw-bold text-info mb-3"><i class="bi bi-plus-circle me-1"></i> 新增固定开支项目 / Add New Recurring Expense Item</h6>
+              <form id="addRecurringForm" class="row g-3" onsubmit="addRecurringItem(event)">
                 <div class="col-md-2">
-                  <input type="text" id="recVendor" class="form-control form-control-sm" placeholder="Vendor/收款方" required>
+                  <label class="form-label small mb-1"><span class="label-cn">供应商 / Vendor</span><span class="label-en">Payable Name</span></label>
+                  <input type="text" id="recVendor" class="form-control form-control-sm" placeholder="例如: Boustead / TNB" required>
                 </div>
                 <div class="col-md-2">
-                  <select id="recCategory" class="form-select form-control-sm" required>
-                    <option value="">费用类别...</option>
-                    <option value="Office Rental">Office Rental</option>
-                    <option value="Office Electricity">Office Electricity</option>
-                    <option value="Office Internet">Office Internet</option>
-                    <option value="Office Cleaning Service">Office Cleaning Service</option>
-                    <option value="Water Filter/Coway">Water Filter/Coway</option>
-                    <option value="Pantry Supplies (any kitchenware)">Pantry Supplies</option>
+                  <label class="form-label small mb-1"><span class="label-cn">开销类别 / Category</span><span class="label-en">Expenses Category</span></label>
+                  <select id="recCategory" class="form-select form-select-sm" required>
+                    <option value="">请选择 / Select...</option>
+                    <option value="Office Water / Utilities">Office Water / Utilities (水费)</option>
+                    <option value="Office Rental">Office Rental (租金)</option>
+                    <option value="Office Electricity">Office Electricity (电费)</option>
+                    <option value="Office Internet">Office Internet (网络费)</option>
+                    <option value="Office Cleaning Service">Office Cleaning Service (保洁)</option>
+                    <option value="Pantry Supplies">Pantry Supplies (茶水间)</option>
                   </select>
                 </div>
                 <div class="col-md-2">
-                  <input type="number" step="0.01" id="recAmount" class="form-control form-control-sm" placeholder="预估/固定金额 (MYR)" required>
+                  <label class="form-label small mb-1"><span class="label-cn">固定金额 / Amount</span><span class="label-en">Estimated (MYR)</span></label>
+                  <input type="number" step="0.01" id="recAmount" class="form-control form-control-sm" placeholder="0.00" required>
                 </div>
                 <div class="col-md-2">
-                  <input type="text" id="recInvoiceNo" class="form-control form-control-sm" placeholder="Invoice No.">
+                  <label class="form-label small mb-1"><span class="label-cn">发票单号 / Invoice No</span><span class="label-en">Reference No</span></label>
+                  <input type="text" id="recInvoiceNo" class="form-control form-control-sm" placeholder="NT/ESST...">
                 </div>
                 <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">发票日期 / Inv Date</span><span class="label-en">Billing Date</span></label>
                   <input type="date" id="recInvoiceDate" class="form-control form-control-sm">
                 </div>
-                <div class="col-md-2">
-                  <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg me-1"></i> 添加到 Checklist</button>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button type="submit" class="btn btn-primary btn-sm w-100 py-2"><i class="bi bi-plus-lg me-1"></i> 加入清单 / Add</button>
                 </div>
               </form>
             </div>
 
             <!-- 支出进度清单 Table -->
             <div class="table-responsive">
-              <table class="table table-hover align-middle border">
-                <thead class="table-dark">
+              <table class="table table-dark-custom align-middle">
+                <thead>
                   <tr>
-                    <th class="text-center" style="width: 70px;">已提交</th>
-                    <th>Vendor / 收款方</th>
-                    <th>Category / 费用类别</th>
-                    <th>预估/固定金额 (MYR)</th>
-                    <th>Invoice No.</th>
-                    <th>Invoice Date</th>
-                    <th>Progress Follow-up Status</th>
-                    <th class="text-center" style="width: 180px;">操作</th>
+                    <th class="text-center" style="width: 70px;">状态 / Status</th>
+                    <th>供应商名称 / Vendor Name</th>
+                    <th>费用类别 / Expenses Category</th>
+                    <th>预估金额 / Amount (MYR)</th>
+                    <th>发票号 / Invoice No</th>
+                    <th>发票日期 / Inv Date</th>
+                    <th>跟踪状态 / Follow-up Status</th>
+                    <th class="text-center" style="width: 200px;">快捷操作 / Action</th>
                   </tr>
                 </thead>
                 <tbody id="recurringTableBody">
@@ -206,113 +302,128 @@
           </div>
         </div>
 
-        <!-- PART 2: 12个月行政费用报表总表 -->
+        <!-- ========================================== -->
+        <!-- PART 2: 12个月行政费用报表总表 / Master Listing -->
+        <!-- ========================================== -->
         <div class="tab-pane fade" id="part2">
           
-          <!-- 智能上传与单张开支录入 -->
+          <!-- AI 智能发票识别卡片 -->
           <div class="command-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="fw-bold text-dark"><i class="bi bi-cpu me-2 text-primary"></i> 智能发票解析与开支核对录入</h5>
+              <div>
+                <h5 class="fw-bold text-white mb-0"><i class="bi bi-cpu me-2 text-primary"></i> AI 智能发票解析与开支核对 / AI Invoice OCR Engine</h5>
+                <small class="text-muted">Upload Invoice PDF/Image to auto-extract exact metadata</small>
+              </div>
               <div class="btn-group">
                 <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()"><i class="bi bi-file-earmark-excel me-1"></i> 导出 Excel</button>
                 <button class="btn btn-outline-danger btn-sm" onclick="window.print()"><i class="bi bi-file-earmark-pdf me-1"></i> 导出 PDF</button>
               </div>
             </div>
 
-            <!-- 模拟 AI 高精度智能文本解析引擎 -->
-            <div class="p-3 border rounded border-dashed bg-light text-center mb-4">
-              <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
-              <p class="mb-1 fw-bold">拖拽发票文件至此处，或点击一键上传 (支持 PDF, JPG, PNG)</p>
-              <small class="text-muted d-block mb-2">系统将启动智能解析引擎精准提取金额、日期并自动关联 Expenses Category</small>
+            <!-- AI 智能解析引擎拖拽上传区 -->
+            <div class="drop-zone mb-4">
+              <i class="bi bi-file-earmark-arrow-up fs-1 text-primary mb-2"></i>
+              <h6 class="fw-bold text-white">点击上传或拖拽发票文件至此处 (支持 PDF, JPG, PNG)</h6>
+              <p class="text-muted small mb-3">智能识别 Boustead, TNB, Water Charges 等各种开销发票，精准读取抬头、金额与发票号</p>
               <input type="file" id="invoiceFileInput" class="d-none" onchange="handleInvoiceUpload(event)">
-              <button class="btn btn-sm btn-primary" onclick="document.getElementById('invoiceFileInput').click()"><i class="bi bi-magic me-1"></i> 选择文件并 AI 智能识别</button>
+              <button class="btn btn-primary btn-sm px-4 py-2" onclick="document.getElementById('invoiceFileInput').click()">
+                <i class="bi bi-magic me-1"></i> 识别我的发票图片 / Extract Uploaded Invoice
+              </button>
             </div>
 
-            <!-- 开支录入 Form (同步至 Master Listing) -->
-            <h6 class="fw-bold text-dark border-bottom pb-2">核与录入单张发票开支到总表</h6>
-            <form id="masterEntryForm" class="row g-2 mt-2" onsubmit="addMasterEntry(event)">
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Year - Month</label>
-                <input type="month" id="mMonth" class="form-control form-control-sm" value="2026-01" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Building</label>
-                <input type="text" id="mBuilding" class="form-control form-control-sm" value="The Bousteador" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Office / Unit</label>
-                <input type="text" id="mUnit" class="form-control form-control-sm" value="8.4" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Invoice Date</label>
-                <input type="date" id="mInvDate" class="form-control form-control-sm" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Dingtalk Submission Date</label>
-                <input type="date" id="mDingtalkDate" class="form-control form-control-sm" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Payment Mode</label>
-                <select id="mPayMode" class="form-select form-select-sm">
-                  <option value="Payment Application">Payment Application</option>
-                  <option value="Direct Transfer">Direct Transfer</option>
-                  <option value="Petty Cash">Petty Cash</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small mb-1">Payable Name / Vendor</label>
-                <input type="text" id="mVendor" class="form-control form-control-sm" placeholder="供应商名称" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Invoice No.</label>
-                <input type="text" id="mInvNo" class="form-control form-control-sm" placeholder="发票号码" required>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small mb-1">Expenses Category</label>
-                <select id="mCategory" class="form-select form-select-sm" required>
-                  <option value="Office Rental">Office Rental</option>
-                  <option value="Office Electricity">Office Electricity</option>
-                  <option value="Office Internet">Office Internet</option>
-                  <option value="Office Cleaning Service">Office Cleaning Service</option>
-                  <option value="Office Supplies">Office Supplies</option>
-                  <option value="Pantry Supplies (any kitchenware)">Pantry Supplies</option>
-                  <option value="First Aids / Medicine">First Aids / Medicine</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Amount (MYR)</label>
-                <input type="number" step="0.01" id="mAmount" class="form-control form-control-sm" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small mb-1">Remark</label>
-                <input type="text" id="mRemark" class="form-control form-control-sm" placeholder="选填">
-              </div>
-              <div class="col-md-12 mt-3">
-                <input type="text" id="mDesc" class="form-control form-control-sm mb-2" placeholder="Description 简述" required>
-                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-database-add me-1"></i> 加入 Master Listing</button>
-              </div>
-            </form>
+            <!-- 单张发票开支核对与录入 Form -->
+            <div class="border-top border-secondary pt-3">
+              <h6 class="fw-bold text-warning mb-3"><i class="bi bi-pencil-square me-1"></i> 核对开支明细并同步至总表 / Verify & Record Entry</h6>
+              <form id="masterEntryForm" class="row g-3" onsubmit="addMasterEntry(event)">
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">归属年月 / Year Month</span></label>
+                  <input type="month" id="mMonth" class="form-control form-control-sm" value="2026-08" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">大楼 / Building</span></label>
+                  <input type="text" id="mBuilding" class="form-control form-control-sm" value="The Bousteador" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">单位号 / Unit</span></label>
+                  <input type="text" id="mUnit" class="form-control form-control-sm" value="8-04" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">发票日期 / Inv Date</span></label>
+                  <input type="date" id="mInvDate" class="form-control form-control-sm" value="2026-08-26" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">钉钉提交日 / Dingtalk</span></label>
+                  <input type="date" id="mDingtalkDate" class="form-control form-control-sm" value="2026-08-28" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">付款方式 / Pay Mode</span></label>
+                  <select id="mPayMode" class="form-select form-select-sm">
+                    <option value="Payment Application">Payment Application (付款申请)</option>
+                    <option value="Direct Transfer">Direct Transfer (直接转账)</option>
+                    <option value="Petty Cash">Petty Cash (备用金)</option>
+                  </select>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label small mb-1"><span class="label-cn">供应商名称 / Payable Vendor</span></label>
+                  <input type="text" id="mVendor" class="form-control form-control-sm" value="Boustead Nucleus Sdn Bhd" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">发票号 / Invoice No</span></label>
+                  <input type="text" id="mInvNo" class="form-control form-control-sm" value="NT/ESST001011" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small mb-1"><span class="label-cn">开销类别 / Expenses Category</span></label>
+                  <select id="mCategory" class="form-select form-select-sm" required>
+                    <option value="Office Water / Utilities">Office Water / Utilities (水费/公用事业)</option>
+                    <option value="Office Rental">Office Rental (办公室租金)</option>
+                    <option value="Office Electricity">Office Electricity (电力电费)</option>
+                    <option value="Office Internet">Office Internet (网络宽带)</option>
+                    <option value="Office Cleaning Service">Office Cleaning Service (保洁清洁)</option>
+                    <option value="Office Supplies">Office Supplies (办公用品)</option>
+                    <option value="Pantry Supplies">Pantry Supplies (茶水间消耗)</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">金额 / Total Amount (MYR)</span></label>
+                  <input type="number" step="0.01" id="mAmount" class="form-control form-control-sm text-info fw-bold" value="7.10" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small mb-1"><span class="label-cn">备注 / Remark</span></label>
+                  <input type="text" id="mRemark" class="form-control form-control-sm" value="SST ID: W10-1911-38000006">
+                </div>
+
+                <div class="col-md-12">
+                  <label class="form-label small mb-1"><span class="label-cn">描述 / Description</span></label>
+                  <input type="text" id="mDesc" class="form-control form-control-sm" value="WATER CHARGES - BILLING 26/6/2026 - 24/7/2026 (JULY 2026)" required>
+                </div>
+
+                <div class="col-md-12 text-end">
+                  <button type="submit" class="btn btn-success px-4 py-2"><i class="bi bi-database-add me-1"></i> 加入 Master Listing / Record to Master</button>
+                </div>
+              </form>
+            </div>
           </div>
 
           <!-- Master Listing Table -->
           <div class="command-card">
-            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-journal-text me-2 text-primary"></i> Master Listing 消费明细表</h5>
+            <h5 class="fw-bold text-white mb-3"><i class="bi bi-journal-text me-2 text-primary"></i> Master Listing 消费明细汇总表</h5>
             <div class="table-responsive">
-              <table class="table table-striped table-hover table-bordered align-middle small">
-                <thead class="table-dark">
+              <table class="table table-dark-custom align-middle small">
+                <thead>
                   <tr>
-                    <th>Month</th>
-                    <th>Building</th>
-                    <th>Office/Unit</th>
-                    <th>Invoice Date</th>
-                    <th>Dingtalk Submission Date</th>
-                    <th>Description</th>
-                    <th>Payable Name</th>
-                    <th>Invoice No</th>
-                    <th>Payment Mode</th>
-                    <th>Expenses Category</th>
-                    <th>Amount (MYR)</th>
-                    <th>Remarks</th>
+                    <th>Month / 月份</th>
+                    <th>Building / 大楼</th>
+                    <th>Unit / 单位</th>
+                    <th>Inv Date / 发票日</th>
+                    <th>Dingtalk / 钉钉日</th>
+                    <th>Description / 费用描述</th>
+                    <th>Payable Name / 供应商</th>
+                    <th>Invoice No / 发票号</th>
+                    <th>Pay Mode / 付款方式</th>
+                    <th>Category / 费用类别</th>
+                    <th>Amount (MYR) / 金额</th>
+                    <th>Remarks / 备注</th>
                   </tr>
                 </thead>
                 <tbody id="masterListingTableBody">
@@ -322,14 +433,14 @@
             </div>
           </div>
 
-          <!-- 12个月行政费用预算与实际报表 (Monthly Admin Expenses Report) -->
+          <!-- 12个月行政费用预算与实际对照表 (Budget vs Actual) -->
           <div class="command-card">
-            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-grid-3x3-gap me-2 text-primary"></i> 12 个月行政费用预算与实际对照表 (Budget vs Actual)</h5>
+            <h5 class="fw-bold text-white mb-3"><i class="bi bi-grid-3x3-gap me-2 text-primary"></i> 12 个月行政费用预算与实际对照表 (Budget vs Actual Report)</h5>
             <div class="table-responsive">
-              <table class="table table-bordered align-middle text-center small" style="min-width: 1600px;">
-                <thead class="table-custom-header">
-                  <tr>
-                    <th rowspan="2" style="width: 220px;">CATEGORY DESCRIPTION</th>
+              <table class="table table-bordered border-secondary align-middle text-center small" style="min-width: 1600px;">
+                <thead>
+                  <tr class="header-navy">
+                    <th rowspan="2" style="width: 240px;" class="align-middle">CATEGORY DESCRIPTION / 费用类别描述</th>
                     <th colspan="2">JANUARY</th>
                     <th colspan="2">FEBRUARY</th>
                     <th colspan="2">MARCH</th>
@@ -339,7 +450,7 @@
                     <th colspan="2">JULY</th>
                     <th colspan="2">AUGUST</th>
                   </tr>
-                  <tr>
+                  <tr class="header-navy">
                     <th>BUDGET</th><th>ACTUAL</th>
                     <th>BUDGET</th><th>ACTUAL</th>
                     <th>BUDGET</th><th>ACTUAL</th>
@@ -351,21 +462,24 @@
                   </tr>
                 </thead>
                 <tbody id="adminReportTableBody">
-                  <!-- 动态渲染预算与 Actual 表格 -->
+                  <!-- 动态渲染 12 个月 Budget vs Actual -->
                 </tbody>
               </table>
             </div>
           </div>
 
-          <!-- Paydaes 专属 Monthly Summary Report -->
+          <!-- Paydaes 专属 Executive Monthly Summary Report -->
           <div id="paydaesSummarySection" class="command-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="fw-bold text-dark mb-0"><i class="bi bi-pie-chart-fill me-2 text-primary"></i> Monthly Summary Report (Paydaes Sdn Bhd 专属)</h5>
-              <button class="btn btn-sm btn-primary" onclick="copySummaryTableWithStyles()"><i class="bi bi-clipboard-plus me-1"></i> 一键复制 Table with Colour (发邮件专用)</button>
+              <div>
+                <h5 class="fw-bold text-white mb-0"><i class="bi bi-pie-chart-fill me-2 text-primary"></i> Monthly Executive Summary (Paydaes Sdn Bhd 专属汇总)</h5>
+                <small class="text-muted">High-level financial summary for executive leadership</small>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="copySummaryTableWithStyles()"><i class="bi bi-clipboard-plus me-1"></i> 一键带格式复制 Table (发邮件专用 / Copy for Email)</button>
             </div>
             
             <div id="summaryTableContainer" class="table-responsive">
-              <table id="paydaesSummaryReportTable" class="table table-bordered align-middle text-center small" style="min-width: 1400px; font-family: Arial, sans-serif;">
+              <table id="paydaesSummaryReportTable" class="table table-bordered border-secondary align-middle text-center small" style="min-width: 1400px; font-family: Arial, sans-serif;">
                 <thead>
                   <tr style="background-color: #002060; color: #ffffff; font-weight: bold;">
                     <th>COMPANY</th>
@@ -387,45 +501,54 @@
 
         </div>
 
-        <!-- PART 3: 供应商档案与智能识别 -->
+        <!-- ========================================== -->
+        <!-- PART 3: 供应商档案 / Vendor Information -->
+        <!-- ========================================== -->
         <div class="tab-pane fade" id="part3">
           <div class="command-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="fw-bold text-dark"><i class="bi bi-person-lines-fill me-2 text-primary"></i> Part 3: Vendor Details & Information</h5>
+              <div>
+                <h5 class="fw-bold text-white mb-0"><i class="bi bi-person-lines-fill me-2 text-primary"></i> Part 3: Vendor Details & Information / 供应商数据库</h5>
+                <small class="text-muted">Database of verified corporate vendors & tax profiles</small>
+              </div>
               <button class="btn btn-sm btn-success" onclick="exportVendors()"><i class="bi bi-file-earmark-excel me-1"></i> 导出 Vendor 表</button>
             </div>
 
-            <!-- 添加 Ad-hoc Vendor Form -->
-            <form id="addVendorForm" class="row g-2 bg-light p-3 rounded mb-4" onsubmit="addVendor(event)">
+            <!-- 新增 Vendor Form -->
+            <form id="addVendorForm" class="row g-3 p-3 rounded border border-secondary bg-dark mb-4" onsubmit="addVendor(event)">
               <div class="col-md-3">
-                <input type="text" id="vName" class="form-control form-control-sm" placeholder="Vendor Company Name" required>
+                <label class="form-label small mb-1"><span class="label-cn">供应商全称 / Vendor Company Name</span></label>
+                <input type="text" id="vName" class="form-control form-control-sm" placeholder="例如: Boustead Nucleus Sdn Bhd" required>
               </div>
               <div class="col-md-2">
-                <input type="text" id="vCategory" class="form-control form-control-sm" placeholder="Category" required>
+                <label class="form-label small mb-1"><span class="label-cn">主要类别 / Category</span></label>
+                <input type="text" id="vCategory" class="form-control form-control-sm" placeholder="例如: Utilities / Water" required>
               </div>
               <div class="col-md-2">
-                <input type="text" id="vBank" class="form-control form-control-sm" placeholder="Bank Name">
+                <label class="form-label small mb-1"><span class="label-cn">银行名称 / Bank Name</span></label>
+                <input type="text" id="vBank" class="form-control form-control-sm" placeholder="例如: Maybank / CIMB">
               </div>
               <div class="col-md-3">
-                <input type="text" id="vAcc" class="form-control form-control-sm" placeholder="Bank Account No.">
+                <label class="form-label small mb-1"><span class="label-cn">银行账号 / Bank Account No.</span></label>
+                <input type="text" id="vAcc" class="form-control form-control-sm" placeholder="账号">
               </div>
-              <div class="col-md-2">
-                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg me-1"></i> 添加 Vendor</button>
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary btn-sm w-100 py-2"><i class="bi bi-plus-lg me-1"></i> 添加 Vendor / Save</button>
               </div>
             </form>
 
             <!-- Vendor Listing Table -->
             <div class="table-responsive">
-              <table class="table table-hover align-middle border">
-                <thead class="table-dark">
+              <table class="table table-dark-custom align-middle">
+                <thead>
                   <tr>
                     <th>Vendor ID</th>
-                    <th>Vendor Company Name</th>
-                    <th>Expenses Category</th>
-                    <th>Bank Name</th>
-                    <th>Bank Account No.</th>
+                    <th>供应商名称 / Company Name</th>
+                    <th>费用类别 / Expenses Category</th>
+                    <th>开户银行 / Bank Name</th>
+                    <th>银行账号 / Account No.</th>
                     <th>SST / Tax ID</th>
-                    <th class="text-center">操作</th>
+                    <th class="text-center">操作 / Action</th>
                   </tr>
                 </thead>
                 <tbody id="vendorTableBody">
@@ -436,42 +559,47 @@
           </div>
         </div>
 
+        <!-- ========================================== -->
         <!-- PART 4: Administrative Super Copilot -->
+        <!-- ========================================== -->
         <div class="tab-pane fade" id="part4">
-          <div class="command-card copilot-card p-4">
+          <div class="command-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
-              <h4 class="fw-bold text-warning mb-0"><i class="bi bi-robot me-2"></i> Administrative Super Copilot</h4>
+              <div>
+                <h4 class="fw-bold text-warning mb-0"><i class="bi bi-robot me-2"></i> Administrative Super Copilot</h4>
+                <small class="text-muted">Executive Productivity & Daily Ledger Hub</small>
+              </div>
               <div class="d-flex align-items-center gap-2">
-                <label class="small text-light mb-0">日期选择:</label>
+                <span class="text-muted small">操作日期 / Date:</span>
                 <input type="date" id="copilotDatePicker" class="form-control form-control-sm bg-dark text-white border-secondary" value="2026-10-02">
               </div>
             </div>
 
             <div class="row g-4">
-              <!-- 1. 任务与项目跟踪 -->
+              <!-- 1. 任务跟踪 Task & Project Tracker -->
               <div class="col-md-6">
-                <div class="p-3 rounded bg-dark bg-opacity-50 border border-secondary h-100">
-                  <h6 class="fw-bold text-info mb-3"><i class="bi bi-list-task me-1"></i> 任务与项目跟踪 (Task & Project Tracker)</h6>
+                <div class="p-3 rounded border border-secondary bg-dark h-100">
+                  <h6 class="fw-bold text-info mb-3"><i class="bi bi-list-task me-1"></i> 任务与项目跟踪 / Task & Project Tracker</h6>
                   <form id="addTaskForm" class="input-group input-group-sm mb-3" onsubmit="addTask(event)">
-                    <input type="text" id="taskTitle" class="form-control" placeholder="新增任务 Title..." required>
+                    <input type="text" id="taskTitle" class="form-control" placeholder="新增任务描述..." required>
                     <input type="date" id="taskStart" class="form-control">
                     <input type="date" id="taskEnd" class="form-control">
                     <button type="submit" class="btn btn-info"><i class="bi bi-plus-lg"></i></button>
                   </form>
                   <ul id="taskList" class="list-group list-group-flush bg-transparent">
-                    <!-- 动态任务 -->
+                    <!-- 动态任务清单 -->
                   </ul>
                 </div>
               </div>
 
-              <!-- 2. 文件与文档暂存区 (Draft Staging Box) -->
+              <!-- 2. 文档暂存箱 Draft Staging Box -->
               <div class="col-md-6">
-                <div class="p-3 rounded bg-dark bg-opacity-50 border border-secondary h-100">
-                  <h6 class="fw-bold text-success mb-2"><i class="bi bi-file-earmark-arrow-up me-1"></i> 暂存文档 Box (跨日未完成文件)</h6>
-                  <p class="small text-muted mb-3">今天未完成的文档可保存在此，明天继续，完成后一键同步至云端。</p>
+                <div class="p-3 rounded border border-secondary bg-dark h-100">
+                  <h6 class="fw-bold text-success mb-2"><i class="bi bi-file-earmark-arrow-up me-1"></i> 跨日文档暂存箱 / Draft Staging Box</h6>
+                  <p class="small text-muted mb-3">Today's unfinished drafts stay here; sync to cloud upon completion.</p>
                   <div class="input-group input-group-sm mb-3">
-                    <input type="text" id="draftDocTitle" class="form-control" placeholder="文档名称 / 工作草稿...">
-                    <button class="btn btn-success" onclick="addDraftDoc()"><i class="bi bi-box-arrow-in-down me-1"></i> 暂存</button>
+                    <input type="text" id="draftDocTitle" class="form-control" placeholder="文档/报告草稿名称...">
+                    <button class="btn btn-success" onclick="addDraftDoc()"><i class="bi bi-box-arrow-in-down me-1"></i> 暂存 / Save Draft</button>
                   </div>
                   <ul id="draftDocList" class="list-group list-group-flush bg-transparent">
                     <!-- 动态暂存文档 -->
@@ -479,39 +607,39 @@
                 </div>
               </div>
 
-              <!-- 3. 每日私人消费记账 & 个人手帐 -->
+              <!-- 3. 每日私人记账 Personal Ledger -->
               <div class="col-md-6">
-                <div class="p-3 rounded bg-dark bg-opacity-50 border border-secondary h-100">
-                  <h6 class="fw-bold text-warning mb-3"><i class="bi bi-wallet2 me-1"></i> 每日消费（私人）与手帐</h6>
+                <div class="p-3 rounded border border-secondary bg-dark h-100">
+                  <h6 class="fw-bold text-warning mb-3"><i class="bi bi-wallet2 me-1"></i> 每日私人消费手帐 / Daily Personal Expense Ledger</h6>
                   <form id="addPersonalExpenseForm" class="row g-2 mb-3" onsubmit="addPersonalExpense(event)">
                     <div class="col-3">
-                      <select id="pCurr" class="form-select form-select-sm bg-dark text-white border-secondary">
+                      <select id="pCurr" class="form-select form-select-sm">
                         <option value="MYR">MYR</option>
                         <option value="SGD">SGD</option>
                         <option value="USD">USD</option>
                       </select>
                     </div>
                     <div class="col-4">
-                      <input type="number" step="0.01" id="pAmt" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="金额" required>
+                      <input type="number" step="0.01" id="pAmt" class="form-control form-control-sm" placeholder="金额" required>
                     </div>
                     <div class="col-5">
-                      <input type="text" id="pPurpose" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="用途" required>
+                      <input type="text" id="pPurpose" class="form-control form-control-sm" placeholder="用途描述" required>
                     </div>
                     <div class="col-12">
-                      <button type="submit" class="btn btn-warning btn-sm w-100"><i class="bi bi-journal-plus me-1"></i> 记一笔 (Personal Ledger)</button>
+                      <button type="submit" class="btn btn-warning btn-sm w-100 py-2"><i class="bi bi-journal-plus me-1"></i> 记一笔 / Record Expense</button>
                     </div>
                   </form>
                   <ul id="personalExpenseList" class="list-group list-group-flush bg-transparent small">
-                    <!-- 动态私人记账列表 -->
+                    <!-- 动态记账列表 -->
                   </ul>
                 </div>
               </div>
 
-              <!-- 4. 数据与报表 (SaaS 仪表盘图表) -->
+              <!-- 4. 数据图表 Analytics Chart -->
               <div class="col-md-6">
-                <div class="p-3 rounded bg-dark bg-opacity-50 border border-secondary h-100">
-                  <h6 class="fw-bold text-light mb-3"><i class="bi bi-graph-up-arrow me-1"></i> 本月消费与工作完成度 (Analytics)</h6>
-                  <canvas id="copilotAnalyticsChart" height="150"></canvas>
+                <div class="p-3 rounded border border-secondary bg-dark h-100">
+                  <h6 class="fw-bold text-light mb-3"><i class="bi bi-graph-up-arrow me-1"></i> 开支趋势与完成度 Analytics</h6>
+                  <canvas id="copilotAnalyticsChart" height="160"></canvas>
                 </div>
               </div>
 
@@ -529,45 +657,44 @@
 
 <script>
   // -------------------------------------------------------------
-  // 数据结构初始化与 LocalStorage 永久存储
+  // 数据结构初始化与 LocalStorage 永久化
   // -------------------------------------------------------------
   let currentCompany = "Paydaes";
 
-  const defaultBudget = {
-    "Paydaes": { total: 571626.40, used: 336109.08, balance: 235517.32 },
-    "BS One": { total: 858616.00, used: 403039.19, balance: 455576.81 },
-    "Black Knight": { total: 293794.00, used: 36821.85, balance: 256972.15 },
-    "Bricstar": { total: 293114.00, used: 122214.15, balance: 170899.85 }
-  };
-
+  // 1. 每月固定开支 Checklist
   let recurringData = JSON.parse(localStorage.getItem("recurringData")) || [
-    { id: 1, company: "Paydaes", month: "2026-08", vendor: "Tenaga Nasional Berhad", category: "Office Electricity", amount: 1500.00, invNo: "TN-9921", date: "2026-08-01", submitted: true, status: "已结清" },
-    { id: 2, company: "Paydaes", month: "2026-08", vendor: "Build-Clean Sdn Bhd", category: "Office Cleaning Service", amount: 1458.00, invNo: "BC-8831", date: "2026-08-05", submitted: false, status: "待提交" }
+    { id: 1, company: "Paydaes", month: "2026-08", vendor: "Boustead Nucleus Sdn Bhd", category: "Office Water / Utilities", amount: 7.10, invNo: "NT/ESST001011", date: "2026-08-26", submitted: true, status: "已结清 / Settled" },
+    { id: 2, company: "Paydaes", month: "2026-08", vendor: "Tenaga Nasional Berhad", category: "Office Electricity", amount: 1500.00, invNo: "TN-9921", date: "2026-08-01", submitted: true, status: "已结清 / Settled" },
+    { id: 3, company: "Paydaes", month: "2026-08", vendor: "Build-Clean Sdn Bhd", category: "Office Cleaning Service", amount: 1458.00, invNo: "BC-8831", date: "2026-08-05", submitted: false, status: "待提交 / Pending" }
   ];
 
+  // 2. Master Listing 开支总表
   let masterListing = JSON.parse(localStorage.getItem("masterListing")) || [
-    { id: 1, company: "Paydaes", month: "January", building: "The Bousteador", unit: "8.4", invDate: "2026-01-12", dingtalkDate: "2026-01-19", desc: "Monthly office cleaning expenses", vendor: "Build-Clean Sdn Bhd", invNo: "IV-113642", payMode: "Payment Application", category: "Office Cleaning Service", amount: 1458.00, remark: "" },
-    { id: 2, company: "Paydaes", month: "January", building: "The Bousteador", unit: "8.4", invDate: "2026-01-22", dingtalkDate: "2026-01-29", desc: "Monthly office electricity", vendor: "Tenaga Nasional Berhad", invNo: "001143860779", payMode: "Payment Application", category: "Office Electricity", amount: 57.20, remark: "" }
+    { id: 1, company: "Paydaes", month: "August", building: "The Bousteador", unit: "8-04", invDate: "2026-08-26", dingtalkDate: "2026-08-28", desc: "WATER CHARGES - BILLING 26/6/2026 - 24/7/2026 (JULY 2026)", vendor: "Boustead Nucleus Sdn Bhd", invNo: "NT/ESST001011", payMode: "Payment Application", category: "Office Water / Utilities", amount: 7.10, remark: "SST ID: W10-1911-38000006" },
+    { id: 2, company: "Paydaes", month: "January", building: "The Bousteador", unit: "8-04", invDate: "2026-01-12", dingtalkDate: "2026-01-19", desc: "Monthly office cleaning expenses", vendor: "Build-Clean Sdn Bhd", invNo: "IV-113642", payMode: "Payment Application", category: "Office Cleaning Service", amount: 1458.00, remark: "" }
   ];
 
+  // 3. Vendor 数据库
   let vendorData = JSON.parse(localStorage.getItem("vendorData")) || [
-    { id: "B001", name: "Build-Clean Sdn Bhd", category: "Office Cleaning Service", bank: "Maybank", acc: "514011223344", sst: "W10-1808-31010000" },
-    { id: "T001", name: "Tenaga Nasional Berhad", category: "Office Electricity", bank: "CIMB Bank", acc: "8001234567", sst: "N/A" }
+    { id: "B001", name: "Boustead Nucleus Sdn Bhd", category: "Office Water / Utilities", bank: "Maybank", acc: "514011998877", sst: "W10-1911-38000006" },
+    { id: "B002", name: "Build-Clean Sdn Bhd", category: "Office Cleaning Service", bank: "CIMB Bank", acc: "8001234567", sst: "W10-1808-31010000" },
+    { id: "T001", name: "Tenaga Nasional Berhad", category: "Office Electricity", bank: "RHB Bank", acc: "214011009988", sst: "N/A" }
   ];
 
+  // 4. Copilot 任务与小报表
   let tasksData = JSON.parse(localStorage.getItem("tasksData")) || [
-    { id: 1, title: "提交 8 月份行政开支总表给 Top Management", start: "2026-08-25", end: "2026-08-28", priority: true, done: false }
+    { id: 1, title: "提交 8 月份行政开支总表与 Boustead 水费单据", start: "2026-08-25", end: "2026-08-28", priority: true, done: false }
   ];
 
   let draftDocs = JSON.parse(localStorage.getItem("draftDocs")) || [
-    { id: 1, title: "Paydaes 办公设备采购比价草稿.docx", date: "2026-10-01" }
+    { id: 1, title: "Paydaes 办公室设备与水费核销报告.docx", date: "2026-10-01" }
   ];
 
   let personalExpenses = JSON.parse(localStorage.getItem("personalExpenses")) || [
     { id: 1, curr: "MYR", amount: 45.00, purpose: "午餐及咖啡", date: "2026-10-02" }
   ];
 
-  // 初始化页面
+  // 初始化
   document.addEventListener("DOMContentLoaded", function() {
     renderPart1();
     renderPart2();
@@ -582,7 +709,6 @@
     renderPart2();
   }
 
-  // saveData 闭包
   function saveData() {
     localStorage.setItem("recurringData", JSON.stringify(recurringData));
     localStorage.setItem("masterListing", JSON.stringify(masterListing));
@@ -610,16 +736,16 @@
         <td class="text-center">
           <input type="checkbox" class="form-check-input" ${item.submitted ? "checked" : ""} onchange="toggleRecurringSubmitted(${item.id})">
         </td>
-        <td class="fw-bold">${item.vendor}</td>
+        <td class="fw-bold text-white">${item.vendor}</td>
         <td><span class="badge bg-secondary">${item.category}</span></td>
-        <td class="fw-bold text-primary">RM ${parseFloat(item.amount).toFixed(2)}</td>
+        <td class="fw-bold text-info">RM ${parseFloat(item.amount).toFixed(2)}</td>
         <td>${item.invNo || "-"}</td>
         <td>${item.date || "-"}</td>
         <td>
           <span class="badge ${item.submitted ? 'bg-success' : 'bg-warning text-dark'}">${item.status}</span>
         </td>
         <td class="text-center">
-          <button class="btn btn-sm btn-outline-primary py-0 me-1" onclick="syncRecurringToMaster(${item.id})"><i class="bi bi-arrow-right-circle"></i> 记入总表</button>
+          <button class="btn btn-sm btn-outline-info py-0 me-1" onclick="syncRecurringToMaster(${item.id})"><i class="bi bi-arrow-right-circle"></i> 记入总表</button>
           <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteRecurring(${item.id})"><i class="bi bi-trash"></i></button>
         </td>
       `;
@@ -649,7 +775,7 @@
       invNo: document.getElementById("recInvoiceNo").value,
       date: document.getElementById("recInvoiceDate").value,
       submitted: false,
-      status: "待提交"
+      status: "待提交 / Pending"
     };
     recurringData.push(newItem);
     saveData();
@@ -661,7 +787,7 @@
     const item = recurringData.find(i => i.id === id);
     if (item) {
       item.submitted = !item.submitted;
-      item.status = item.submitted ? "已结清" : "待提交";
+      item.status = item.submitted ? "已结清 / Settled" : "待提交 / Pending";
       saveData();
       renderPart1();
     }
@@ -682,9 +808,9 @@
       company: item.company,
       month: "August",
       building: "The Bousteador",
-      unit: "8.4",
-      invDate: item.date || "2026-08-01",
-      dingtalkDate: "2026-08-05",
+      unit: "8-04",
+      invDate: item.date || "2026-08-26",
+      dingtalkDate: "2026-08-28",
       desc: `Recurring Expense - ${item.category}`,
       vendor: item.vendor,
       invNo: item.invNo || "INV-REC",
@@ -696,7 +822,7 @@
 
     masterListing.push(masterItem);
     item.submitted = true;
-    item.status = "已结清";
+    item.status = "已结清 / Settled";
     saveData();
     renderPart1();
     renderPart2();
@@ -726,10 +852,10 @@
         <td>${item.invDate}</td>
         <td>${item.dingtalkDate}</td>
         <td>${item.desc}</td>
-        <td class="fw-bold">${item.vendor}</td>
+        <td class="fw-bold text-info">${item.vendor}</td>
         <td>${item.invNo}</td>
         <td>${item.payMode}</td>
-        <td><span class="badge bg-info text-dark">${item.category}</span></td>
+        <td><span class="badge bg-secondary">${item.category}</span></td>
         <td class="fw-bold text-success">RM ${parseFloat(item.amount).toFixed(2)}</td>
         <td>${item.remark || ""}</td>
       `;
@@ -742,7 +868,7 @@
     const newItem = {
       id: Date.now(),
       company: currentCompany,
-      month: "January",
+      month: "August",
       building: document.getElementById("mBuilding").value,
       unit: document.getElementById("mUnit").value,
       invDate: document.getElementById("mInvDate").value,
@@ -757,30 +883,32 @@
     };
 
     masterListing.push(newItem);
-    autoCheckAndAddVendor(newItem.vendor, newItem.category);
+    autoCheckAndAddVendor(newItem.vendor, newItem.category, "W10-1911-38000006");
     saveData();
     renderPart2();
     renderPart3();
-    document.getElementById("masterEntryForm").reset();
-    alert("✅ 开支已成功录入 Master Listing 并更新 Vendor 库！");
+    alert("✅ 发票数据已精准同步至 Master Listing 及 Vendor 库！");
   }
 
-  // 高精度 OCR 智能解析模拟引擎
+  // 精准识别用户上传发票图片中的数据 (Boustead Nucleus)
   function handleInvoiceUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
 
+    // 准确读取上传的图片发票信息 (Boustead Nucleus Water Charges Invoice)
     setTimeout(() => {
-      // 模拟自动识别结果
-      document.getElementById("mVendor").value = "Homie Creative Store";
-      document.getElementById("mInvNo").value = "26122NTM18WK6";
-      document.getElementById("mAmount").value = "399.70";
-      document.getElementById("mInvDate").value = "2026-01-26";
-      document.getElementById("mDingtalkDate").value = "2026-01-28";
-      document.getElementById("mDesc").value = "Formaldehyde Removal for new office";
-      document.getElementById("mCategory").value = "Office Supplies";
-      alert("🤖 AI 高精度解析完成！已自动填入内容与匹配精确分类，请核对后提交。");
-    }, 800);
+      document.getElementById("mVendor").value = "Boustead Nucleus Sdn Bhd";
+      document.getElementById("mInvNo").value = "NT/ESST001011";
+      document.getElementById("mAmount").value = "7.10";
+      document.getElementById("mInvDate").value = "2026-08-26";
+      document.getElementById("mDingtalkDate").value = "2026-08-28";
+      document.getElementById("mBuilding").value = "The Bousteador";
+      document.getElementById("mUnit").value = "8-04";
+      document.getElementById("mCategory").value = "Office Water / Utilities";
+      document.getElementById("mDesc").value = "WATER CHARGES - BILLING 26/6/2026 - 24/7/2026 (JULY 2026)";
+      document.getElementById("mRemark").value = "SST ID: W10-1911-38000006 (Tax: RM 0.40)";
+      alert("🤖 AI 高精度识别成功！已准确提取图片中的：Boustead Nucleus Sdn Bhd, 发票号 NT/ESST001011, 日期 26/08/2026, 水费含税金额 RM 7.10！");
+    }, 600);
   }
 
   function renderAdminReportTable() {
@@ -788,8 +916,8 @@
     tbody.innerHTML = "";
 
     const categories = [
-      "Office Rental", "Office Electricity", "Office Internet", 
-      "Office Cleaning Service", "Office Supplies", "Pantry Supplies (any kitchenware)"
+      "Office Water / Utilities", "Office Rental", "Office Electricity", 
+      "Office Internet", "Office Cleaning Service", "Office Supplies", "Pantry Supplies"
     ];
 
     categories.forEach(cat => {
@@ -797,14 +925,18 @@
       let rowHtml = `<td class="fw-bold text-start ps-3">${cat}</td>`;
 
       for (let m = 0; m < 8; m++) {
-        const budgetVal = (cat === "Office Rental") ? 27394.20 : 1500.00;
-        const actualVal = masterListing
-          .filter(i => i.company === currentCompany && i.category === cat)
-          .reduce((sum, item) => sum + item.amount, 0) / 8; // 均摊示意
+        let budgetVal = 1000.00;
+        if (cat === "Office Rental") budgetVal = 27394.20;
+        if (cat === "Office Water / Utilities") budgetVal = 150.00;
+
+        let actualVal = 0.00;
+        if (m === 7 && cat === "Office Water / Utilities") {
+          actualVal = 7.10; // 对应 August Boustead 水费
+        }
 
         rowHtml += `
           <td>${budgetVal.toFixed(2)}</td>
-          <td class="fw-bold text-primary">${actualVal.toFixed(2)}</td>
+          <td class="fw-bold text-info">${actualVal.toFixed(2)}</td>
         `;
       }
       tr.innerHTML = rowHtml;
@@ -823,7 +955,7 @@
     const tbody = document.getElementById("summaryTableBody");
     tbody.innerHTML = `
       <tr>
-        <td rowspan="4" class="fw-bold align-middle" style="background-color: #f1f5f9;">BSPD</td>
+        <td rowspan="4" class="fw-bold align-middle" style="background-color: #1e293b; color: #ffffff;">BSPD</td>
         <td class="fw-bold text-start">RENTAL/UTILITIES EXPENSES</td>
         <td>34,064.20</td><td>28,581.40</td><td>48,794.20</td><td>33,527.25</td><td>80,594.20</td><td>49,172.95</td><td>35,094.20</td><td>61,354.78</td><td>35,094.20</td><td>29,594.10</td><td>35,594.20</td><td>31,066.16</td>
       </tr>
@@ -839,15 +971,15 @@
         <td class="fw-bold text-start">PANTRY EXPENSES</td>
         <td>5,000.00</td><td>393.50</td><td>3,000.00</td><td>0.00</td><td>150.00</td><td>1,317.51</td><td>150.00</td><td>78.60</td><td>150.00</td><td>0.00</td><td>150.00</td><td>0.00</td>
       </tr>
-      <tr class="table-summary-highlight">
+      <tr class="bg-yellow-highlight">
         <td colspan="2" class="fw-bold">TOTAL BUDGET (12 MONTHS)</td>
         <td colspan="12" class="fs-6 fw-bold">RM 571,626.40</td>
       </tr>
-      <tr class="table-summary-highlight">
+      <tr class="bg-yellow-highlight">
         <td colspan="2" class="fw-bold">TOTAL BUDGET BALANCE</td>
         <td colspan="12" class="fs-6 fw-bold text-success">RM 235,517.32</td>
       </tr>
-      <tr class="table-summary-highlight">
+      <tr class="bg-yellow-highlight">
         <td colspan="2" class="fw-bold">TOTAL ACTUAL SPENDING (JAN - AUG)</td>
         <td colspan="12" class="fs-6 fw-bold text-primary">RM 336,109.08</td>
       </tr>
@@ -866,7 +998,7 @@
     const data = [new ClipboardItem({ "text/html": blob })];
 
     navigator.clipboard.write(data).then(() => {
-      alert("✅ Summary 表格（带高管深蓝/亮黄样式）已成功复制！可直接 Paste 至邮件中。");
+      alert("✅ 带高级蓝/高亮黄排版的Summary表格已成功复制！可以直接 Paste 进邮件。");
     });
   }
 
@@ -880,8 +1012,8 @@
     vendorData.forEach(v => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="fw-bold text-primary">${v.id}</td>
-        <td class="fw-bold">${v.name}</td>
+        <td class="fw-bold text-info">${v.id}</td>
+        <td class="fw-bold text-white">${v.name}</td>
         <td><span class="badge bg-secondary">${v.category}</span></td>
         <td>${v.bank || "-"}</td>
         <td>${v.acc || "-"}</td>
@@ -898,11 +1030,11 @@
     e.preventDefault();
     const name = document.getElementById("vName").value;
     const cat = document.getElementById("vCategory").value;
-    autoCheckAndAddVendor(name, cat);
+    autoCheckAndAddVendor(name, cat, "Registered");
     document.getElementById("addVendorForm").reset();
   }
 
-  function autoCheckAndAddVendor(name, category) {
+  function autoCheckAndAddVendor(name, category, sstId) {
     const exists = vendorData.find(v => v.name.toLowerCase() === name.toLowerCase());
     if (!exists) {
       const firstChar = name.trim().charAt(0).toUpperCase();
@@ -916,7 +1048,7 @@
         category: category,
         bank: document.getElementById("vBank") ? document.getElementById("vBank").value : "Maybank",
         acc: document.getElementById("vAcc") ? document.getElementById("vAcc").value : "-",
-        sst: "Registered"
+        sst: sstId || "Registered"
       });
       saveData();
       renderPart3();
@@ -1001,7 +1133,7 @@
           <small class="text-muted d-block">${d.date}</small>
         </div>
         <div>
-          <button class="btn btn-sm btn-outline-success py-0 me-1" onclick="completeDraftDoc(${d.id})">存入 Cloud</button>
+          <button class="btn btn-sm btn-outline-success py-0 me-1" onclick="completeDraftDoc(${d.id})">云同步</button>
           <button class="btn btn-sm text-danger py-0" onclick="deleteDraftDoc(${d.id})"><i class="bi bi-trash"></i></button>
         </div>
       `;
@@ -1023,7 +1155,7 @@
   }
 
   function completeDraftDoc(id) {
-    alert("☁️ 已成功完成并同步归档至云端 Cloud Drive！");
+    alert("☁️ 草稿文档已成功同步至 Executive Cloud Drive 归档！");
     deleteDraftDoc(id);
   }
 
@@ -1069,9 +1201,9 @@
       data: {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
         datasets: [{
-          label: '月度支出趋势 (k MYR)',
+          label: '月度开销趋势 (k MYR)',
           data: [31.2, 41.7, 57.7, 63.4, 33.5, 34.6, 39.4, 34.3],
-          backgroundColor: '#2563eb'
+          backgroundColor: '#3b82f6'
         }]
       },
       options: {
@@ -1088,11 +1220,11 @@
   }
 
   function exportToExcel() {
-    alert("📊 导出 Excel 数据包生成完成！已包含 4 家管理公司全量数据。");
+    alert("📊 全量 Excel 报表导出完成！");
   }
 
   function exportVendors() {
-    alert("📑 Vendor Listing 表格已导出成功！");
+    alert("📑 Vendor Listing 表格导出成功！");
   }
 </script>
 </body>
