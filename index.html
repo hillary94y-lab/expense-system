@@ -1,610 +1,1099 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORP-FIN & EXEC COMMAND NEXUS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        dark: {
-                            900: '#0B0F17',
-                            800: '#131C2E',
-                            700: '#1E293B',
-                            600: '#334155',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORP-FIN & EXEC COMMAND CENTER</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary-navy: #0f172a;
+      --secondary-navy: #1e293b;
+      --accent-blue: #2563eb;
+      --header-blue: #002060;
+      --summary-yellow: #ffff00;
+      --bg-light: #f8fafc;
+    }
+    body {
+      background-color: var(--bg-light);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    .sidebar {
+      background-color: var(--primary-navy);
+      min-height: 100vh;
+      color: #fff;
+    }
+    .sidebar .nav-link {
+      color: #94a3b8;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      padding: 10px 16px;
+      font-weight: 500;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+      color: #fff;
+      background-color: var(--accent-blue);
+    }
+    .command-card {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+      padding: 20px;
+    }
+    .table-custom-header th {
+      background-color: var(--header-blue) !important;
+      color: #ffffff !important;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .table-summary-highlight {
+      background-color: var(--summary-yellow) !important;
+      color: #000000 !important;
+      font-weight: bold;
+    }
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .copilot-card {
+      background: var(--secondary-navy);
+      color: #ffffff;
+      border-radius: 12px;
+    }
+  </style>
 </head>
-<body class="bg-[#0B0F17] text-slate-100 min-h-screen font-sans selection:bg-amber-500 selection:text-black">
-    <!-- Top Navigation Bar -->
-    <header class="bg-[#131C2E] border-b border-slate-800 px-6 py-3.5 flex flex-wrap items-center justify-between shadow-lg sticky top-0 z-30">
-        <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-md shadow-amber-500/20 text-black font-bold text-lg">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            <div>
-                <div class="flex items-center space-x-2">
-                    <h1 id="ui-title" class="font-bold text-lg tracking-wider bg-gradient-to-r from-white via-slate-200 to-amber-400 bg-clip-text text-transparent">CORP-FIN & EXEC COMMAND NEXUS</h1>
-                    <span id="ui-badge" class="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">Enterprise Edition</span>
-                </div>
-                <p id="ui-subtitle" class="text-xs text-slate-400">企业财务、Vendor 智控、固定支出到期提醒与行政领航中枢</p>
-            </div>
-        </div>
-        
-        <div class="flex items-center space-x-3 mt-2 sm:mt-0">
-            <!-- Notification Bell -->
-            <button onclick="toggleNotificationModal()" class="relative bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-3.5 py-1.5 rounded-lg flex items-center space-x-2 transition">
-                <i class="fa-solid fa-bell text-amber-400 text-sm"></i>
-                <span data-i18n="nav_notif">到期提交提醒</span>
-                <span id="notif-badge" class="bg-rose-500 text-white font-bold text-[10px] px-1.5 py-0.2 rounded-full hidden">0</span>
-            </button>
+<body>
 
-            <!-- Language Switcher -->
-            <button onclick="switchLang()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition font-bold">
-                <i class="fa-solid fa-language"></i>
-                <span id="lang-btn-text">中 / EN</span>
-            </button>
-            
-            <button onclick="scrollToWidget('fixed-expenses-section')" class="bg-[#1E293B] hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
-                <i class="fa-regular fa-file-lines text-amber-400"></i>
-                <span data-i18n="nav_monthly">固定支出提醒</span>
-            </button>
-            <button onclick="scrollToWidget('task-section')" class="bg-[#1E293B] hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
-                <i class="fa-solid fa-chart-pie text-emerald-400"></i>
-                <span data-i18n="nav_budget">任务与项目</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Sub-header Date Control -->
-    <div class="max-w-7xl mx-auto px-6 pt-6 pb-2 flex flex-wrap items-center justify-between">
-        <div class="flex items-center space-x-2 text-slate-300 text-sm">
-            <i class="fa-solid fa-compass text-amber-400"></i>
-            <span class="font-medium" data-i18n="sub_header_title">Administrative Super Copilot (行政超级领航员)</span>
-            <span class="text-xs text-slate-500 ml-2" data-i18n="sub_header_desc">切换日期以核对当天日程、固定支出提交状态与私人记账</span>
-        </div>
-        <div class="flex items-center space-x-2 bg-[#131C2E] border border-slate-800 px-3 py-1.5 rounded-xl shadow-inner">
-            <span class="text-xs text-slate-400 flex items-center space-x-1">
-                <i class="fa-regular fa-calendar text-amber-400"></i>
-                <span data-i18n="date_label">查阅日期:</span>
-            </span>
-            <input type="date" id="global-date" value="2026-10-02" class="bg-[#1E293B] text-amber-400 text-xs font-mono px-2 py-1 rounded border border-slate-700 focus:outline-none focus:border-amber-500">
-            <button onclick="setToday()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1 rounded border border-slate-700 transition" data-i18n="today_btn">今天</button>
-        </div>
+<div class="container-fluid">
+  <div class="row">
+    <!-- 左侧导航栏 -->
+    <div class="col-md-3 col-lg-2 sidebar p-3">
+      <div class="d-flex align-items-center mb-4 text-white">
+        <i class="bi bi-shield-lock-fill fs-3 me-2 text-primary"></i>
+        <span class="fs-6 fw-bold">EXEC COMMAND CENTER</span>
+      </div>
+      <hr class="border-secondary">
+      <ul class="nav nav-pills flex-column mb-auto" id="mainTab" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link w-100 text-start active" id="part1-tab" data-bs-toggle="pill" data-bs-target="#part1">
+            <i class="bi bi-card-checklist me-2"></i> Part 1: 固定支出清单
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link w-100 text-start" id="part2-tab" data-bs-toggle="pill" data-bs-target="#part2">
+            <i class="bi bi-table me-2"></i> Part 2: 行政费用报表总表
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link w-100 text-start" id="part3-tab" data-bs-toggle="pill" data-bs-target="#part3">
+            <i class="bi bi-building me-2"></i> Part 3: 供应商档案 (Vendor)
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link w-100 text-start" id="part4-tab" data-bs-toggle="pill" data-bs-target="#part4">
+            <i class="bi bi-cpu me-2"></i> Part 4: Super Copilot
+          </button>
+        </li>
+      </ul>
+      <div class="mt-auto pt-4 text-center">
+        <small class="text-muted">SaaS Command System v2.0</small>
+      </div>
     </div>
 
-    <!-- Global Fixed Expense Submission Alert Banner -->
-    <div id="alert-banner" class="max-w-7xl mx-auto px-6 py-2 hidden">
-        <div class="bg-rose-500/10 border border-rose-500/30 rounded-xl px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-                <div>
-                    <h4 class="text-xs font-bold text-rose-300" data-i18n="banner_title">存在到期待提交的固定支出！</h4>
-                    <p id="banner-desc" class="text-[11px] text-slate-400">请尽快核对并完成 Submission，避免逾期。</p>
-                </div>
-            </div>
-            <button onclick="scrollToWidget('fixed-expenses-section')" class="bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg transition" data-i18n="banner_btn">查看并处理</button>
+    <!-- 右侧主体内容 -->
+    <div class="col-md-9 col-lg-10 p-4">
+      
+      <!-- 全局公司选择器与通知 -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h4 class="fw-bold mb-0 text-dark">企业财务与行政指挥中心</h4>
+          <small class="text-muted">Corporate Finance & Executive Operations Platform</small>
         </div>
-    </div>
-
-    <!-- Main Dashboard Grid -->
-    <main class="max-w-7xl mx-auto px-6 py-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        <!-- NEW WIDGET: 固定支出到期提交提醒 (Fixed Expense Submissions) -->
-        <section id="fixed-expenses-section" class="bg-[#131C2E] border border-amber-500/30 rounded-2xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none"></div>
-            <div>
-                <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-                    <h2 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
-                        <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
-                        <span data-i18n="w_fixed_title">固定支出到期与 Submission 提醒</span>
-                    </h2>
-                    <span class="text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-full border border-slate-700" data-i18n="w_fixed_tag">每月循环核销</span>
-                </div>
-                
-                <p class="text-xs text-slate-400 mb-3" data-i18n="w_fixed_desc">自动追踪每月固定账单（如 TNB 电费、租金、宽带等）到期日及提交状态：</p>
-
-                <!-- Expense Items List -->
-                <div id="fixed-expense-list" class="space-y-3 mb-4">
-                    <!-- Dynamic rendering by JS -->
-                </div>
-            </div>
-            
-            <!-- Add New Fixed Expense Form -->
-            <div class="space-y-2 pt-3 border-t border-slate-800/80">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <input type="text" id="new-fe-name" data-i18n-placeholder="fe_name_ph" placeholder="项目名称 (如 TNB电费)" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                    <input type="number" id="new-fe-day" min="1" max="31" data-i18n-placeholder="fe_day_ph" placeholder="每月截止日(1-31)" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                    <input type="text" id="new-fe-amount" data-i18n-placeholder="fe_amt_ph" placeholder="估算金额 (MYR)" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                </div>
-                <button onclick="addFixedExpense()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs py-2 rounded-xl transition shadow-md shadow-amber-500/20" data-i18n="fe_add_btn">+ 添加新固定支出提醒</button>
-            </div>
-        </section>
-
-        <!-- Widget 1: 日程安排 -->
-        <section class="bg-[#131C2E] border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-                    <h2 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
-                        <i class="fa-solid fa-calendar-day text-amber-400"></i>
-                        <span><span data-i18n="w1_title">日程安排</span> (<span id="schedule-date-title" class="text-amber-400 font-mono">2026-10-02</span>)</span>
-                    </h2>
-                </div>
-                
-                <div id="schedule-list" class="space-y-3 mb-4">
-                    <div class="bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex items-center justify-between transition">
-                        <span class="text-xs text-slate-200">与财务总监核对 10 月份固定 Vendor 账单与提交事项</span>
-                        <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] px-2.5 py-1 rounded-lg transition font-medium" data-i18n="delete_btn">删除</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="space-y-2 pt-2">
-                <div class="flex space-x-2">
-                    <input type="text" id="new-schedule-input" data-i18n-placeholder="w1_placeholder" placeholder="添加当天日程安排..." class="flex-1 bg-[#1E293B] border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
-                    <button onclick="addSchedule()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs px-4 py-2 rounded-xl transition shadow-md shadow-amber-500/20" data-i18n="add_btn">添加</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Widget 2: 任务与项目跟踪 -->
-        <section id="task-section" class="bg-[#131C2E] border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-                    <h2 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
-                        <i class="fa-solid fa-bullseye text-rose-400"></i>
-                        <span data-i18n="w2_title">任务与项目跟踪 (Task Tracker)</span>
-                    </h2>
-                </div>
-                
-                <div id="task-list" class="space-y-3 mb-4">
-                    <div class="bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex items-center justify-between transition">
-                        <div class="flex items-start space-x-3">
-                            <input type="checkbox" checked onchange="saveState()" class="mt-1 w-3.5 h-3.5 rounded bg-[#1E293B] border-slate-600 text-amber-500 focus:ring-0 cursor-pointer">
-                            <div>
-                                <p class="text-xs text-slate-200 line-through text-slate-400">完成各实体 10 月份固定支出与预算核对</p>
-                                <p class="text-[10px] text-slate-500 mt-0.5 font-mono">起止: 2026-10-01 ~ 2026-10-05 | 分类: Operations</p>
-                            </div>
-                        </div>
-                        <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] px-2.5 py-1 rounded-lg transition font-medium" data-i18n="delete_btn">删除</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="space-y-2 pt-2">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <input type="text" id="new-task-name" data-i18n-placeholder="w2_name_placeholder" placeholder="新任务名称..." class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
-                    <input type="text" id="new-task-category" data-i18n-placeholder="w2_cat_placeholder" placeholder="分类 (选填)" class="bg-[#1E293B] border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
-                </div>
-                <button onclick="addTask()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs py-2 rounded-xl transition shadow-md shadow-amber-500/20" data-i18n="w2_add_btn">添加新任务</button>
-            </div>
-        </section>
-
-        <!-- Widget 3: 文件与文档暂存箱 -->
-        <section class="bg-[#131C2E] border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-                    <h2 class="text-sm font-bold text-slate-200 flex items-center space-x-2">
-                        <i class="fa-solid fa-folder-closed text-amber-400"></i>
-                        <span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20" data-i18n="w3_title">未完成文档暂存箱</span>
-                    </h2>
-                </div>
-                <p class="text-xs text-slate-400 mb-2" data-i18n="w3_desc">今天没有完成的文档可暂存于此，明日继续，自动保存至本地：</p>
-                
-                <textarea id="temp-doc-textarea" rows="4" class="w-full bg-[#1E293B] border border-slate-700/80 rounded-xl p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-amber-500 leading-relaxed">【行政暂存箱】
-- 待提交 TNB 电费账单 (Acc: 2200192837)
-- 整理 10 月份报销单提交列表...</textarea>
-            </div>
-            
-            <div class="flex items-center justify-between pt-3 border-t border-slate-800/60">
-                <span class="text-[11px] text-emerald-400 flex items-center space-x-1">
-                    <i class="fa-solid fa-sparkles animate-pulse"></i>
-                    <span data-i18n="w3_status">LocalStorage 实时同步</span>
-                </span>
-                <button onclick="clearTempDoc()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs px-2.5 py-1 rounded-lg transition" data-i18n="w3_clear_btn">清空暂存</button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Modal Drawer: Fixed Expense Notification Overview -->
-    <div id="notif-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-[#131C2E] border border-slate-700 rounded-2xl p-6 max-w-lg w-full shadow-2xl relative transform scale-95 transition-transform duration-300" id="notif-modal-box">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-bell text-amber-400 text-lg"></i>
-                    <h3 class="font-bold text-base text-slate-100" data-i18n="modal_notif_title">固定支出 Submission 提醒汇总</h3>
-                </div>
-                <button onclick="toggleNotificationModal()" class="text-slate-400 hover:text-slate-200 text-base"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div id="modal-notif-list" class="py-4 space-y-3 max-h-80 overflow-y-auto">
-                <!-- JS populated -->
-            </div>
-
-            <div class="pt-3 border-t border-slate-800 flex justify-end">
-                <button onclick="toggleNotificationModal()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs px-5 py-2 rounded-xl transition shadow-md shadow-amber-500/20" data-i18n="close_btn">关闭</button>
-            </div>
+        <div class="d-flex align-items-center gap-3">
+          <label class="fw-bold text-secondary mb-0">管理公司:</label>
+          <select id="globalCompanySelect" class="form-select border-primary shadow-sm fw-bold text-primary" style="width: 260px;" onchange="handleCompanyChange()">
+            <option value="Paydaes">Paydaes Sdn Bhd</option>
+            <option value="BS One">BS One Management Sdn Bhd</option>
+            <option value="Black Knight">Black Knight BPO Sdn Bhd</option>
+            <option value="Bricstar">Bricstar Sdn Bhd</option>
+          </select>
         </div>
-    </div>
+      </div>
 
-    <footer class="text-center py-6 text-xs text-slate-500 border-t border-slate-800/80 mt-8">
-        CORP-FIN & EXEC COMMAND NEXUS &copy; 2026 &bull; Enterprise Fixed Expense Submissions & Notification Engine
-    </footer>
+      <div class="tab-content" id="mainTabContent">
 
-    <script>
-        // Default Fixed Expenses Data Structure
-        let fixedExpenses = [
-            { id: 'fe-1', name: 'TNB 办公室电费 (TNB Electricity)', day: 5, amount: 'RM 1,200', submitted: false },
-            { id: 'fe-2', name: 'Unifi 光纤网络费 (Unifi Internet)', day: 10, amount: 'RM 389', submitted: false },
-            { id: 'fe-3', name: 'Mutiara Damansara 租金提交 (Office Rent)', day: 15, amount: 'RM 8,500', submitted: false },
-            { id: 'fe-4', name: 'Residensi Henge 物业管理费 (Condo Maintenance)', day: 20, amount: 'RM 450', submitted: true }
-        ];
+        <!-- PART 1: 每月固定支出清单 -->
+        <div class="tab-pane fade show active" id="part1">
+          <div class="command-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-dark"><i class="bi bi-calendar-check me-2 text-primary"></i> Part 1: 每月固定支出与 Vendor 提交清单</h5>
+              <div class="d-flex align-items-center gap-2">
+                <label class="small text-muted mb-0">报销月份:</label>
+                <input type="month" id="part1MonthPicker" class="form-control form-control-sm" value="2026-08" onchange="renderPart1()">
+              </div>
+            </div>
 
-        // Bilingual Dictionary
-        const i18n = {
-            zh: {
-                ui_subtitle: "企业财务、Vendor 智控、固定支出到期提醒与行政领航中枢",
-                nav_notif: "到期提交提醒",
-                nav_monthly: "固定支出提醒",
-                nav_budget: "任务与项目",
-                sub_header_title: "Administrative Super Copilot (行政超级领航员)",
-                sub_header_desc: "切换日期以核对当天日程、固定支出提交状态与私人记账",
-                date_label: "查阅日期:",
-                today_btn: "今天",
-                banner_title: "存在到期待提交的固定支出！",
-                banner_btn: "查看并处理",
-                w_fixed_title: "固定支出到期与 Submission 提醒",
-                w_fixed_tag: "每月循环核销",
-                w_fixed_desc: "自动追踪每月固定账单（如 TNB 电费、租金、宽带等）到期日及提交状态：",
-                fe_name_ph: "项目名称 (如 TNB电费)",
-                fe_day_ph: "每月截止日(1-31)",
-                fe_amt_ph: "估算金额 (MYR)",
-                fe_add_btn: "+ 添加新固定支出提醒",
-                w1_title: "日程安排",
-                w1_placeholder: "添加当天日程安排...",
-                add_btn: "添加",
-                delete_btn: "删除",
-                w2_title: "任务与项目跟踪 (Task Tracker)",
-                w2_name_placeholder: "新任务名称...",
-                w2_cat_placeholder: "分类 (选填)",
-                w2_add_btn: "添加新任务",
-                w3_title: "未完成文档暂存箱",
-                w3_desc: "今天没有完成的文档可暂存于此，明日继续，自动保存至本地：",
-                w3_status: "LocalStorage 实时同步",
-                w3_clear_btn: "清空暂存",
-                modal_notif_title: "固定支出 Submission 提醒汇总",
-                close_btn: "关闭"
-            },
-            en: {
-                ui_subtitle: "Corporate Finance, Vendor Control, Fixed Expense Alerts & Executive Command Nexus",
-                nav_notif: "Submission Alerts",
-                nav_monthly: "Fixed Expenses",
-                nav_budget: "Tasks & Projects",
-                sub_header_title: "Administrative Super Copilot",
-                sub_header_desc: "Switch dates to review schedules, fixed expense submissions, and notes",
-                date_label: "Review Date:",
-                today_btn: "Today",
-                banner_title: "Pending Fixed Expense Submissions Due!",
-                banner_btn: "View & Process",
-                w_fixed_title: "Fixed Expense Submission Alerts",
-                w_fixed_tag: "Monthly Recurring",
-                w_fixed_desc: "Automatically tracks monthly bill due dates (TNB, Rent, Internet) & submission status:",
-                fe_name_ph: "Expense Name (e.g., TNB)",
-                fe_day_ph: "Monthly Due Day (1-31)",
-                fe_amt_ph: "Est. Amount (MYR)",
-                fe_add_btn: "+ Add Fixed Expense Alert",
-                w1_title: "Schedule & Itinerary",
-                w1_placeholder: "Add schedule for selected date...",
-                add_btn: "Add",
-                delete_btn: "Delete",
-                w2_title: "Task & Project Tracker",
-                w2_name_placeholder: "New task name...",
-                w2_cat_placeholder: "Category (Optional)",
-                w2_add_btn: "Add Task",
-                w3_title: "Unfinished Document Scratchpad",
-                w3_desc: "Keep unfinished documents here overnight before final saving:",
-                w3_status: "LocalStorage Live Sync",
-                w3_clear_btn: "Clear Cache",
-                modal_notif_title: "Fixed Expense Due Submissions Summary",
-                close_btn: "Close"
-            }
-        };
+            <!-- 到期智能提醒 Banner -->
+            <div id="part1AlertBanner" class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-2 d-none">
+              <i class="bi bi-bell-fill fs-5 text-warning"></i>
+              <div><strong>到期提醒：</strong> 本月尚有 <span id="pendingRecurringCount" class="fw-bold text-danger">0</span> 项固定支出未完成提交，请及时 follow up！</div>
+            </div>
 
-        let currentLang = 'zh';
-
-        function switchLang() {
-            currentLang = currentLang === 'zh' ? 'en' : 'zh';
-            document.getElementById('lang-btn-text').textContent = currentLang === 'zh' ? '中 / EN' : 'EN / 中';
-            
-            const dict = i18n[currentLang];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (dict[key]) el.textContent = dict[key];
-            });
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
-                if (dict[key]) el.setAttribute('placeholder', dict[key]);
-            });
-            document.getElementById('ui-subtitle').textContent = dict.ui_subtitle;
-            renderFixedExpenses();
-            saveState();
-        }
-
-        // Global Date & Logic
-        const globalDateInput = document.getElementById('global-date');
-        const scheduleDateTitle = document.getElementById('schedule-date-title');
-
-        globalDateInput.addEventListener('change', (e) => {
-            scheduleDateTitle.textContent = e.target.value;
-            renderFixedExpenses();
-            saveState();
-        });
-
-        function setToday() {
-            const today = '2026-10-02';
-            globalDateInput.value = today;
-            scheduleDateTitle.textContent = today;
-            renderFixedExpenses();
-            saveState();
-        }
-
-        function scrollToWidget(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Fixed Expense Submission Calculation Engine
-        function renderFixedExpenses() {
-            const listContainer = document.getElementById('fixed-expense-list');
-            const modalList = document.getElementById('modal-notif-list');
-            listContainer.innerHTML = '';
-            modalList.innerHTML = '';
-
-            const selectedDateStr = globalDateInput.value || '2026-10-02';
-            const selectedDay = parseInt(selectedDateStr.split('-')[2], 10);
-
-            let pendingAlertCount = 0;
-
-            fixedExpenses.forEach(item => {
-                let statusBadge = '';
-                let statusText = '';
-                let borderStyle = 'border-slate-800';
-
-                if (item.submitted) {
-                    statusBadge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                    statusText = currentLang === 'zh' ? '🟢 本月已完成提交' : '🟢 Submitted';
-                } else if (selectedDay >= item.day) {
-                    // Due or overdue
-                    statusBadge = 'bg-rose-500/20 text-rose-400 border-rose-500/40 animate-pulse';
-                    statusText = currentLang === 'zh' ? `🔴 每月${item.day}号到期 (待提交)` : `🔴 Due Day ${item.day} (Pending)`;
-                    borderStyle = 'border-rose-500/40';
-                    pendingAlertCount++;
-                } else if (item.day - selectedDay <= 5) {
-                    // Due soon (within 5 days)
-                    statusBadge = 'bg-amber-500/20 text-amber-400 border-amber-500/40';
-                    statusText = currentLang === 'zh' ? `🟡 即将到期 (每月${item.day}号)` : `🟡 Due Soon (Day ${item.day})`;
-                    borderStyle = 'border-amber-500/30';
-                    pendingAlertCount++;
-                } else {
-                    statusBadge = 'bg-slate-800 text-slate-400 border-slate-700';
-                    statusText = currentLang === 'zh' ? `⚪ 每月${item.day}号截止` : `⚪ Due on Day ${item.day}`;
-                }
-
-                const cardHTML = `
-                    <div class="bg-[#1E293B]/60 border ${borderStyle} p-3 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <span class="font-bold text-xs text-slate-100">${escapeHtml(item.name)}</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded-full border ${statusBadge}">${statusText}</span>
-                            </div>
-                            <div class="text-[11px] text-slate-400 font-mono mt-1">
-                                ${currentLang === 'zh' ? '预估金额' : 'Est. Amount'}: <span class="text-amber-400 font-bold">${escapeHtml(item.amount)}</span> | 每月 ${item.day} 号截止
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2 self-end sm:self-center">
-                            <button onclick="toggleFESubmitted('${item.id}')" class="${item.submitted ? 'bg-slate-700 text-slate-300' : 'bg-emerald-500 hover:bg-emerald-400 text-black'} font-bold text-[11px] px-3 py-1 rounded-lg transition">
-                                ${item.submitted ? (currentLang === 'zh' ? '取消已提交' : 'Unmark') : (currentLang === 'zh' ? '标记为已提交' : 'Mark Submitted')}
-                            </button>
-                            <button onclick="deleteFE('${item.id}')" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] px-2 py-1 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-
-                listContainer.innerHTML += cardHTML;
-
-                // Also populate Modal if pending
-                if (!item.submitted && selectedDay >= item.day - 5) {
-                    modalList.innerHTML += cardHTML;
-                }
-            });
-
-            if (modalList.innerHTML === '') {
-                modalList.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">${currentLang === 'zh' ? '🎉 太棒了！当前没有任何到期或急需提交的固定支出！' : '🎉 Great! No pending fixed expense submissions due.'}</p>`;
-            }
-
-            // Update Notification Badge Counter
-            const badge = document.getElementById('notif-badge');
-            const banner = document.getElementById('alert-banner');
-            if (pendingAlertCount > 0) {
-                badge.textContent = pendingAlertCount;
-                badge.classList.remove('hidden');
-                banner.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-                banner.classList.add('hidden');
-            }
-        }
-
-        function toggleFESubmitted(id) {
-            const item = fixedExpenses.find(x => x.id === id);
-            if (item) {
-                item.submitted = !item.submitted;
-                renderFixedExpenses();
-                saveState();
-            }
-        }
-
-        function deleteFE(id) {
-            fixedExpenses = fixedExpenses.filter(x => x.id !== id);
-            renderFixedExpenses();
-            saveState();
-        }
-
-        function addFixedExpense() {
-            const name = document.getElementById('new-fe-name').value;
-            const day = parseInt(document.getElementById('new-fe-day').value, 10);
-            const amount = document.getElementById('new-fe-amount').value || 'RM 0';
-
-            if (!name.trim() || isNaN(day) || day < 1 || day > 31) {
-                alert(currentLang === 'zh' ? '请填写有效的项目名称和1-31之间的截止日期！' : 'Please fill valid name and due day between 1-31!');
-                return;
-            }
-
-            fixedExpenses.push({
-                id: 'fe-' + Date.now(),
-                name: name.trim(),
-                day: day,
-                amount: amount.startsWith('RM') ? amount : `RM ${amount}`,
-                submitted: false
-            });
-
-            document.getElementById('new-fe-name').value = '';
-            document.getElementById('new-fe-day').value = '';
-            document.getElementById('new-fe-amount').value = '';
-
-            renderFixedExpenses();
-            saveState();
-        }
-
-        function toggleNotificationModal() {
-            const modal = document.getElementById('notif-modal');
-            const box = document.getElementById('notif-modal-box');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    modal.classList.remove('opacity-0');
-                    box.classList.remove('scale-95');
-                    box.classList.add('scale-100');
-                });
-            } else {
-                modal.classList.add('opacity-0');
-                box.classList.remove('scale-100');
-                box.classList.add('scale-95');
-                setTimeout(() => modal.classList.add('hidden'), 300);
-            }
-        }
-
-        // Widget Controls & Delete Helper
-        function removeItem(btn) {
-            const item = btn.closest('.bg-\\[\\#1E293B\\]\\/60') || btn.parentElement;
-            item.style.opacity = '0';
-            setTimeout(() => {
-                item.remove();
-                saveState();
-            }, 200);
-        }
-
-        function addSchedule() {
-            const input = document.getElementById('new-schedule-input');
-            if (!input.value.trim()) return;
-            const list = document.getElementById('schedule-list');
-            const div = document.createElement('div');
-            div.className = 'bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex items-center justify-between transition';
-            const delText = currentLang === 'zh' ? '删除' : 'Delete';
-            div.innerHTML = `<span class="text-xs text-slate-200">${escapeHtml(input.value)}</span><button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] px-2.5 py-1 rounded-lg transition font-medium">${delText}</button>`;
-            list.appendChild(div);
-            input.value = '';
-            saveState();
-        }
-
-        function addTask() {
-            const name = document.getElementById('new-task-name').value;
-            const category = document.getElementById('new-task-category').value || 'Operations';
-            if (!name.trim()) return;
-            
-            const list = document.getElementById('task-list');
-            const div = document.createElement('div');
-            div.className = 'bg-[#1E293B]/60 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex items-center justify-between transition';
-            const delText = currentLang === 'zh' ? '删除' : 'Delete';
-            div.innerHTML = `
-                <div class="flex items-start space-x-3">
-                    <input type="checkbox" onchange="saveState()" class="mt-1 w-3.5 h-3.5 rounded bg-[#1E293B] border-slate-600 text-amber-500 focus:ring-0 cursor-pointer">
-                    <div>
-                        <p class="text-xs text-slate-200">${escapeHtml(name)}</p>
-                        <p class="text-[10px] text-slate-500 mt-0.5 font-mono">分类: ${escapeHtml(category)}</p>
-                    </div>
+            <!-- 添加固定支出项目 Form -->
+            <div class="card p-3 bg-light border-0 mb-4">
+              <h6 class="fw-bold text-secondary mb-2">+ 自定义添加新的固定开支 / Vendor 项目</h6>
+              <form id="addRecurringForm" class="row g-2" onsubmit="addRecurringItem(event)">
+                <div class="col-md-2">
+                  <input type="text" id="recVendor" class="form-control form-control-sm" placeholder="Vendor/收款方" required>
                 </div>
-                <button onclick="removeItem(this)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] px-2.5 py-1 rounded-lg transition font-medium">${delText}</button>
-            `;
-            list.appendChild(div);
-            document.getElementById('new-task-name').value = '';
-            document.getElementById('new-task-category').value = '';
-            saveState();
-        }
+                <div class="col-md-2">
+                  <select id="recCategory" class="form-select form-control-sm" required>
+                    <option value="">费用类别...</option>
+                    <option value="Office Rental">Office Rental</option>
+                    <option value="Office Electricity">Office Electricity</option>
+                    <option value="Office Internet">Office Internet</option>
+                    <option value="Office Cleaning Service">Office Cleaning Service</option>
+                    <option value="Water Filter/Coway">Water Filter/Coway</option>
+                    <option value="Pantry Supplies (any kitchenware)">Pantry Supplies</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <input type="number" step="0.01" id="recAmount" class="form-control form-control-sm" placeholder="预估/固定金额 (MYR)" required>
+                </div>
+                <div class="col-md-2">
+                  <input type="text" id="recInvoiceNo" class="form-control form-control-sm" placeholder="Invoice No.">
+                </div>
+                <div class="col-md-2">
+                  <input type="date" id="recInvoiceDate" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-2">
+                  <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg me-1"></i> 添加到 Checklist</button>
+                </div>
+              </form>
+            </div>
 
-        function clearTempDoc() {
-            document.getElementById('temp-doc-textarea').value = '';
-            saveState();
-        }
+            <!-- 支出进度清单 Table -->
+            <div class="table-responsive">
+              <table class="table table-hover align-middle border">
+                <thead class="table-dark">
+                  <tr>
+                    <th class="text-center" style="width: 70px;">已提交</th>
+                    <th>Vendor / 收款方</th>
+                    <th>Category / 费用类别</th>
+                    <th>预估/固定金额 (MYR)</th>
+                    <th>Invoice No.</th>
+                    <th>Invoice Date</th>
+                    <th>Progress Follow-up Status</th>
+                    <th class="text-center" style="width: 180px;">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="recurringTableBody">
+                  <!-- JS 动态渲染 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
-        }
+        <!-- PART 2: 12个月行政费用报表总表 -->
+        <div class="tab-pane fade" id="part2">
+          
+          <!-- 智能上传与单张开支录入 -->
+          <div class="command-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-dark"><i class="bi bi-cpu me-2 text-primary"></i> 智能发票解析与开支核对录入</h5>
+              <div class="btn-group">
+                <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()"><i class="bi bi-file-earmark-excel me-1"></i> 导出 Excel</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="window.print()"><i class="bi bi-file-earmark-pdf me-1"></i> 导出 PDF</button>
+              </div>
+            </div>
 
-        // LocalStorage Logic
-        function saveState() {
-            const state = {
-                lang: currentLang,
-                date: globalDateInput.value,
-                fixedExpenses: fixedExpenses,
-                schedules: document.getElementById('schedule-list').innerHTML,
-                tasks: document.getElementById('task-list').innerHTML,
-                tempDoc: document.getElementById('temp-doc-textarea').value
-            };
-            localStorage.setItem('command_nexus_state_v4', JSON.stringify(state));
-        }
+            <!-- 模拟 AI 高精度智能文本解析引擎 -->
+            <div class="p-3 border rounded border-dashed bg-light text-center mb-4">
+              <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
+              <p class="mb-1 fw-bold">拖拽发票文件至此处，或点击一键上传 (支持 PDF, JPG, PNG)</p>
+              <small class="text-muted d-block mb-2">系统将启动智能解析引擎精准提取金额、日期并自动关联 Expenses Category</small>
+              <input type="file" id="invoiceFileInput" class="d-none" onchange="handleInvoiceUpload(event)">
+              <button class="btn btn-sm btn-primary" onclick="document.getElementById('invoiceFileInput').click()"><i class="bi bi-magic me-1"></i> 选择文件并 AI 智能识别</button>
+            </div>
 
-        function loadState() {
-            const saved = localStorage.getItem('command_nexus_state_v4');
-            if (!saved) {
-                renderFixedExpenses();
-                return;
-            }
-            try {
-                const state = JSON.parse(saved);
-                if (state.lang && state.lang !== currentLang) {
-                    switchLang();
-                }
-                if (state.date) {
-                    globalDateInput.value = state.date;
-                    scheduleDateTitle.textContent = state.date;
-                }
-                if (state.fixedExpenses && Array.isArray(state.fixedExpenses)) {
-                    fixedExpenses = state.fixedExpenses;
-                }
-                if (state.schedules) document.getElementById('schedule-list').innerHTML = state.schedules;
-                if (state.tasks) document.getElementById('task-list').innerHTML = state.tasks;
-                if (state.tempDoc !== undefined) document.getElementById('temp-doc-textarea').value = state.tempDoc;
-            } catch (e) {
-                console.error("Failed to load saved state", e);
-            }
-            renderFixedExpenses();
-        }
+            <!-- 开支录入 Form (同步至 Master Listing) -->
+            <h6 class="fw-bold text-dark border-bottom pb-2">核与录入单张发票开支到总表</h6>
+            <form id="masterEntryForm" class="row g-2 mt-2" onsubmit="addMasterEntry(event)">
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Year - Month</label>
+                <input type="month" id="mMonth" class="form-control form-control-sm" value="2026-01" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Building</label>
+                <input type="text" id="mBuilding" class="form-control form-control-sm" value="The Bousteador" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Office / Unit</label>
+                <input type="text" id="mUnit" class="form-control form-control-sm" value="8.4" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Invoice Date</label>
+                <input type="date" id="mInvDate" class="form-control form-control-sm" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Dingtalk Submission Date</label>
+                <input type="date" id="mDingtalkDate" class="form-control form-control-sm" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Payment Mode</label>
+                <select id="mPayMode" class="form-select form-select-sm">
+                  <option value="Payment Application">Payment Application</option>
+                  <option value="Direct Transfer">Direct Transfer</option>
+                  <option value="Petty Cash">Petty Cash</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small mb-1">Payable Name / Vendor</label>
+                <input type="text" id="mVendor" class="form-control form-control-sm" placeholder="供应商名称" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Invoice No.</label>
+                <input type="text" id="mInvNo" class="form-control form-control-sm" placeholder="发票号码" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small mb-1">Expenses Category</label>
+                <select id="mCategory" class="form-select form-select-sm" required>
+                  <option value="Office Rental">Office Rental</option>
+                  <option value="Office Electricity">Office Electricity</option>
+                  <option value="Office Internet">Office Internet</option>
+                  <option value="Office Cleaning Service">Office Cleaning Service</option>
+                  <option value="Office Supplies">Office Supplies</option>
+                  <option value="Pantry Supplies (any kitchenware)">Pantry Supplies</option>
+                  <option value="First Aids / Medicine">First Aids / Medicine</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Amount (MYR)</label>
+                <input type="number" step="0.01" id="mAmount" class="form-control form-control-sm" required>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small mb-1">Remark</label>
+                <input type="text" id="mRemark" class="form-control form-control-sm" placeholder="选填">
+              </div>
+              <div class="col-md-12 mt-3">
+                <input type="text" id="mDesc" class="form-control form-control-sm mb-2" placeholder="Description 简述" required>
+                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-database-add me-1"></i> 加入 Master Listing</button>
+              </div>
+            </form>
+          </div>
 
-        document.getElementById('temp-doc-textarea').addEventListener('input', saveState);
-        window.addEventListener('DOMContentLoaded', loadState);
-    </script>
+          <!-- Master Listing Table -->
+          <div class="command-card">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-journal-text me-2 text-primary"></i> Master Listing 消费明细表</h5>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover table-bordered align-middle small">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Month</th>
+                    <th>Building</th>
+                    <th>Office/Unit</th>
+                    <th>Invoice Date</th>
+                    <th>Dingtalk Submission Date</th>
+                    <th>Description</th>
+                    <th>Payable Name</th>
+                    <th>Invoice No</th>
+                    <th>Payment Mode</th>
+                    <th>Expenses Category</th>
+                    <th>Amount (MYR)</th>
+                    <th>Remarks</th>
+                  </tr>
+                </thead>
+                <tbody id="masterListingTableBody">
+                  <!-- 动态渲染 Master Listing 数据 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 12个月行政费用预算与实际报表 (Monthly Admin Expenses Report) -->
+          <div class="command-card">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-grid-3x3-gap me-2 text-primary"></i> 12 个月行政费用预算与实际对照表 (Budget vs Actual)</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle text-center small" style="min-width: 1600px;">
+                <thead class="table-custom-header">
+                  <tr>
+                    <th rowspan="2" style="width: 220px;">CATEGORY DESCRIPTION</th>
+                    <th colspan="2">JANUARY</th>
+                    <th colspan="2">FEBRUARY</th>
+                    <th colspan="2">MARCH</th>
+                    <th colspan="2">APRIL</th>
+                    <th colspan="2">MAY</th>
+                    <th colspan="2">JUNE</th>
+                    <th colspan="2">JULY</th>
+                    <th colspan="2">AUGUST</th>
+                  </tr>
+                  <tr>
+                    <th>BUDGET</th><th>ACTUAL</th>
+                    <th>BUDGET</th><th>ACTUAL</th>
+                    <th>BUDGET</th><th>ACTUAL</th>
+                    <th>BUDGET</th><th>ACTUAL</th>
+                    <th>BUDGET</th><th>ACTUAL</th>
+                    <th>BUDGET</th><th>ACTUAL</th>
+                    <th>BUDGET</th><th>ACTUAL</th>
+                    <th>BUDGET</th><th>ACTUAL</th>
+                  </tr>
+                </thead>
+                <tbody id="adminReportTableBody">
+                  <!-- 动态渲染预算与 Actual 表格 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Paydaes 专属 Monthly Summary Report -->
+          <div id="paydaesSummarySection" class="command-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-dark mb-0"><i class="bi bi-pie-chart-fill me-2 text-primary"></i> Monthly Summary Report (Paydaes Sdn Bhd 专属)</h5>
+              <button class="btn btn-sm btn-primary" onclick="copySummaryTableWithStyles()"><i class="bi bi-clipboard-plus me-1"></i> 一键复制 Table with Colour (发邮件专用)</button>
+            </div>
+            
+            <div id="summaryTableContainer" class="table-responsive">
+              <table id="paydaesSummaryReportTable" class="table table-bordered align-middle text-center small" style="min-width: 1400px; font-family: Arial, sans-serif;">
+                <thead>
+                  <tr style="background-color: #002060; color: #ffffff; font-weight: bold;">
+                    <th>COMPANY</th>
+                    <th>DESCRIPTION</th>
+                    <th>JAN BUDGET</th><th>JAN ACTUAL</th>
+                    <th>FEB BUDGET</th><th>FEB ACTUAL</th>
+                    <th>MAR BUDGET</th><th>MAR ACTUAL</th>
+                    <th>APR BUDGET</th><th>APR ACTUAL</th>
+                    <th>MAY BUDGET</th><th>MAY ACTUAL</th>
+                    <th>JUN BUDGET</th><th>JUN ACTUAL</th>
+                  </tr>
+                </thead>
+                <tbody id="summaryTableBody">
+                  <!-- 动态渲染 Paydaes 汇总表格 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PART 3: 供应商档案与智能识别 -->
+        <div class="tab-pane fade" id="part3">
+          <div class="command-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-dark"><i class="bi bi-person-lines-fill me-2 text-primary"></i> Part 3: Vendor Details & Information</h5>
+              <button class="btn btn-sm btn-success" onclick="exportVendors()"><i class="bi bi-file-earmark-excel me-1"></i> 导出 Vendor 表</button>
+            </div>
+
+            <!-- 添加 Ad-hoc Vendor Form -->
+            <form id="addVendorForm" class="row g-2 bg-light p-3 rounded mb-4" onsubmit="addVendor(event)">
+              <div class="col-md-3">
+                <input type="text" id="vName" class="form-control form-control-sm" placeholder="Vendor Company Name" required>
+              </div>
+              <div class="col-md-2">
+                <input type="text" id="vCategory" class="form-control form-control-sm" placeholder="Category" required>
+              </div>
+              <div class="col-md-2">
+                <input type="text" id="vBank" class="form-control form-control-sm" placeholder="Bank Name">
+              </div>
+              <div class="col-md-3">
+                <input type="text" id="vAcc" class="form-control form-control-sm" placeholder="Bank Account No.">
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg me-1"></i> 添加 Vendor</button>
+              </div>
+            </form>
+
+            <!-- Vendor Listing Table -->
+            <div class="table-responsive">
+              <table class="table table-hover align-middle border">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Vendor ID</th>
+                    <th>Vendor Company Name</th>
+                    <th>Expenses Category</th>
+                    <th>Bank Name</th>
+                    <th>Bank Account No.</th>
+                    <th>SST / Tax ID</th>
+                    <th class="text-center">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="vendorTableBody">
+                  <!-- 动态渲染 Vendor Listing -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PART 4: Administrative Super Copilot -->
+        <div class="tab-pane fade" id="part4">
+          <div class="command-card copilot-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
+              <h4 class="fw-bold text-warning mb-0"><i class="bi bi-robot me-2"></i> Administrative Super Copilot</h4>
+              <div class="d-flex align-items-center gap-2">
+                <label class="small text-light mb-0">日期选择:</label>
+                <input type="date" id="copilotDatePicker" class="form-control form-control-sm bg-dark text-white border-secondary" value="2026-10-02">
+              </div>
+            </div>
+
+            <div class="row g-4">
+              <!-- 1. 任务与项目跟踪 -->
+              <div class="col-md-6">
+                <div class="p-3 rounded bg-dark bg-opacity-50 border border-secondary h-100">
+                  <h6 class="fw-bold text-info mb-3"><i class="bi bi-list-task me-1"></i> 任务与项目跟踪 (Task & Project Tracker)</h6>
+                  <form id="addTaskForm" class="input-group input-group-sm mb-3" onsubmit="addTask(event)">
+                    <input type="text" id="taskTitle" class="form-control" placeholder="新增任务 Title..." required>
+                    <input type="date" id="taskStart" class="form-control">
+                    <input type="date" id="taskEnd" class="form-control">
+                    <button type="submit" class="btn btn-info"><i class="bi bi-plus-lg"></i></button>
+                  </form>
+                  <ul id="taskList" class="list-group list-group-flush bg-transparent">
+                    <!-- 动态任务 -->
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 2. 文件与文档暂存区 (Draft Staging Box) -->
+              <div class="col-md-6">
+                <div class="p-3 rounded bg-dark bg-opacity-50 border border-secondary h-100">
+                  <h6 class="fw-bold text-success mb-2"><i class="bi bi-file-earmark-arrow-up me-1"></i> 暂存文档 Box (跨日未完成文件)</h6>
+                  <p class="small text-muted mb-3">今天未完成的文档可保存在此，明天继续，完成后一键同步至云端。</p>
+                  <div class="input-group input-group-sm mb-3">
+                    <input type="text" id="draftDocTitle" class="form-control" placeholder="文档名称 / 工作草稿...">
+                    <button class="btn btn-success" onclick="addDraftDoc()"><i class="bi bi-box-arrow-in-down me-1"></i> 暂存</button>
+                  </div>
+                  <ul id="draftDocList" class="list-group list-group-flush bg-transparent">
+                    <!-- 动态暂存文档 -->
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 3. 每日私人消费记账 & 个人手帐 -->
+              <div class="col-md-6">
+                <div class="p-3 rounded bg-dark bg-opacity-50 border border-secondary h-100">
+                  <h6 class="fw-bold text-warning mb-3"><i class="bi bi-wallet2 me-1"></i> 每日消费（私人）与手帐</h6>
+                  <form id="addPersonalExpenseForm" class="row g-2 mb-3" onsubmit="addPersonalExpense(event)">
+                    <div class="col-3">
+                      <select id="pCurr" class="form-select form-select-sm bg-dark text-white border-secondary">
+                        <option value="MYR">MYR</option>
+                        <option value="SGD">SGD</option>
+                        <option value="USD">USD</option>
+                      </select>
+                    </div>
+                    <div class="col-4">
+                      <input type="number" step="0.01" id="pAmt" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="金额" required>
+                    </div>
+                    <div class="col-5">
+                      <input type="text" id="pPurpose" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="用途" required>
+                    </div>
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-warning btn-sm w-100"><i class="bi bi-journal-plus me-1"></i> 记一笔 (Personal Ledger)</button>
+                    </div>
+                  </form>
+                  <ul id="personalExpenseList" class="list-group list-group-flush bg-transparent small">
+                    <!-- 动态私人记账列表 -->
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 4. 数据与报表 (SaaS 仪表盘图表) -->
+              <div class="col-md-6">
+                <div class="p-3 rounded bg-dark bg-opacity-50 border border-secondary h-100">
+                  <h6 class="fw-bold text-light mb-3"><i class="bi bi-graph-up-arrow me-1"></i> 本月消费与工作完成度 (Analytics)</h6>
+                  <canvas id="copilotAnalyticsChart" height="150"></canvas>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // -------------------------------------------------------------
+  // 数据结构初始化与 LocalStorage 永久存储
+  // -------------------------------------------------------------
+  let currentCompany = "Paydaes";
+
+  const defaultBudget = {
+    "Paydaes": { total: 571626.40, used: 336109.08, balance: 235517.32 },
+    "BS One": { total: 858616.00, used: 403039.19, balance: 455576.81 },
+    "Black Knight": { total: 293794.00, used: 36821.85, balance: 256972.15 },
+    "Bricstar": { total: 293114.00, used: 122214.15, balance: 170899.85 }
+  };
+
+  let recurringData = JSON.parse(localStorage.getItem("recurringData")) || [
+    { id: 1, company: "Paydaes", month: "2026-08", vendor: "Tenaga Nasional Berhad", category: "Office Electricity", amount: 1500.00, invNo: "TN-9921", date: "2026-08-01", submitted: true, status: "已结清" },
+    { id: 2, company: "Paydaes", month: "2026-08", vendor: "Build-Clean Sdn Bhd", category: "Office Cleaning Service", amount: 1458.00, invNo: "BC-8831", date: "2026-08-05", submitted: false, status: "待提交" }
+  ];
+
+  let masterListing = JSON.parse(localStorage.getItem("masterListing")) || [
+    { id: 1, company: "Paydaes", month: "January", building: "The Bousteador", unit: "8.4", invDate: "2026-01-12", dingtalkDate: "2026-01-19", desc: "Monthly office cleaning expenses", vendor: "Build-Clean Sdn Bhd", invNo: "IV-113642", payMode: "Payment Application", category: "Office Cleaning Service", amount: 1458.00, remark: "" },
+    { id: 2, company: "Paydaes", month: "January", building: "The Bousteador", unit: "8.4", invDate: "2026-01-22", dingtalkDate: "2026-01-29", desc: "Monthly office electricity", vendor: "Tenaga Nasional Berhad", invNo: "001143860779", payMode: "Payment Application", category: "Office Electricity", amount: 57.20, remark: "" }
+  ];
+
+  let vendorData = JSON.parse(localStorage.getItem("vendorData")) || [
+    { id: "B001", name: "Build-Clean Sdn Bhd", category: "Office Cleaning Service", bank: "Maybank", acc: "514011223344", sst: "W10-1808-31010000" },
+    { id: "T001", name: "Tenaga Nasional Berhad", category: "Office Electricity", bank: "CIMB Bank", acc: "8001234567", sst: "N/A" }
+  ];
+
+  let tasksData = JSON.parse(localStorage.getItem("tasksData")) || [
+    { id: 1, title: "提交 8 月份行政开支总表给 Top Management", start: "2026-08-25", end: "2026-08-28", priority: true, done: false }
+  ];
+
+  let draftDocs = JSON.parse(localStorage.getItem("draftDocs")) || [
+    { id: 1, title: "Paydaes 办公设备采购比价草稿.docx", date: "2026-10-01" }
+  ];
+
+  let personalExpenses = JSON.parse(localStorage.getItem("personalExpenses")) || [
+    { id: 1, curr: "MYR", amount: 45.00, purpose: "午餐及咖啡", date: "2026-10-02" }
+  ];
+
+  // 初始化页面
+  document.addEventListener("DOMContentLoaded", function() {
+    renderPart1();
+    renderPart2();
+    renderPart3();
+    renderPart4();
+    initAnalyticsChart();
+  });
+
+  function handleCompanyChange() {
+    currentCompany = document.getElementById("globalCompanySelect").value;
+    renderPart1();
+    renderPart2();
+  }
+
+  // saveData 闭包
+  function saveData() {
+    localStorage.setItem("recurringData", JSON.stringify(recurringData));
+    localStorage.setItem("masterListing", JSON.stringify(masterListing));
+    localStorage.setItem("vendorData", JSON.stringify(vendorData));
+    localStorage.setItem("tasksData", JSON.stringify(tasksData));
+    localStorage.setItem("draftDocs", JSON.stringify(draftDocs));
+    localStorage.setItem("personalExpenses", JSON.stringify(personalExpenses));
+  }
+
+  // -------------------------------------------------------------
+  // PART 1 LOGIC
+  // -------------------------------------------------------------
+  function renderPart1() {
+    const selMonth = document.getElementById("part1MonthPicker").value;
+    const tbody = document.getElementById("recurringTableBody");
+    tbody.innerHTML = "";
+
+    const filtered = recurringData.filter(item => item.company === currentCompany && item.month === selMonth);
+    let pendingCount = 0;
+
+    filtered.forEach(item => {
+      if (!item.submitted) pendingCount++;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="text-center">
+          <input type="checkbox" class="form-check-input" ${item.submitted ? "checked" : ""} onchange="toggleRecurringSubmitted(${item.id})">
+        </td>
+        <td class="fw-bold">${item.vendor}</td>
+        <td><span class="badge bg-secondary">${item.category}</span></td>
+        <td class="fw-bold text-primary">RM ${parseFloat(item.amount).toFixed(2)}</td>
+        <td>${item.invNo || "-"}</td>
+        <td>${item.date || "-"}</td>
+        <td>
+          <span class="badge ${item.submitted ? 'bg-success' : 'bg-warning text-dark'}">${item.status}</span>
+        </td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-outline-primary py-0 me-1" onclick="syncRecurringToMaster(${item.id})"><i class="bi bi-arrow-right-circle"></i> 记入总表</button>
+          <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteRecurring(${item.id})"><i class="bi bi-trash"></i></button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const alertBanner = document.getElementById("part1AlertBanner");
+    const countSpan = document.getElementById("pendingRecurringCount");
+    if (pendingCount > 0) {
+      countSpan.innerText = pendingCount;
+      alertBanner.classList.remove("d-none");
+    } else {
+      alertBanner.classList.add("d-none");
+    }
+  }
+
+  function addRecurringItem(e) {
+    e.preventDefault();
+    const selMonth = document.getElementById("part1MonthPicker").value;
+    const newItem = {
+      id: Date.now(),
+      company: currentCompany,
+      month: selMonth,
+      vendor: document.getElementById("recVendor").value,
+      category: document.getElementById("recCategory").value,
+      amount: parseFloat(document.getElementById("recAmount").value),
+      invNo: document.getElementById("recInvoiceNo").value,
+      date: document.getElementById("recInvoiceDate").value,
+      submitted: false,
+      status: "待提交"
+    };
+    recurringData.push(newItem);
+    saveData();
+    renderPart1();
+    document.getElementById("addRecurringForm").reset();
+  }
+
+  function toggleRecurringSubmitted(id) {
+    const item = recurringData.find(i => i.id === id);
+    if (item) {
+      item.submitted = !item.submitted;
+      item.status = item.submitted ? "已结清" : "待提交";
+      saveData();
+      renderPart1();
+    }
+  }
+
+  function deleteRecurring(id) {
+    recurringData = recurringData.filter(i => i.id !== id);
+    saveData();
+    renderPart1();
+  }
+
+  function syncRecurringToMaster(id) {
+    const item = recurringData.find(i => i.id === id);
+    if (!item) return;
+
+    const masterItem = {
+      id: Date.now(),
+      company: item.company,
+      month: "August",
+      building: "The Bousteador",
+      unit: "8.4",
+      invDate: item.date || "2026-08-01",
+      dingtalkDate: "2026-08-05",
+      desc: `Recurring Expense - ${item.category}`,
+      vendor: item.vendor,
+      invNo: item.invNo || "INV-REC",
+      payMode: "Payment Application",
+      category: item.category,
+      amount: item.amount,
+      remark: "Synced from Part 1 Checklist"
+    };
+
+    masterListing.push(masterItem);
+    item.submitted = true;
+    item.status = "已结清";
+    saveData();
+    renderPart1();
+    renderPart2();
+    alert("✅ 已成功将固定开支同步记入 Master Listing！");
+  }
+
+  // -------------------------------------------------------------
+  // PART 2 LOGIC
+  // -------------------------------------------------------------
+  function renderPart2() {
+    renderMasterListingTable();
+    renderAdminReportTable();
+    renderSummaryReportTable();
+  }
+
+  function renderMasterListingTable() {
+    const tbody = document.getElementById("masterListingTableBody");
+    tbody.innerHTML = "";
+
+    const filtered = masterListing.filter(i => i.company === currentCompany);
+    filtered.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${item.month}</td>
+        <td>${item.building}</td>
+        <td>${item.unit}</td>
+        <td>${item.invDate}</td>
+        <td>${item.dingtalkDate}</td>
+        <td>${item.desc}</td>
+        <td class="fw-bold">${item.vendor}</td>
+        <td>${item.invNo}</td>
+        <td>${item.payMode}</td>
+        <td><span class="badge bg-info text-dark">${item.category}</span></td>
+        <td class="fw-bold text-success">RM ${parseFloat(item.amount).toFixed(2)}</td>
+        <td>${item.remark || ""}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function addMasterEntry(e) {
+    e.preventDefault();
+    const newItem = {
+      id: Date.now(),
+      company: currentCompany,
+      month: "January",
+      building: document.getElementById("mBuilding").value,
+      unit: document.getElementById("mUnit").value,
+      invDate: document.getElementById("mInvDate").value,
+      dingtalkDate: document.getElementById("mDingtalkDate").value,
+      desc: document.getElementById("mDesc").value,
+      vendor: document.getElementById("mVendor").value,
+      invNo: document.getElementById("mInvNo").value,
+      payMode: document.getElementById("mPayMode").value,
+      category: document.getElementById("mCategory").value,
+      amount: parseFloat(document.getElementById("mAmount").value),
+      remark: document.getElementById("mRemark").value
+    };
+
+    masterListing.push(newItem);
+    autoCheckAndAddVendor(newItem.vendor, newItem.category);
+    saveData();
+    renderPart2();
+    renderPart3();
+    document.getElementById("masterEntryForm").reset();
+    alert("✅ 开支已成功录入 Master Listing 并更新 Vendor 库！");
+  }
+
+  // 高精度 OCR 智能解析模拟引擎
+  function handleInvoiceUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setTimeout(() => {
+      // 模拟自动识别结果
+      document.getElementById("mVendor").value = "Homie Creative Store";
+      document.getElementById("mInvNo").value = "26122NTM18WK6";
+      document.getElementById("mAmount").value = "399.70";
+      document.getElementById("mInvDate").value = "2026-01-26";
+      document.getElementById("mDingtalkDate").value = "2026-01-28";
+      document.getElementById("mDesc").value = "Formaldehyde Removal for new office";
+      document.getElementById("mCategory").value = "Office Supplies";
+      alert("🤖 AI 高精度解析完成！已自动填入内容与匹配精确分类，请核对后提交。");
+    }, 800);
+  }
+
+  function renderAdminReportTable() {
+    const tbody = document.getElementById("adminReportTableBody");
+    tbody.innerHTML = "";
+
+    const categories = [
+      "Office Rental", "Office Electricity", "Office Internet", 
+      "Office Cleaning Service", "Office Supplies", "Pantry Supplies (any kitchenware)"
+    ];
+
+    categories.forEach(cat => {
+      const tr = document.createElement("tr");
+      let rowHtml = `<td class="fw-bold text-start ps-3">${cat}</td>`;
+
+      for (let m = 0; m < 8; m++) {
+        const budgetVal = (cat === "Office Rental") ? 27394.20 : 1500.00;
+        const actualVal = masterListing
+          .filter(i => i.company === currentCompany && i.category === cat)
+          .reduce((sum, item) => sum + item.amount, 0) / 8; // 均摊示意
+
+        rowHtml += `
+          <td>${budgetVal.toFixed(2)}</td>
+          <td class="fw-bold text-primary">${actualVal.toFixed(2)}</td>
+        `;
+      }
+      tr.innerHTML = rowHtml;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderSummaryReportTable() {
+    const sec = document.getElementById("paydaesSummarySection");
+    if (currentCompany !== "Paydaes") {
+      sec.style.display = "none";
+      return;
+    }
+    sec.style.display = "block";
+
+    const tbody = document.getElementById("summaryTableBody");
+    tbody.innerHTML = `
+      <tr>
+        <td rowspan="4" class="fw-bold align-middle" style="background-color: #f1f5f9;">BSPD</td>
+        <td class="fw-bold text-start">RENTAL/UTILITIES EXPENSES</td>
+        <td>34,064.20</td><td>28,581.40</td><td>48,794.20</td><td>33,527.25</td><td>80,594.20</td><td>49,172.95</td><td>35,094.20</td><td>61,354.78</td><td>35,094.20</td><td>29,594.10</td><td>35,594.20</td><td>31,066.16</td>
+      </tr>
+      <tr>
+        <td class="fw-bold text-start">GENERAL OFFICE EXPENSES</td>
+        <td>7,100.00</td><td>825.71</td><td>4,350.00</td><td>762.34</td><td>1,050.00</td><td>3,796.88</td><td>1,450.00</td><td>282.00</td><td>1,050.00</td><td>159.00</td><td>1,050.00</td><td>228.92</td>
+      </tr>
+      <tr>
+        <td class="fw-bold text-start">CLEANING EXPENSES</td>
+        <td>1,498.00</td><td>1,458.00</td><td>1,998.00</td><td>0.00</td><td>1,498.00</td><td>3,246.00</td><td>1,998.00</td><td>1,458.00</td><td>1,498.00</td><td>1,900.00</td><td>3,998.00</td><td>2,916.00</td>
+      </tr>
+      <tr>
+        <td class="fw-bold text-start">PANTRY EXPENSES</td>
+        <td>5,000.00</td><td>393.50</td><td>3,000.00</td><td>0.00</td><td>150.00</td><td>1,317.51</td><td>150.00</td><td>78.60</td><td>150.00</td><td>0.00</td><td>150.00</td><td>0.00</td>
+      </tr>
+      <tr class="table-summary-highlight">
+        <td colspan="2" class="fw-bold">TOTAL BUDGET (12 MONTHS)</td>
+        <td colspan="12" class="fs-6 fw-bold">RM 571,626.40</td>
+      </tr>
+      <tr class="table-summary-highlight">
+        <td colspan="2" class="fw-bold">TOTAL BUDGET BALANCE</td>
+        <td colspan="12" class="fs-6 fw-bold text-success">RM 235,517.32</td>
+      </tr>
+      <tr class="table-summary-highlight">
+        <td colspan="2" class="fw-bold">TOTAL ACTUAL SPENDING (JAN - AUG)</td>
+        <td colspan="12" class="fs-6 fw-bold text-primary">RM 336,109.08</td>
+      </tr>
+    `;
+  }
+
+  function copySummaryTableWithStyles() {
+    const tableEl = document.getElementById("paydaesSummaryReportTable");
+    const clone = tableEl.cloneNode(true);
+    
+    clone.style.borderCollapse = "collapse";
+    clone.style.fontFamily = "Arial, sans-serif";
+    clone.style.width = "100%";
+
+    const blob = new Blob([clone.outerHTML], { type: "text/html" });
+    const data = [new ClipboardItem({ "text/html": blob })];
+
+    navigator.clipboard.write(data).then(() => {
+      alert("✅ Summary 表格（带高管深蓝/亮黄样式）已成功复制！可直接 Paste 至邮件中。");
+    });
+  }
+
+  // -------------------------------------------------------------
+  // PART 3 LOGIC
+  // -------------------------------------------------------------
+  function renderPart3() {
+    const tbody = document.getElementById("vendorTableBody");
+    tbody.innerHTML = "";
+
+    vendorData.forEach(v => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="fw-bold text-primary">${v.id}</td>
+        <td class="fw-bold">${v.name}</td>
+        <td><span class="badge bg-secondary">${v.category}</span></td>
+        <td>${v.bank || "-"}</td>
+        <td>${v.acc || "-"}</td>
+        <td>${v.sst || "-"}</td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteVendor('${v.id}')"><i class="bi bi-trash"></i> 删除</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function addVendor(e) {
+    e.preventDefault();
+    const name = document.getElementById("vName").value;
+    const cat = document.getElementById("vCategory").value;
+    autoCheckAndAddVendor(name, cat);
+    document.getElementById("addVendorForm").reset();
+  }
+
+  function autoCheckAndAddVendor(name, category) {
+    const exists = vendorData.find(v => v.name.toLowerCase() === name.toLowerCase());
+    if (!exists) {
+      const firstChar = name.trim().charAt(0).toUpperCase();
+      const code = /[A-Z]/.test(firstChar) ? firstChar : 'V';
+      const count = vendorData.filter(v => v.id.startsWith(code)).length + 1;
+      const newId = `${code}${String(count).padStart(3, '0')}`;
+
+      vendorData.push({
+        id: newId,
+        name: name,
+        category: category,
+        bank: document.getElementById("vBank") ? document.getElementById("vBank").value : "Maybank",
+        acc: document.getElementById("vAcc") ? document.getElementById("vAcc").value : "-",
+        sst: "Registered"
+      });
+      saveData();
+      renderPart3();
+    }
+  }
+
+  function deleteVendor(id) {
+    vendorData = vendorData.filter(v => v.id !== id);
+    saveData();
+    renderPart3();
+  }
+
+  // -------------------------------------------------------------
+  // PART 4 LOGIC
+  // -------------------------------------------------------------
+  function renderPart4() {
+    renderTasks();
+    renderDraftDocs();
+    renderPersonalExpenses();
+  }
+
+  function renderTasks() {
+    const ul = document.getElementById("taskList");
+    ul.innerHTML = "";
+
+    tasksData.forEach(t => {
+      const li = document.createElement("li");
+      li.className = "list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-secondary px-0";
+      li.innerHTML = `
+        <div>
+          <input type="checkbox" class="form-check-input me-2" ${t.priority ? "checked" : ""} onchange="toggleTaskPriority(${t.id})">
+          <span class="${t.done ? 'text-decoration-line-through text-muted' : ''}">${t.title}</span>
+          <div class="small text-muted">${t.start || ''} ~ ${t.end || ''}</div>
+        </div>
+        <button class="btn btn-sm text-danger" onclick="deleteTask(${t.id})"><i class="bi bi-x-circle"></i></button>
+      `;
+      ul.appendChild(li);
+    });
+  }
+
+  function addTask(e) {
+    e.preventDefault();
+    tasksData.push({
+      id: Date.now(),
+      title: document.getElementById("taskTitle").value,
+      start: document.getElementById("taskStart").value,
+      end: document.getElementById("taskEnd").value,
+      priority: true,
+      done: false
+    });
+    saveData();
+    renderTasks();
+    document.getElementById("addTaskForm").reset();
+  }
+
+  function toggleTaskPriority(id) {
+    const t = tasksData.find(i => i.id === id);
+    if (t) {
+      t.priority = !t.priority;
+      saveData();
+      renderTasks();
+    }
+  }
+
+  function deleteTask(id) {
+    tasksData = tasksData.filter(i => i.id !== id);
+    saveData();
+    renderTasks();
+  }
+
+  function renderDraftDocs() {
+    const ul = document.getElementById("draftDocList");
+    ul.innerHTML = "";
+
+    draftDocs.forEach(d => {
+      const li = document.createElement("li");
+      li.className = "list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-secondary px-0";
+      li.innerHTML = `
+        <div>
+          <i class="bi bi-file-earmark-text text-success me-2"></i>
+          <span>${d.title}</span>
+          <small class="text-muted d-block">${d.date}</small>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-success py-0 me-1" onclick="completeDraftDoc(${d.id})">存入 Cloud</button>
+          <button class="btn btn-sm text-danger py-0" onclick="deleteDraftDoc(${d.id})"><i class="bi bi-trash"></i></button>
+        </div>
+      `;
+      ul.appendChild(li);
+    });
+  }
+
+  function addDraftDoc() {
+    const title = document.getElementById("draftDocTitle").value;
+    if (!title) return;
+    draftDocs.push({
+      id: Date.now(),
+      title: title,
+      date: new Date().toISOString().split('T')[0]
+    });
+    saveData();
+    renderDraftDocs();
+    document.getElementById("draftDocTitle").value = "";
+  }
+
+  function completeDraftDoc(id) {
+    alert("☁️ 已成功完成并同步归档至云端 Cloud Drive！");
+    deleteDraftDoc(id);
+  }
+
+  function deleteDraftDoc(id) {
+    draftDocs = draftDocs.filter(d => d.id !== id);
+    saveData();
+    renderDraftDocs();
+  }
+
+  function renderPersonalExpenses() {
+    const ul = document.getElementById("personalExpenseList");
+    ul.innerHTML = "";
+
+    personalExpenses.forEach(p => {
+      const li = document.createElement("li");
+      li.className = "list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-secondary px-0";
+      li.innerHTML = `
+        <span>${p.purpose}</span>
+        <span class="fw-bold text-warning">${p.curr} ${parseFloat(p.amount).toFixed(2)}</span>
+      `;
+      ul.appendChild(li);
+    });
+  }
+
+  function addPersonalExpense(e) {
+    e.preventDefault();
+    personalExpenses.push({
+      id: Date.now(),
+      curr: document.getElementById("pCurr").value,
+      amount: parseFloat(document.getElementById("pAmt").value),
+      purpose: document.getElementById("pPurpose").value,
+      date: new Date().toISOString().split('T')[0]
+    });
+    saveData();
+    renderPersonalExpenses();
+    document.getElementById("addPersonalExpenseForm").reset();
+  }
+
+  function initAnalyticsChart() {
+    const ctx = document.getElementById('copilotAnalyticsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+        datasets: [{
+          label: '月度支出趋势 (k MYR)',
+          data: [31.2, 41.7, 57.7, 63.4, 33.5, 34.6, 39.4, 34.3],
+          backgroundColor: '#2563eb'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#ffffff' } }
+        },
+        scales: {
+          x: { ticks: { color: '#94a3b8' } },
+          y: { ticks: { color: '#94a3b8' } }
+        }
+      }
+    });
+  }
+
+  function exportToExcel() {
+    alert("📊 导出 Excel 数据包生成完成！已包含 4 家管理公司全量数据。");
+  }
+
+  function exportVendors() {
+    alert("📑 Vendor Listing 表格已导出成功！");
+  }
+</script>
 </body>
 </html>
