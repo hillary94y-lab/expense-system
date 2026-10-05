@@ -1,208 +1,122 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EXEC COMMAND CENTER | 行政与财务指挥中心</title>
-  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
-      --bg-dark: #0b0f19;
-      --card-bg: #151c2c;
-      --card-border: #2a364f;
-      --input-bg: #1e293b;
-      --input-border: #334155;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent-blue: #3b82f6;
-      --accent-cyan: #06b6d4;
-      --accent-gold: #f59e0b;
-      --accent-green: #10b981;
+      --bg-dark: #0b0f19; --card-bg: #151c2c; --card-border: #2a364f;
+      --input-bg: #1e293b; --input-border: #334155;
+      --text-main: #f8fafc; --text-muted: #94a3b8;
+      --accent-blue: #3b82f6; --accent-cyan: #06b6d4; --accent-gold: #f59e0b; --accent-green: #10b981;
       --header-blue: #0f2b5c;
     }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
-
-    /* 侧边栏样式 */
-    .sidebar {
-      background-color: #0d1322;
-      min-height: 100vh;
-      border-right: 1px solid var(--card-border);
-    }
-    .sidebar .nav-link {
-      color: var(--text-muted);
-      border-radius: 8px;
-      margin-bottom: 6px;
-      padding: 12px 16px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active {
-      color: #ffffff;
-      background: linear-gradient(90deg, #2563eb, #1d4ed8);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    }
-
-    /* 暗黑高级感卡片 */
-    .command-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      margin-bottom: 24px;
-      padding: 24px;
-    }
-
-    /* 暗色表单输入框样式 */
-    .form-control, .form-select {
-      background-color: var(--input-bg) !important;
-      border: 1px solid var(--input-border) !important;
-      color: var(--text-main) !important;
-      border-radius: 8px;
-    }
-    .form-control:focus, .form-select:focus {
-      border-color: var(--accent-blue) !important;
-      box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
-    }
-    .form-control::placeholder {
-      color: #64748b !important;
-    }
-
-    /* 表格暗色高级调性 */
-    .table-dark-custom {
-      color: var(--text-main);
-      border-color: var(--card-border);
-    }
-    .table-dark-custom th {
-      background-color: #1e293b !important;
-      color: #38bdf8 !important;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      letter-spacing: 0.5px;
-      border-bottom: 2px solid var(--card-border) !important;
-    }
-    .table-dark-custom td {
-      background-color: var(--card-bg) !important;
-      color: var(--text-main) !important;
-      border-color: var(--card-border) !important;
-      vertical-align: middle;
-    }
-    .table-dark-custom tr:hover td {
-      background-color: #1c273e !important;
-    }
-
-    /* 报表表头深蓝与高亮黄 */
-    .header-navy {
-      background-color: #002060 !important;
-      color: #ffffff !important;
-    }
-    .bg-yellow-highlight {
-      background-color: #facc15 !important;
-      color: #000000 !important;
-      font-weight: bold;
-    }
-
-    /* AI 扫描识别区域风格 */
-    .drop-zone {
-      border: 2px dashed #3b82f6;
-      background-color: rgba(59, 130, 246, 0.05);
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-    .drop-zone:hover {
-      background-color: rgba(59, 130, 246, 0.1);
-      border-color: #60a5fa;
-    }
-
-    /* 双语标签提示微调 */
-    .label-cn {
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: #f1f5f9;
-    }
-    .label-en {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      display: block;
-    }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    .sidebar { background-color: #0d1322; min-height: 100vh; border-right: 1px solid var(--card-border); }
+    .sidebar .nav-link { color: var(--text-muted); border-radius: 8px; margin-bottom: 6px; padding: 12px 16px; font-weight: 500; transition: all 0.2s ease; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #ffffff; background: linear-gradient(90deg, #2563eb, #1d4ed8); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    .command-card { background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); margin-bottom: 24px; padding: 24px; }
+    .form-control, .form-select { background-color: var(--input-bg) !important; border: 1px solid var(--input-border) !important; color: var(--text-main) !important; border-radius: 8px; }
+    .form-control:focus, .form-select:focus { border-color: var(--accent-blue) !important; box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important; }
+    .form-control::placeholder { color: #64748b !important; }
+    .table-dark-custom { color: var(--text-main); border-color: var(--card-border); }
+    .table-dark-custom th { background-color: #1e293b !important; color: #38bdf8 !important; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; border-bottom: 2px solid var(--card-border) !important; position: sticky; top:0; z-index:2;}
+    .table-dark-custom td { background-color: var(--card-bg) !important; color: var(--text-main) !important; border-color: var(--card-border) !important; vertical-align: middle; }
+    .table-dark-custom tr:hover td { background-color: #1c273e !important; }
+    .header-navy { background-color: #002060 !important; color: #ffffff !important; position:sticky; top:0; z-index:2;}
+    .bg-yellow-highlight { background-color: #facc15 !important; color: #000000 !important; font-weight: bold; }
+    .drop-zone { border: 2px dashed #3b82f6; background-color: rgba(59, 130, 246, 0.05); border-radius: 12px; padding: 24px; text-align: center; transition: all 0.3s ease; }
+    .drop-zone:hover { background-color: rgba(59, 130, 246, 0.1); border-color: #60a5fa; }
+    .label-cn { font-size: 0.88rem; font-weight: 600; color: #f1f5f9; }
+    .label-en { font-size: 0.75rem; color: var(--text-muted); display: block; }
+    .file-pill { display:inline-flex; align-items:center; gap:8px; background: rgba(16,185,129,0.12); color:#34d399; border-radius:6px; padding:8px 14px; font-size:13px; font-weight:600; margin-top:10px; }
+    .extract-status { font-size: 13px; margin-top: 10px; min-height: 18px; }
+    .extract-status.err { color:#f87171; }
+    .extract-status.ok { color:#34d399; font-weight:600; }
+    .lang-toggle { cursor:pointer; border:1px solid var(--accent-blue); border-radius:20px; padding:6px 16px; font-size:13px; font-weight:700; color:#fff; background:transparent; }
+    .lang-toggle:hover { background: rgba(59,130,246,0.15); }
+    .budget-input { width:90px; background:transparent !important; border:1px solid transparent !important; color:#fbbf24 !important; text-align:right; padding:2px 4px !important; font-size:12px; }
+    .budget-input:focus { border:1px solid var(--accent-blue) !important; background:var(--input-bg) !important; }
+    .actual-cell { color:#38bdf8; font-weight:600; font-size:12px; }
+    .group-header-row td { background:#1e3a5f !important; color:#fff !important; font-weight:700; position:sticky; left:0; }
+    .budget-table-wrap { max-height:640px; overflow:auto; }
+    .budget-table-wrap table { font-size:12px; }
+    .budget-table-wrap th, .budget-table-wrap td { white-space:nowrap; padding:4px 6px; }
+    .kpi-card { background:linear-gradient(145deg, #1a2338, #141c2e); border:1px solid var(--card-border); border-radius:10px; padding:16px; text-align:center; }
+    .kpi-val { font-size:22px; font-weight:800; color:var(--accent-cyan); }
+    .kpi-label { font-size:11px; color:var(--text-muted); margin-top:4px; }
+    .setup-banner { background: rgba(245,158,11,0.1); border:1px solid var(--accent-gold); color:#fcd34d; border-radius:8px; padding:12px 16px; font-size:13px; margin-bottom:16px; }
   </style>
 </head>
 <body>
 
 <div class="container-fluid">
   <div class="row">
-    
-    <!-- 左侧导航栏 / Sidebar Navigation -->
+
+    <!-- 侧边栏 -->
     <div class="col-md-3 col-lg-2 sidebar p-3">
-      <div class="d-flex align-items-center mb-4 text-white">
+      <div class="d-flex align-items-center mb-3 text-white">
         <i class="bi bi-shield-lock-fill fs-3 me-2 text-primary"></i>
         <div>
           <div class="fw-bold fs-6">EXEC COMMAND</div>
           <small class="text-muted" style="font-size: 0.7rem;">ADMIN & FIN SYSTEM</small>
         </div>
       </div>
+      <button class="lang-toggle w-100 mb-3" onclick="toggleLang()"><i class="bi bi-translate me-1"></i> <span id="langBtnLabel">EN / 中文</span></button>
       <hr class="border-secondary">
-      
+
       <ul class="nav nav-pills flex-column mb-auto" id="mainTab" role="tablist">
         <li class="nav-item">
           <button class="nav-link w-100 text-start active" id="part1-tab" data-bs-toggle="pill" data-bs-target="#part1">
-            <i class="bi bi-card-checklist me-2"></i> 
-            <span>Part 1: 固定支出清单</span>
-            <small class="d-block text-muted" style="font-size: 0.7rem;">Monthly Recurring Checklist</small>
+            <i class="bi bi-card-checklist me-2"></i>
+            <span data-i18n="nav_part1">Part 1: 固定支出清单</span>
+            <small class="d-block text-muted" style="font-size: 0.7rem;" data-i18n="nav_part1_sub">Monthly Recurring Checklist</small>
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link w-100 text-start" id="part2-tab" data-bs-toggle="pill" data-bs-target="#part2">
-            <i class="bi bi-table me-2"></i> 
-            <span>Part 2: 行政费用报表总表</span>
-            <small class="d-block text-muted" style="font-size: 0.7rem;">Master Listing & Budget</small>
+            <i class="bi bi-table me-2"></i>
+            <span data-i18n="nav_part2">Part 2: 行政费用报表总表</span>
+            <small class="d-block text-muted" style="font-size: 0.7rem;" data-i18n="nav_part2_sub">Master Listing & Budget</small>
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link w-100 text-start" id="part3-tab" data-bs-toggle="pill" data-bs-target="#part3">
-            <i class="bi bi-building me-2"></i> 
-            <span>Part 3: 供应商档案</span>
-            <small class="d-block text-muted" style="font-size: 0.7rem;">Vendor Database & Information</small>
+            <i class="bi bi-building me-2"></i>
+            <span data-i18n="nav_part3">Part 3: 供应商档案</span>
+            <small class="d-block text-muted" style="font-size: 0.7rem;" data-i18n="nav_part3_sub">Vendor Database</small>
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link w-100 text-start" id="part4-tab" data-bs-toggle="pill" data-bs-target="#part4">
-            <i class="bi bi-cpu me-2"></i> 
-            <span>Part 4: Super Copilot</span>
-            <small class="d-block text-muted" style="font-size: 0.7rem;">Executive Workplace Hub</small>
+            <i class="bi bi-cpu me-2"></i>
+            <span data-i18n="nav_part4">Part 4: Super Copilot</span>
+            <small class="d-block text-muted" style="font-size: 0.7rem;" data-i18n="nav_part4_sub">Executive Workplace Hub</small>
           </button>
         </li>
       </ul>
-      
+
       <div class="mt-auto pt-4 text-center">
-        <span class="badge bg-outline-primary border border-primary text-primary px-3 py-2">Dark Executive v2.5</span>
+        <span class="badge bg-outline-primary border border-primary text-primary px-3 py-2">Dark Executive v3.0</span>
       </div>
     </div>
 
-    <!-- 右侧主体内容 / Main Content Area -->
+    <!-- 主体内容 -->
     <div class="col-md-9 col-lg-10 p-4">
-      
-      <!-- 全局公司选择器与双语标题 Header -->
+
       <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">
         <div>
-          <h3 class="fw-bold mb-0 text-white">企业财务与行政指挥中心</h3>
-          <small class="text-muted">Corporate Finance & Executive Operations Platform</small>
+          <h3 class="fw-bold mb-0 text-white" data-i18n="page_title">企业财务与行政指挥中心</h3>
+          <small class="text-muted" data-i18n="page_subtitle">Corporate Finance & Executive Operations Platform</small>
         </div>
         <div class="d-flex align-items-center gap-3">
           <div>
-            <span class="label-cn">切换管理公司</span>
+            <span class="label-cn" data-i18n="select_company">切换管理公司</span>
             <span class="label-en">Select Company</span>
           </div>
           <select id="globalCompanySelect" class="form-select border-primary shadow-sm fw-bold text-info" style="width: 280px;" onchange="handleCompanyChange()">
@@ -216,433 +130,375 @@
 
       <div class="tab-content" id="mainTabContent">
 
-        <!-- ========================================== -->
-        <!-- PART 1: 每月固定支出清单 / Monthly Checklist -->
-        <!-- ========================================== -->
+        <!-- PART 1 -->
         <div class="tab-pane fade show active" id="part1">
           <div class="command-card">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <div>
-                <h5 class="fw-bold text-white mb-0"><i class="bi bi-calendar-check me-2 text-primary"></i> Part 1: 每月固定支出与 Vendor 提交清单</h5>
-                <small class="text-muted">Monthly Fixed Operating Expenses & Vendor Submission Checklist</small>
+                <h5 class="fw-bold text-white mb-0"><i class="bi bi-calendar-check me-2 text-primary"></i> <span data-i18n="p1_title">每月固定支出与 Vendor 提交清单</span></h5>
+                <small class="text-muted" data-i18n="p1_subtitle">Monthly Recurring Expenses & Vendor Submission Checklist</small>
               </div>
               <div class="d-flex align-items-center gap-2">
-                <span class="text-muted small">报销月份 / Month:</span>
+                <span class="text-muted small" data-i18n="month_label">报销月份 / Month:</span>
                 <input type="month" id="part1MonthPicker" class="form-control form-control-sm" value="2026-08" onchange="renderPart1()">
               </div>
             </div>
 
-            <!-- 到期智能提醒 Banner -->
             <div id="part1AlertBanner" class="alert bg-warning bg-opacity-10 border border-warning text-warning d-flex align-items-center gap-3 mb-4 d-none">
               <i class="bi bi-exclamation-triangle-fill fs-4 text-warning"></i>
               <div>
-                <strong class="d-block">到期催收提醒 / Due Checklist Warning</strong>
-                <span>本月尚有 <span id="pendingRecurringCount" class="fw-bold text-danger fs-5">0</span> 项固定支出未完成提交，请及时 Follow up 供应商发票！</span>
+                <strong class="d-block" data-i18n="due_alert_title">到期催收提醒 / Due Checklist Warning</strong>
+                <span data-i18n="due_alert_body">本月尚有 <span id="pendingRecurringCount" class="fw-bold text-danger fs-5">0</span> 项固定支出未完成提交，请及时 Follow up 供应商发票！</span>
               </div>
             </div>
 
-            <!-- 添加固定支出项目 Form -->
             <div class="p-3 rounded border border-secondary bg-dark mb-4">
-              <h6 class="fw-bold text-info mb-3"><i class="bi bi-plus-circle me-1"></i> 新增固定开支项目 / Add New Recurring Expense Item</h6>
+              <h6 class="fw-bold text-info mb-3"><i class="bi bi-plus-circle me-1"></i> <span data-i18n="p1_add_title">新增固定开支项目 / Add New Recurring Expense Item</span></h6>
               <form id="addRecurringForm" class="row g-3" onsubmit="addRecurringItem(event)">
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">供应商 / Vendor</span><span class="label-en">Payable Name</span></label>
-                  <input type="text" id="recVendor" class="form-control form-control-sm" placeholder="例如: Boustead / TNB" required>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="vendor_label">供应商 / Vendor</span><span class="label-en">Payable Name</span></label>
+                  <input type="text" id="recVendor" class="form-control form-control-sm" placeholder="Boustead / TNB" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">开销类别 / Category</span><span class="label-en">Expenses Category</span></label>
-                  <select id="recCategory" class="form-select form-select-sm" required>
-                    <option value="">请选择 / Select...</option>
-                    <option value="Office Water / Utilities">Office Water / Utilities (水费)</option>
-                    <option value="Office Rental">Office Rental (租金)</option>
-                    <option value="Office Electricity">Office Electricity (电费)</option>
-                    <option value="Office Internet">Office Internet (网络费)</option>
-                    <option value="Office Cleaning Service">Office Cleaning Service (保洁)</option>
-                    <option value="Pantry Supplies">Pantry Supplies (茶水间)</option>
-                  </select>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="category_label">开销类别 / Category</span><span class="label-en">Expenses Category</span></label>
+                  <select id="recCategory" class="form-select form-select-sm" required></select>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">固定金额 / Amount</span><span class="label-en">Estimated (MYR)</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="amount_label">固定金额 / Amount</span><span class="label-en">Estimated (MYR)</span></label>
                   <input type="number" step="0.01" id="recAmount" class="form-control form-control-sm" placeholder="0.00" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">发票单号 / Invoice No</span><span class="label-en">Reference No</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="invno_label">发票单号 / Invoice No</span><span class="label-en">Reference No</span></label>
                   <input type="text" id="recInvoiceNo" class="form-control form-control-sm" placeholder="NT/ESST...">
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">发票日期 / Inv Date</span><span class="label-en">Billing Date</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="invdate_label">发票日期 / Inv Date</span><span class="label-en">Billing Date</span></label>
                   <input type="date" id="recInvoiceDate" class="form-control form-control-sm">
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                  <button type="submit" class="btn btn-primary btn-sm w-100 py-2"><i class="bi bi-plus-lg me-1"></i> 加入清单 / Add</button>
+                  <button type="submit" class="btn btn-primary btn-sm w-100 py-2"><i class="bi bi-plus-lg me-1"></i> <span data-i18n="add_to_checklist_btn">加入清单 / Add</span></button>
                 </div>
               </form>
             </div>
 
-            <!-- 支出进度清单 Table -->
             <div class="table-responsive">
               <table class="table table-dark-custom align-middle">
                 <thead>
                   <tr>
-                    <th class="text-center" style="width: 70px;">状态 / Status</th>
-                    <th>供应商名称 / Vendor Name</th>
-                    <th>费用类别 / Expenses Category</th>
-                    <th>预估金额 / Amount (MYR)</th>
-                    <th>发票号 / Invoice No</th>
-                    <th>发票日期 / Inv Date</th>
-                    <th>跟踪状态 / Follow-up Status</th>
-                    <th class="text-center" style="width: 200px;">快捷操作 / Action</th>
+                    <th class="text-center" style="width: 70px;" data-i18n="th_status">状态 / Status</th>
+                    <th data-i18n="th_vendor">供应商名称 / Vendor Name</th>
+                    <th data-i18n="th_category">费用类别 / Expenses Category</th>
+                    <th data-i18n="th_amount">预估金额 / Amount (MYR)</th>
+                    <th data-i18n="th_invno">发票号 / Invoice No</th>
+                    <th data-i18n="th_invdate">发票日期 / Inv Date</th>
+                    <th data-i18n="th_followup">跟踪状态 / Follow-up Status</th>
+                    <th class="text-center" style="width: 200px;" data-i18n="th_action">快捷操作 / Action</th>
                   </tr>
                 </thead>
-                <tbody id="recurringTableBody">
-                  <!-- JS 动态渲染 -->
-                </tbody>
+                <tbody id="recurringTableBody"></tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PART 2: 12个月行政费用报表总表 / Master Listing -->
-        <!-- ========================================== -->
+        <!-- PART 2 -->
         <div class="tab-pane fade" id="part2">
-          
-          <!-- AI 智能发票识别卡片 -->
+
           <div class="command-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
-                <h5 class="fw-bold text-white mb-0"><i class="bi bi-cpu me-2 text-primary"></i> AI 智能发票解析与开支核对 / AI Invoice OCR Engine</h5>
-                <small class="text-muted">Upload Invoice PDF/Image to auto-extract exact metadata</small>
+                <h5 class="fw-bold text-white mb-0"><i class="bi bi-cpu me-2 text-primary"></i> <span data-i18n="p2_ai_title">AI 智能发票解析与开支核对</span></h5>
+                <small class="text-muted" data-i18n="p2_ai_subtitle">Upload Invoice PDF/Image to auto-extract exact metadata</small>
               </div>
               <div class="btn-group">
-                <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()"><i class="bi bi-file-earmark-excel me-1"></i> 导出 Excel</button>
-                <button class="btn btn-outline-danger btn-sm" onclick="window.print()"><i class="bi bi-file-earmark-pdf me-1"></i> 导出 PDF</button>
+                <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()"><i class="bi bi-file-earmark-excel me-1"></i> <span data-i18n="export_excel_btn">导出 Excel</span></button>
+                <button class="btn btn-outline-danger btn-sm" onclick="window.print()"><i class="bi bi-file-earmark-pdf me-1"></i> <span data-i18n="export_pdf_btn">导出 PDF</span></button>
               </div>
             </div>
 
-            <!-- AI 智能解析引擎拖拽上传区 -->
-            <div class="drop-zone mb-4">
+            <div class="drop-zone mb-2" id="invoiceDropZone">
               <i class="bi bi-file-earmark-arrow-up fs-1 text-primary mb-2"></i>
-              <h6 class="fw-bold text-white">点击上传或拖拽发票文件至此处 (支持 PDF, JPG, PNG)</h6>
-              <p class="text-muted small mb-3">智能识别 Boustead, TNB, Water Charges 等各种开销发票，精准读取抬头、金额与发票号</p>
-              <input type="file" id="invoiceFileInput" class="d-none" onchange="handleInvoiceUpload(event)">
+              <h6 class="fw-bold text-white" data-i18n="drop_title">点击上传或拖拽发票文件至此处 (支持 PDF, JPG, PNG)</h6>
+              <p class="text-muted small mb-3" data-i18n="drop_desc">AI 会实际读取文件内容，自动提取抬头、金额、日期、发票号，并自动归类 Expenses Category</p>
+              <input type="file" id="invoiceFileInput" class="d-none" accept="image/jpeg,image/png,image/jpg,application/pdf" onchange="handleInvoiceUpload(event)">
               <button class="btn btn-primary btn-sm px-4 py-2" onclick="document.getElementById('invoiceFileInput').click()">
-                <i class="bi bi-magic me-1"></i> 识别我的发票图片 / Extract Uploaded Invoice
+                <i class="bi bi-magic me-1"></i> <span data-i18n="extract_btn">识别我的发票文件 / Extract Uploaded Invoice</span>
               </button>
+              <div id="invoiceFilePill" class="file-pill" style="display:none;"></div>
             </div>
+            <div id="invoiceExtractStatus" class="extract-status mb-3"></div>
 
-            <!-- 单张发票开支核对与录入 Form -->
             <div class="border-top border-secondary pt-3">
-              <h6 class="fw-bold text-warning mb-3"><i class="bi bi-pencil-square me-1"></i> 核对开支明细并同步至总表 / Verify & Record Entry</h6>
+              <h6 class="fw-bold text-warning mb-3"><i class="bi bi-pencil-square me-1"></i> <span data-i18n="p2_verify_title">核对开支明细并同步至总表 / Verify & Record Entry</span></h6>
               <form id="masterEntryForm" class="row g-3" onsubmit="addMasterEntry(event)">
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">归属年月 / Year Month</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="yearmonth_label">归属年月 / Year Month</span></label>
                   <input type="month" id="mMonth" class="form-control form-control-sm" value="2026-08" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">大楼 / Building</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="building_label">大楼 / Building</span></label>
                   <input type="text" id="mBuilding" class="form-control form-control-sm" value="The Bousteador" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">单位号 / Unit</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="unit_label">单位号 / Unit</span></label>
                   <input type="text" id="mUnit" class="form-control form-control-sm" value="8-04" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">发票日期 / Inv Date</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="invdate_label2">发票日期 / Inv Date</span></label>
                   <input type="date" id="mInvDate" class="form-control form-control-sm" value="2026-08-26" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">钉钉提交日 / Dingtalk</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="dingtalk_label">钉钉提交日 / Dingtalk</span></label>
                   <input type="date" id="mDingtalkDate" class="form-control form-control-sm" value="2026-08-28" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">付款方式 / Pay Mode</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="paymode_label">付款方式 / Pay Mode</span></label>
                   <select id="mPayMode" class="form-select form-select-sm">
-                    <option value="Payment Application">Payment Application (付款申请)</option>
-                    <option value="Direct Transfer">Direct Transfer (直接转账)</option>
-                    <option value="Petty Cash">Petty Cash (备用金)</option>
+                    <option value="Payment Application">Payment Application</option>
+                    <option value="Direct Transfer">Direct Transfer</option>
+                    <option value="Petty Cash">Petty Cash</option>
                   </select>
                 </div>
 
                 <div class="col-md-3">
-                  <label class="form-label small mb-1"><span class="label-cn">供应商名称 / Payable Vendor</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="payablename_label">供应商名称 / Payable Vendor</span></label>
                   <input type="text" id="mVendor" class="form-control form-control-sm" value="Boustead Nucleus Sdn Bhd" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">发票号 / Invoice No</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="invno_label2">发票号 / Invoice No</span></label>
                   <input type="text" id="mInvNo" class="form-control form-control-sm" value="NT/ESST001011" required>
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label small mb-1"><span class="label-cn">开销类别 / Expenses Category</span></label>
-                  <select id="mCategory" class="form-select form-select-sm" required>
-                    <option value="Office Water / Utilities">Office Water / Utilities (水费/公用事业)</option>
-                    <option value="Office Rental">Office Rental (办公室租金)</option>
-                    <option value="Office Electricity">Office Electricity (电力电费)</option>
-                    <option value="Office Internet">Office Internet (网络宽带)</option>
-                    <option value="Office Cleaning Service">Office Cleaning Service (保洁清洁)</option>
-                    <option value="Office Supplies">Office Supplies (办公用品)</option>
-                    <option value="Pantry Supplies">Pantry Supplies (茶水间消耗)</option>
-                  </select>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="category_label2">开销类别 / Expenses Category</span> <span class="label-en" data-i18n="ai_autocat">AI 自动归类，可手动改</span></label>
+                  <select id="mCategory" class="form-select form-select-sm" required></select>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">金额 / Total Amount (MYR)</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="total_amount_label">金额 / Total Amount (MYR)</span></label>
                   <input type="number" step="0.01" id="mAmount" class="form-control form-control-sm text-info fw-bold" value="7.10" required>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small mb-1"><span class="label-cn">备注 / Remark</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="remark_label">备注 / Remark</span></label>
                   <input type="text" id="mRemark" class="form-control form-control-sm" value="SST ID: W10-1911-38000006">
                 </div>
 
                 <div class="col-md-12">
-                  <label class="form-label small mb-1"><span class="label-cn">描述 / Description</span></label>
+                  <label class="form-label small mb-1"><span class="label-cn" data-i18n="desc_label">描述 / Description</span></label>
                   <input type="text" id="mDesc" class="form-control form-control-sm" value="WATER CHARGES - BILLING 26/6/2026 - 24/7/2026 (JULY 2026)" required>
                 </div>
 
                 <div class="col-md-12 text-end">
-                  <button type="submit" class="btn btn-success px-4 py-2"><i class="bi bi-database-add me-1"></i> 加入 Master Listing / Record to Master</button>
+                  <button type="button" id="mCancelEditBtn" class="btn btn-outline-secondary px-4 py-2 me-2" style="display:none;" onclick="cancelMasterEdit()"><span data-i18n="cancel_edit_btn">取消编辑 / Cancel</span></button>
+                  <button type="submit" id="mSubmitBtn" class="btn btn-success px-4 py-2"><i class="bi bi-database-add me-1"></i> <span data-i18n="record_to_master_btn">加入 Master Listing / Record to Master</span></button>
                 </div>
               </form>
             </div>
           </div>
 
-          <!-- Master Listing Table -->
           <div class="command-card">
-            <h5 class="fw-bold text-white mb-3"><i class="bi bi-journal-text me-2 text-primary"></i> Master Listing 消费明细汇总表</h5>
+            <h5 class="fw-bold text-white mb-3"><i class="bi bi-journal-text me-2 text-primary"></i> <span data-i18n="master_listing_title">Master Listing 消费明细汇总表</span></h5>
             <div class="table-responsive">
               <table class="table table-dark-custom align-middle small">
                 <thead>
                   <tr>
-                    <th>Month / 月份</th>
-                    <th>Building / 大楼</th>
-                    <th>Unit / 单位</th>
-                    <th>Inv Date / 发票日</th>
-                    <th>Dingtalk / 钉钉日</th>
-                    <th>Description / 费用描述</th>
-                    <th>Payable Name / 供应商</th>
-                    <th>Invoice No / 发票号</th>
-                    <th>Pay Mode / 付款方式</th>
-                    <th>Category / 费用类别</th>
-                    <th>Amount (MYR) / 金额</th>
-                    <th>Remarks / 备注</th>
+                    <th data-i18n="th_month">Month / 月份</th>
+                    <th data-i18n="th_building">Building / 大楼</th>
+                    <th data-i18n="th_unit">Unit / 单位</th>
+                    <th data-i18n="th_invdate3">Inv Date / 发票日</th>
+                    <th data-i18n="th_dingtalk">Dingtalk / 钉钉日</th>
+                    <th data-i18n="th_desc">Description / 费用描述</th>
+                    <th data-i18n="th_payablename">Payable Name / 供应商</th>
+                    <th data-i18n="th_invno2">Invoice No / 发票号</th>
+                    <th data-i18n="th_paymode">Pay Mode / 付款方式</th>
+                    <th data-i18n="th_category2">Category / 费用类别</th>
+                    <th data-i18n="th_amount2">Amount (MYR) / 金额</th>
+                    <th data-i18n="th_remarks">Remarks / 备注</th>
+                    <th class="text-center" data-i18n="th_action2">操作 / Action</th>
                   </tr>
                 </thead>
-                <tbody id="masterListingTableBody">
-                  <!-- 动态渲染 Master Listing 数据 -->
-                </tbody>
+                <tbody id="masterListingTableBody"></tbody>
               </table>
             </div>
           </div>
 
-          <!-- 12个月行政费用预算与实际对照表 (Budget vs Actual) -->
           <div class="command-card">
-            <h5 class="fw-bold text-white mb-3"><i class="bi bi-grid-3x3-gap me-2 text-primary"></i> 12 个月行政费用预算与实际对照表 (Budget vs Actual Report)</h5>
-            <div class="table-responsive">
-              <table class="table table-bordered border-secondary align-middle text-center small" style="min-width: 1600px;">
-                <thead>
-                  <tr class="header-navy">
-                    <th rowspan="2" style="width: 240px;" class="align-middle">CATEGORY DESCRIPTION / 费用类别描述</th>
-                    <th colspan="2">JANUARY</th>
-                    <th colspan="2">FEBRUARY</th>
-                    <th colspan="2">MARCH</th>
-                    <th colspan="2">APRIL</th>
-                    <th colspan="2">MAY</th>
-                    <th colspan="2">JUNE</th>
-                    <th colspan="2">JULY</th>
-                    <th colspan="2">AUGUST</th>
-                  </tr>
-                  <tr class="header-navy">
-                    <th>BUDGET</th><th>ACTUAL</th>
-                    <th>BUDGET</th><th>ACTUAL</th>
-                    <th>BUDGET</th><th>ACTUAL</th>
-                    <th>BUDGET</th><th>ACTUAL</th>
-                    <th>BUDGET</th><th>ACTUAL</th>
-                    <th>BUDGET</th><th>ACTUAL</th>
-                    <th>BUDGET</th><th>ACTUAL</th>
-                    <th>BUDGET</th><th>ACTUAL</th>
-                  </tr>
-                </thead>
-                <tbody id="adminReportTableBody">
-                  <!-- 动态渲染 12 个月 Budget vs Actual -->
-                </tbody>
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <h5 class="fw-bold text-white mb-0"><i class="bi bi-grid-3x3-gap me-2 text-primary"></i> <span data-i18n="budget_table_title">12 个月行政费用预算与实际对照表 (每个 Category 明细)</span></h5>
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small" data-i18n="year_label">年份 / Year:</span>
+                <input type="number" id="reportYear" class="form-control form-control-sm" style="width:100px;" value="2026" onchange="renderAdminReportTable()">
+              </div>
+            </div>
+            <div class="setup-banner">
+              <i class="bi bi-info-circle me-1"></i>
+              <span data-i18n="budget_banner">BUDGET 栏位可直接点击输入/修改金额，改完自动保存；ACTUAL 栏位会自动从 Master Listing 同步计算，不需要手动填。</span>
+            </div>
+            <div class="budget-table-wrap table-responsive">
+              <table class="table table-bordered border-secondary align-middle text-center" id="adminReportTable">
+                <thead id="adminReportTableHead"></thead>
+                <tbody id="adminReportTableBody"></tbody>
               </table>
             </div>
           </div>
 
-          <!-- Paydaes 专属 Executive Monthly Summary Report -->
           <div id="paydaesSummarySection" class="command-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
-                <h5 class="fw-bold text-white mb-0"><i class="bi bi-pie-chart-fill me-2 text-primary"></i> Monthly Executive Summary (Paydaes Sdn Bhd 专属汇总)</h5>
-                <small class="text-muted">High-level financial summary for executive leadership</small>
+                <h5 class="fw-bold text-white mb-0"><i class="bi bi-pie-chart-fill me-2 text-primary"></i> <span data-i18n="summary_title">Monthly Executive Summary (Paydaes Sdn Bhd 专属汇总)</span></h5>
+                <small class="text-muted" data-i18n="summary_subtitle">High-level financial summary for executive leadership</small>
               </div>
-              <button class="btn btn-sm btn-primary" onclick="copySummaryTableWithStyles()"><i class="bi bi-clipboard-plus me-1"></i> 一键带格式复制 Table (发邮件专用 / Copy for Email)</button>
+              <button class="btn btn-sm btn-primary" onclick="copySummaryTableWithStyles()"><i class="bi bi-clipboard-plus me-1"></i> <span data-i18n="copy_summary_btn">一键带格式复制 Table (发邮件专用)</span></button>
             </div>
-            
             <div id="summaryTableContainer" class="table-responsive">
               <table id="paydaesSummaryReportTable" class="table table-bordered border-secondary align-middle text-center small" style="min-width: 1400px; font-family: Arial, sans-serif;">
-                <thead>
-                  <tr style="background-color: #002060; color: #ffffff; font-weight: bold;">
-                    <th>COMPANY</th>
-                    <th>DESCRIPTION</th>
-                    <th>JAN BUDGET</th><th>JAN ACTUAL</th>
-                    <th>FEB BUDGET</th><th>FEB ACTUAL</th>
-                    <th>MAR BUDGET</th><th>MAR ACTUAL</th>
-                    <th>APR BUDGET</th><th>APR ACTUAL</th>
-                    <th>MAY BUDGET</th><th>MAY ACTUAL</th>
-                    <th>JUN BUDGET</th><th>JUN ACTUAL</th>
-                  </tr>
-                </thead>
-                <tbody id="summaryTableBody">
-                  <!-- 动态渲染 Paydaes 汇总表格 -->
-                </tbody>
+                <thead id="summaryTableHead"></thead>
+                <tbody id="summaryTableBody"></tbody>
               </table>
             </div>
           </div>
 
         </div>
 
-        <!-- ========================================== -->
-        <!-- PART 3: 供应商档案 / Vendor Information -->
-        <!-- ========================================== -->
+        <!-- PART 3 -->
         <div class="tab-pane fade" id="part3">
           <div class="command-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
-                <h5 class="fw-bold text-white mb-0"><i class="bi bi-person-lines-fill me-2 text-primary"></i> Part 3: Vendor Details & Information / 供应商数据库</h5>
-                <small class="text-muted">Database of verified corporate vendors & tax profiles</small>
+                <h5 class="fw-bold text-white mb-0"><i class="bi bi-person-lines-fill me-2 text-primary"></i> <span data-i18n="p3_title">Vendor Details & Information / 供应商数据库</span></h5>
+                <small class="text-muted" data-i18n="p3_subtitle">Database of verified corporate vendors & tax profiles</small>
               </div>
-              <button class="btn btn-sm btn-success" onclick="exportVendors()"><i class="bi bi-file-earmark-excel me-1"></i> 导出 Vendor 表</button>
+              <button class="btn btn-sm btn-success" onclick="exportVendors()"><i class="bi bi-file-earmark-excel me-1"></i> <span data-i18n="export_vendor_btn">导出 Vendor 表</span></button>
             </div>
 
-            <!-- 新增 Vendor Form -->
             <form id="addVendorForm" class="row g-3 p-3 rounded border border-secondary bg-dark mb-4" onsubmit="addVendor(event)">
               <div class="col-md-3">
-                <label class="form-label small mb-1"><span class="label-cn">供应商全称 / Vendor Company Name</span></label>
-                <input type="text" id="vName" class="form-control form-control-sm" placeholder="例如: Boustead Nucleus Sdn Bhd" required>
+                <label class="form-label small mb-1"><span class="label-cn" data-i18n="vendor_fullname_label">供应商全称 / Vendor Company Name</span></label>
+                <input type="text" id="vName" class="form-control form-control-sm" placeholder="Boustead Nucleus Sdn Bhd" required>
               </div>
               <div class="col-md-2">
-                <label class="form-label small mb-1"><span class="label-cn">主要类别 / Category</span></label>
-                <input type="text" id="vCategory" class="form-control form-control-sm" placeholder="例如: Utilities / Water" required>
+                <label class="form-label small mb-1"><span class="label-cn" data-i18n="main_category_label">主要类别 / Category</span></label>
+                <select id="vCategory" class="form-select form-select-sm" required></select>
               </div>
               <div class="col-md-2">
-                <label class="form-label small mb-1"><span class="label-cn">银行名称 / Bank Name</span></label>
-                <input type="text" id="vBank" class="form-control form-control-sm" placeholder="例如: Maybank / CIMB">
+                <label class="form-label small mb-1"><span class="label-cn" data-i18n="bank_name_label">银行名称 / Bank Name</span></label>
+                <input type="text" id="vBank" class="form-control form-control-sm" placeholder="Maybank / CIMB">
               </div>
               <div class="col-md-3">
-                <label class="form-label small mb-1"><span class="label-cn">银行账号 / Bank Account No.</span></label>
-                <input type="text" id="vAcc" class="form-control form-control-sm" placeholder="账号">
+                <label class="form-label small mb-1"><span class="label-cn" data-i18n="bank_acc_label">银行账号 / Bank Account No.</span></label>
+                <input type="text" id="vAcc" class="form-control form-control-sm">
               </div>
               <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary btn-sm w-100 py-2"><i class="bi bi-plus-lg me-1"></i> 添加 Vendor / Save</button>
+                <button type="submit" class="btn btn-primary btn-sm w-100 py-2"><i class="bi bi-plus-lg me-1"></i> <span data-i18n="add_vendor_btn">添加 Vendor / Save</span></button>
               </div>
             </form>
 
-            <!-- Vendor Listing Table -->
             <div class="table-responsive">
               <table class="table table-dark-custom align-middle">
                 <thead>
                   <tr>
                     <th>Vendor ID</th>
-                    <th>供应商名称 / Company Name</th>
-                    <th>费用类别 / Expenses Category</th>
-                    <th>开户银行 / Bank Name</th>
-                    <th>银行账号 / Account No.</th>
+                    <th data-i18n="th_companyname">供应商名称 / Company Name</th>
+                    <th data-i18n="th_category3">费用类别 / Expenses Category</th>
+                    <th data-i18n="th_bankname">开户银行 / Bank Name</th>
+                    <th data-i18n="th_accno">银行账号 / Account No.</th>
                     <th>SST / Tax ID</th>
-                    <th class="text-center">操作 / Action</th>
+                    <th class="text-center" data-i18n="th_action3">操作 / Action</th>
                   </tr>
                 </thead>
-                <tbody id="vendorTableBody">
-                  <!-- 动态渲染 Vendor Listing -->
-                </tbody>
+                <tbody id="vendorTableBody"></tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PART 4: Administrative Super Copilot -->
-        <!-- ========================================== -->
+        <!-- PART 4 -->
         <div class="tab-pane fade" id="part4">
           <div class="command-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
               <div>
-                <h4 class="fw-bold text-warning mb-0"><i class="bi bi-robot me-2"></i> Administrative Super Copilot</h4>
-                <small class="text-muted">Executive Productivity & Daily Ledger Hub</small>
+                <h4 class="fw-bold text-warning mb-0"><i class="bi bi-robot me-2"></i> <span data-i18n="p4_title">Administrative Super Copilot</span></h4>
+                <small class="text-muted" data-i18n="p4_subtitle">Executive Productivity & Daily Ledger Hub</small>
               </div>
               <div class="d-flex align-items-center gap-2">
-                <span class="text-muted small">操作日期 / Date:</span>
-                <input type="date" id="copilotDatePicker" class="form-control form-control-sm bg-dark text-white border-secondary" value="2026-10-02">
+                <span class="text-muted small" data-i18n="date_label">操作日期 / Date:</span>
+                <input type="date" id="copilotDatePicker" class="form-control form-control-sm bg-dark text-white border-secondary" value="2026-10-02" onchange="renderPart4()">
               </div>
             </div>
 
+            <!-- KPI 数据仪表盘 -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-2 col-6"><div class="kpi-card"><div class="kpi-val" id="kpiTodaySchedule">0</div><div class="kpi-label" data-i18n="kpi_today_schedule">今日日程数</div></div></div>
+              <div class="col-md-2 col-6"><div class="kpi-card"><div class="kpi-val" id="kpiTaskDone">0/0</div><div class="kpi-label" data-i18n="kpi_task_done">已完成/总数</div></div></div>
+              <div class="col-md-2 col-6"><div class="kpi-card"><div class="kpi-val" id="kpiTaskPct">0%</div><div class="kpi-label" data-i18n="kpi_task_pct">任务完整度 %</div></div></div>
+              <div class="col-md-2 col-6"><div class="kpi-card"><div class="kpi-val" id="kpiPendingPriority">0</div><div class="kpi-label" data-i18n="kpi_pending_priority">待办优先项</div></div></div>
+              <div class="col-md-2 col-6"><div class="kpi-card"><div class="kpi-val" id="kpiDrafts">0</div><div class="kpi-label" data-i18n="kpi_drafts">待审核文档</div></div></div>
+              <div class="col-md-2 col-6"><div class="kpi-card"><div class="kpi-val" id="kpiMonthSpend">0.00</div><div class="kpi-label" data-i18n="kpi_month_spend">本月消费 (MYR)</div></div></div>
+            </div>
+
             <div class="row g-4">
-              <!-- 1. 任务跟踪 Task & Project Tracker -->
+              <!-- 日程安排 -->
               <div class="col-md-6">
                 <div class="p-3 rounded border border-secondary bg-dark h-100">
-                  <h6 class="fw-bold text-info mb-3"><i class="bi bi-list-task me-1"></i> 任务与项目跟踪 / Task & Project Tracker</h6>
+                  <h6 class="fw-bold text-primary mb-3"><i class="bi bi-calendar2-week me-1"></i> <span data-i18n="schedule_title">日程安排 / Daily Schedule</span></h6>
+                  <form id="addScheduleForm" class="input-group input-group-sm mb-3" onsubmit="addSchedule(event)">
+                    <input type="time" id="scheduleTime" class="form-control" style="max-width:110px;">
+                    <input type="text" id="scheduleTitle" class="form-control" placeholder="日程内容 / Event..." required>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg"></i></button>
+                  </form>
+                  <ul id="scheduleList" class="list-group list-group-flush bg-transparent"></ul>
+                </div>
+              </div>
+
+              <!-- 任务与项目跟踪 -->
+              <div class="col-md-6">
+                <div class="p-3 rounded border border-secondary bg-dark h-100">
+                  <h6 class="fw-bold text-info mb-3"><i class="bi bi-list-task me-1"></i> <span data-i18n="task_title">任务与项目跟踪 / Task & Project Tracker</span></h6>
                   <form id="addTaskForm" class="input-group input-group-sm mb-3" onsubmit="addTask(event)">
                     <input type="text" id="taskTitle" class="form-control" placeholder="新增任务描述..." required>
                     <input type="date" id="taskStart" class="form-control">
                     <input type="date" id="taskEnd" class="form-control">
                     <button type="submit" class="btn btn-info"><i class="bi bi-plus-lg"></i></button>
                   </form>
-                  <ul id="taskList" class="list-group list-group-flush bg-transparent">
-                    <!-- 动态任务清单 -->
-                  </ul>
+                  <ul id="taskList" class="list-group list-group-flush bg-transparent"></ul>
                 </div>
               </div>
 
-              <!-- 2. 文档暂存箱 Draft Staging Box -->
+              <!-- 文档暂存箱 -->
               <div class="col-md-6">
                 <div class="p-3 rounded border border-secondary bg-dark h-100">
-                  <h6 class="fw-bold text-success mb-2"><i class="bi bi-file-earmark-arrow-up me-1"></i> 跨日文档暂存箱 / Draft Staging Box</h6>
-                  <p class="small text-muted mb-3">Today's unfinished drafts stay here; sync to cloud upon completion.</p>
+                  <h6 class="fw-bold text-success mb-2"><i class="bi bi-file-earmark-arrow-up me-1"></i> <span data-i18n="draft_title">跨日文档暂存箱 / Draft Staging Box</span></h6>
+                  <p class="small text-muted mb-3" data-i18n="draft_desc">Today's unfinished drafts stay here; sync to cloud upon completion.</p>
                   <div class="input-group input-group-sm mb-3">
                     <input type="text" id="draftDocTitle" class="form-control" placeholder="文档/报告草稿名称...">
-                    <button class="btn btn-success" onclick="addDraftDoc()"><i class="bi bi-box-arrow-in-down me-1"></i> 暂存 / Save Draft</button>
+                    <button class="btn btn-success" onclick="addDraftDoc()"><i class="bi bi-box-arrow-in-down me-1"></i> <span data-i18n="save_draft_btn">暂存 / Save Draft</span></button>
                   </div>
-                  <ul id="draftDocList" class="list-group list-group-flush bg-transparent">
-                    <!-- 动态暂存文档 -->
-                  </ul>
+                  <ul id="draftDocList" class="list-group list-group-flush bg-transparent"></ul>
                 </div>
               </div>
 
-              <!-- 3. 每日私人记账 Personal Ledger -->
+              <!-- 每日私人记账 -->
               <div class="col-md-6">
                 <div class="p-3 rounded border border-secondary bg-dark h-100">
-                  <h6 class="fw-bold text-warning mb-3"><i class="bi bi-wallet2 me-1"></i> 每日私人消费手帐 / Daily Personal Expense Ledger</h6>
+                  <h6 class="fw-bold text-warning mb-3"><i class="bi bi-wallet2 me-1"></i> <span data-i18n="personal_ledger_title">每日私人消费手帐 / Daily Personal Expense Ledger</span></h6>
                   <form id="addPersonalExpenseForm" class="row g-2 mb-3" onsubmit="addPersonalExpense(event)">
                     <div class="col-3">
                       <select id="pCurr" class="form-select form-select-sm">
-                        <option value="MYR">MYR</option>
-                        <option value="SGD">SGD</option>
-                        <option value="USD">USD</option>
+                        <option value="MYR">MYR</option><option value="SGD">SGD</option><option value="USD">USD</option>
                       </select>
                     </div>
-                    <div class="col-4">
-                      <input type="number" step="0.01" id="pAmt" class="form-control form-control-sm" placeholder="金额" required>
-                    </div>
-                    <div class="col-5">
-                      <input type="text" id="pPurpose" class="form-control form-control-sm" placeholder="用途描述" required>
-                    </div>
-                    <div class="col-12">
-                      <button type="submit" class="btn btn-warning btn-sm w-100 py-2"><i class="bi bi-journal-plus me-1"></i> 记一笔 / Record Expense</button>
-                    </div>
+                    <div class="col-4"><input type="number" step="0.01" id="pAmt" class="form-control form-control-sm" placeholder="金额" required></div>
+                    <div class="col-5"><input type="text" id="pPurpose" class="form-control form-control-sm" placeholder="用途描述" required></div>
+                    <div class="col-12"><button type="submit" class="btn btn-warning btn-sm w-100 py-2"><i class="bi bi-journal-plus me-1"></i> <span data-i18n="record_expense_btn">记一笔 / Record Expense</span></button></div>
                   </form>
-                  <ul id="personalExpenseList" class="list-group list-group-flush bg-transparent small">
-                    <!-- 动态记账列表 -->
-                  </ul>
+                  <ul id="personalExpenseList" class="list-group list-group-flush bg-transparent small"></ul>
                 </div>
               </div>
 
-              <!-- 4. 数据图表 Analytics Chart -->
-              <div class="col-md-6">
+              <div class="col-md-12">
                 <div class="p-3 rounded border border-secondary bg-dark h-100">
-                  <h6 class="fw-bold text-light mb-3"><i class="bi bi-graph-up-arrow me-1"></i> 开支趋势与完成度 Analytics</h6>
-                  <canvas id="copilotAnalyticsChart" height="160"></canvas>
+                  <h6 class="fw-bold text-light mb-3"><i class="bi bi-graph-up-arrow me-1"></i> <span data-i18n="analytics_title">开支趋势与完成度 Analytics</span></h6>
+                  <canvas id="copilotAnalyticsChart" height="80"></canvas>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -652,55 +508,233 @@
   </div>
 </div>
 
-<!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-  // -------------------------------------------------------------
-  // 数据结构初始化与 LocalStorage 永久化
-  // -------------------------------------------------------------
-  let currentCompany = "Paydaes";
+  // ============================================================
+  // 双语 I18N
+  // ============================================================
+  const I18N = {
+    zh: {
+      nav_part1:"Part 1: 固定支出清单", nav_part1_sub:"每月固定支出清单",
+      nav_part2:"Part 2: 行政费用报表总表", nav_part2_sub:"Master Listing 与预算",
+      nav_part3:"Part 3: 供应商档案", nav_part3_sub:"供应商数据库",
+      nav_part4:"Part 4: Super Copilot", nav_part4_sub:"行政工作台",
+      page_title:"企业财务与行政指挥中心", page_subtitle:"企业财务与行政运营平台",
+      select_company:"切换管理公司",
+      p1_title:"每月固定支出与 Vendor 提交清单", p1_subtitle:"每月固定运营支出与供应商提交清单",
+      month_label:"报销月份：", due_alert_title:"到期催收提醒",
+      due_alert_body:'本月尚有 <span id="pendingRecurringCount" class="fw-bold text-danger fs-5">0</span> 项固定支出未完成提交，请及时跟进供应商发票！',
+      p1_add_title:"新增固定开支项目", vendor_label:"供应商", category_label:"开销类别",
+      amount_label:"固定金额", invno_label:"发票单号", invdate_label:"发票日期",
+      add_to_checklist_btn:"加入清单",
+      th_status:"状态", th_vendor:"供应商名称", th_category:"费用类别", th_amount:"预估金额 (MYR)",
+      th_invno:"发票号", th_invdate:"发票日期", th_followup:"跟踪状态", th_action:"快捷操作",
+      p2_ai_title:"AI 智能发票解析与开支核对", p2_ai_subtitle:"上传发票 PDF/图片，自动提取精确元数据",
+      export_excel_btn:"导出 Excel", export_pdf_btn:"导出 PDF",
+      drop_title:"点击上传或拖拽发票文件至此处 (支持 PDF, JPG, PNG)",
+      drop_desc:"AI 会实际读取文件内容，自动提取抬头、金额、日期、发票号，并自动归类费用类别",
+      extract_btn:"识别我的发票文件",
+      p2_verify_title:"核对开支明细并同步至总表",
+      yearmonth_label:"归属年月", building_label:"大楼", unit_label:"单位号",
+      invdate_label2:"发票日期", dingtalk_label:"钉钉提交日", paymode_label:"付款方式",
+      payablename_label:"供应商名称", invno_label2:"发票号", category_label2:"开销类别",
+      ai_autocat:"AI 自动归类，可手动改", total_amount_label:"金额 (MYR)", remark_label:"备注",
+      desc_label:"描述", cancel_edit_btn:"取消编辑", record_to_master_btn:"加入 Master Listing",
+      master_listing_title:"Master Listing 消费明细汇总表",
+      th_month:"月份", th_building:"大楼", th_unit:"单位", th_invdate3:"发票日", th_dingtalk:"钉钉日",
+      th_desc:"费用描述", th_payablename:"供应商", th_invno2:"发票号", th_paymode:"付款方式",
+      th_category2:"费用类别", th_amount2:"金额 (MYR)", th_remarks:"备注", th_action2:"操作",
+      budget_table_title:"12 个月行政费用预算与实际对照表 (每个 Category 明细)", year_label:"年份：",
+      budget_banner:"BUDGET 栏位可直接点击输入/修改金额，改完自动保存；ACTUAL 栏位会自动从 Master Listing 同步计算，不需要手动填。",
+      summary_title:"每月高层汇总报表 (Paydaes Sdn Bhd 专属)", summary_subtitle:"给管理层看的高层级财务汇总",
+      copy_summary_btn:"一键带格式复制 (发邮件专用)",
+      p3_title:"供应商详情与资料库", p3_subtitle:"已验证供应商与税务资料数据库",
+      export_vendor_btn:"导出 Vendor 表",
+      vendor_fullname_label:"供应商全称", main_category_label:"主要类别", bank_name_label:"银行名称",
+      bank_acc_label:"银行账号", add_vendor_btn:"添加 Vendor",
+      th_companyname:"供应商名称", th_category3:"费用类别", th_bankname:"开户银行", th_accno:"银行账号", th_action3:"操作",
+      p4_title:"行政超级助理", p4_subtitle:"行政生产力与每日记事中心",
+      date_label:"操作日期：",
+      kpi_today_schedule:"今日日程数", kpi_task_done:"已完成/总数", kpi_task_pct:"任务完整度 %",
+      kpi_pending_priority:"待办优先项", kpi_drafts:"待审核文档", kpi_month_spend:"本月消费 (MYR)",
+      schedule_title:"日程安排", task_title:"任务与项目跟踪",
+      draft_title:"跨日文档暂存箱", draft_desc:"今天没完成的草稿先存在这里，完成后再同步到云端。",
+      save_draft_btn:"暂存草稿",
+      personal_ledger_title:"每日私人消费手帐", record_expense_btn:"记一笔",
+      analytics_title:"开支趋势与完成度分析"
+    },
+    en: {
+      nav_part1:"Part 1: Recurring Checklist", nav_part1_sub:"Monthly Recurring Checklist",
+      nav_part2:"Part 2: Master Listing & Budget", nav_part2_sub:"Master Listing & Budget Report",
+      nav_part3:"Part 3: Vendor Database", nav_part3_sub:"Vendor Database",
+      nav_part4:"Part 4: Super Copilot", nav_part4_sub:"Executive Workplace Hub",
+      page_title:"Corporate Finance & Executive Command Center", page_subtitle:"Corporate Finance & Executive Operations Platform",
+      select_company:"Select Company",
+      p1_title:"Monthly Recurring Expenses & Vendor Submission Checklist", p1_subtitle:"Monthly Fixed Operating Expenses & Vendor Submission Checklist",
+      month_label:"Expense Month:", due_alert_title:"Due Checklist Warning",
+      due_alert_body:'There are still <span id="pendingRecurringCount" class="fw-bold text-danger fs-5">0</span> recurring expenses pending submission this month — follow up with vendors!',
+      p1_add_title:"Add New Recurring Expense Item", vendor_label:"Vendor", category_label:"Category",
+      amount_label:"Fixed Amount", invno_label:"Invoice No.", invdate_label:"Invoice Date",
+      add_to_checklist_btn:"Add to Checklist",
+      th_status:"Status", th_vendor:"Vendor Name", th_category:"Expenses Category", th_amount:"Est. Amount (MYR)",
+      th_invno:"Invoice No", th_invdate:"Invoice Date", th_followup:"Follow-up Status", th_action:"Action",
+      p2_ai_title:"AI Invoice OCR Engine", p2_ai_subtitle:"Upload Invoice PDF/Image to auto-extract exact metadata",
+      export_excel_btn:"Export Excel", export_pdf_btn:"Export PDF",
+      drop_title:"Click or drag invoice file here (PDF, JPG, PNG supported)",
+      drop_desc:"AI reads the actual file content and extracts vendor, amount, date, invoice no, and auto-categorizes it",
+      extract_btn:"Extract Uploaded Invoice",
+      p2_verify_title:"Verify Expense Details & Sync to Master",
+      yearmonth_label:"Year Month", building_label:"Building", unit_label:"Unit",
+      invdate_label2:"Invoice Date", dingtalk_label:"Dingtalk Submission", paymode_label:"Payment Mode",
+      payablename_label:"Payable Vendor", invno_label2:"Invoice No", category_label2:"Expenses Category",
+      ai_autocat:"AI auto-categorized, editable", total_amount_label:"Total Amount (MYR)", remark_label:"Remark",
+      desc_label:"Description", cancel_edit_btn:"Cancel Edit", record_to_master_btn:"Record to Master",
+      master_listing_title:"Master Listing Summary Table",
+      th_month:"Month", th_building:"Building", th_unit:"Unit", th_invdate3:"Inv Date", th_dingtalk:"Dingtalk",
+      th_desc:"Description", th_payablename:"Payable Name", th_invno2:"Invoice No", th_paymode:"Pay Mode",
+      th_category2:"Category", th_amount2:"Amount (MYR)", th_remarks:"Remarks", th_action2:"Action",
+      budget_table_title:"12-Month Budget vs Actual Report (Full Category Detail)", year_label:"Year:",
+      budget_banner:"BUDGET cells are directly editable — click to type and it auto-saves. ACTUAL cells are computed automatically from Master Listing — no manual entry needed.",
+      summary_title:"Monthly Executive Summary (Paydaes Sdn Bhd Only)", summary_subtitle:"High-level financial summary for executive leadership",
+      copy_summary_btn:"Copy Table with Formatting (for Email)",
+      p3_title:"Vendor Details & Information", p3_subtitle:"Database of verified corporate vendors & tax profiles",
+      export_vendor_btn:"Export Vendor List",
+      vendor_fullname_label:"Vendor Company Name", main_category_label:"Main Category", bank_name_label:"Bank Name",
+      bank_acc_label:"Bank Account No.", add_vendor_btn:"Add Vendor",
+      th_companyname:"Company Name", th_category3:"Expenses Category", th_bankname:"Bank Name", th_accno:"Account No.", th_action3:"Action",
+      p4_title:"Administrative Super Copilot", p4_subtitle:"Executive Productivity & Daily Ledger Hub",
+      date_label:"Operating Date:",
+      kpi_today_schedule:"Today's Schedule", kpi_task_done:"Done / Total", kpi_task_pct:"Task Completion %",
+      kpi_pending_priority:"Pending Priority", kpi_drafts:"Drafts Pending", kpi_month_spend:"This Month (MYR)",
+      schedule_title:"Daily Schedule", task_title:"Task & Project Tracker",
+      draft_title:"Draft Staging Box", draft_desc:"Today's unfinished drafts stay here; sync to cloud upon completion.",
+      save_draft_btn:"Save Draft",
+      personal_ledger_title:"Daily Personal Expense Ledger", record_expense_btn:"Record Expense",
+      analytics_title:"Spending Trend & Completion Analytics"
+    }
+  };
+  let currentLang = localStorage.getItem('execLang') || 'zh';
 
-  // 1. 每月固定开支 Checklist
+  function applyLang() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const val = I18N[currentLang][key];
+      if (val !== undefined) el.innerHTML = val;
+    });
+    document.getElementById('htmlRoot').lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+    document.getElementById('langBtnLabel').textContent = currentLang === 'zh' ? '中文 / EN' : 'EN / 中文';
+    renderPart2();
+  }
+  function toggleLang() {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    localStorage.setItem('execLang', currentLang);
+    applyLang();
+  }
+
+  // ============================================================
+  // Category 清单与分组 (官方 50 项)
+  // ============================================================
+  const CATEGORY_GROUPS = {
+    "RENTAL/UTILITIES EXPENSES": ["Office rental","Office Water","Office Electricity","Office Indah Water","Office Internet","Office Telephone Line","Office Additional Aircond Fee","Office Building Insurance","Office Plant/Fish Aquarium","Office Renovation","Office Repair & Maintenance / Management Fee","Car Park/Motorbike Rental","Annual Renewal (License, Agreement)"],
+    "GENERAL OFFICE EXPENSES": ["Event Decoration","Stationery","Headcount Fee","Door Access Card & Key","Office Water Filter/Coway","Office Supplies","First Aids / Medicine","Warehouse"],
+    "CLEANING EXPENSES": ["Office Cleaning Service","Sanitation Materials/Service"],
+    "PANTRY EXPENSES": ["Office Refreshment","Pantry Supplies (any kitchenware)"],
+    "DEVICE / ASSETS EXPENSES": ["Office Equipment (e.g Printer/Paper Shredder/Other)","Electronic Device","Printer Monthly Rental & Meter Reading Fee","Device Repair & Maintenance"],
+    "HOSTEL EXPENSES": ["Hostel Rental","Hostel Cost for renewal of rental","Hostel Water","Hostel Electricity","Hostel Indah Water","Hostel Internet","Hostel Cleaning Service / Waste Collection","Hostel Labour Cost","Hostel Repair & Maintenance","Hostel Water Filter Service","Hostel Supplies"],
+    "OTHERS": ["Welcome Kit Set","Staff Uniform","Windbreaker","Courier/Moving Service","Printing Expenses","Praying Expenses"],
+    "COMPANY VEHICLE EXPENSES": ["Toll & Parking","Petrol","Vehiche Repair & Maintenance","Roadtax & Insurance"]
+  };
+  const CATEGORY_TO_GROUP = {};
+  Object.entries(CATEGORY_GROUPS).forEach(([g, list]) => list.forEach(c => CATEGORY_TO_GROUP[c] = g));
+  const ALL_CATEGORIES = Object.values(CATEGORY_GROUPS).flat();
+  const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const MONTH_ABBR = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+
+  function populateCategorySelect(selectEl, keepValue) {
+    const prev = keepValue ? selectEl.value : null;
+    selectEl.innerHTML = "";
+    Object.entries(CATEGORY_GROUPS).forEach(([group, items]) => {
+      const og = document.createElement("optgroup");
+      og.label = group;
+      items.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c; opt.textContent = c;
+        og.appendChild(opt);
+      });
+      selectEl.appendChild(og);
+    });
+    if (prev) selectEl.value = prev;
+  }
+
+  // ============================================================
+  // 数据初始化（LocalStorage 永久化）
+  // ============================================================
+  let currentCompany = "Paydaes";
+  const COMPANIES = ["Paydaes","BS One","Black Knight","Bricstar"];
+
   let recurringData = JSON.parse(localStorage.getItem("recurringData")) || [
-    { id: 1, company: "Paydaes", month: "2026-08", vendor: "Boustead Nucleus Sdn Bhd", category: "Office Water / Utilities", amount: 7.10, invNo: "NT/ESST001011", date: "2026-08-26", submitted: true, status: "已结清 / Settled" },
+    { id: 1, company: "Paydaes", month: "2026-08", vendor: "Boustead Nucleus Sdn Bhd", category: "Office Water", amount: 7.10, invNo: "NT/ESST001011", date: "2026-08-26", submitted: true, status: "已结清 / Settled" },
     { id: 2, company: "Paydaes", month: "2026-08", vendor: "Tenaga Nasional Berhad", category: "Office Electricity", amount: 1500.00, invNo: "TN-9921", date: "2026-08-01", submitted: true, status: "已结清 / Settled" },
     { id: 3, company: "Paydaes", month: "2026-08", vendor: "Build-Clean Sdn Bhd", category: "Office Cleaning Service", amount: 1458.00, invNo: "BC-8831", date: "2026-08-05", submitted: false, status: "待提交 / Pending" }
   ];
 
-  // 2. Master Listing 开支总表
   let masterListing = JSON.parse(localStorage.getItem("masterListing")) || [
-    { id: 1, company: "Paydaes", month: "August", building: "The Bousteador", unit: "8-04", invDate: "2026-08-26", dingtalkDate: "2026-08-28", desc: "WATER CHARGES - BILLING 26/6/2026 - 24/7/2026 (JULY 2026)", vendor: "Boustead Nucleus Sdn Bhd", invNo: "NT/ESST001011", payMode: "Payment Application", category: "Office Water / Utilities", amount: 7.10, remark: "SST ID: W10-1911-38000006" },
+    { id: 1, company: "Paydaes", month: "August", building: "The Bousteador", unit: "8-04", invDate: "2026-08-26", dingtalkDate: "2026-08-28", desc: "WATER CHARGES - BILLING 26/6/2026 - 24/7/2026 (JULY 2026)", vendor: "Boustead Nucleus Sdn Bhd", invNo: "NT/ESST001011", payMode: "Payment Application", category: "Office Water", amount: 7.10, remark: "SST ID: W10-1911-38000006" },
     { id: 2, company: "Paydaes", month: "January", building: "The Bousteador", unit: "8-04", invDate: "2026-01-12", dingtalkDate: "2026-01-19", desc: "Monthly office cleaning expenses", vendor: "Build-Clean Sdn Bhd", invNo: "IV-113642", payMode: "Payment Application", category: "Office Cleaning Service", amount: 1458.00, remark: "" }
   ];
 
-  // 3. Vendor 数据库
   let vendorData = JSON.parse(localStorage.getItem("vendorData")) || [
-    { id: "B001", name: "Boustead Nucleus Sdn Bhd", category: "Office Water / Utilities", bank: "Maybank", acc: "514011998877", sst: "W10-1911-38000006" },
+    { id: "B001", name: "Boustead Nucleus Sdn Bhd", category: "Office Water", bank: "Maybank", acc: "514011998877", sst: "W10-1911-38000006" },
     { id: "B002", name: "Build-Clean Sdn Bhd", category: "Office Cleaning Service", bank: "CIMB Bank", acc: "8001234567", sst: "W10-1808-31010000" },
     { id: "T001", name: "Tenaga Nasional Berhad", category: "Office Electricity", bank: "RHB Bank", acc: "214011009988", sst: "N/A" }
   ];
 
-  // 4. Copilot 任务与小报表
   let tasksData = JSON.parse(localStorage.getItem("tasksData")) || [
     { id: 1, title: "提交 8 月份行政开支总表与 Boustead 水费单据", start: "2026-08-25", end: "2026-08-28", priority: true, done: false }
   ];
-
   let draftDocs = JSON.parse(localStorage.getItem("draftDocs")) || [
     { id: 1, title: "Paydaes 办公室设备与水费核销报告.docx", date: "2026-10-01" }
   ];
-
   let personalExpenses = JSON.parse(localStorage.getItem("personalExpenses")) || [
     { id: 1, curr: "MYR", amount: 45.00, purpose: "午餐及咖啡", date: "2026-10-02" }
   ];
+  let scheduleData = JSON.parse(localStorage.getItem("scheduleData")) || [
+    { id: 1, date: "2026-10-02", time: "10:00", title: "Admin 周会" }
+  ];
+  let budgetData = JSON.parse(localStorage.getItem("budgetData")) || {};
 
-  // 初始化
+  function getBudget(company, category, mIdx) {
+    return (budgetData[company] && budgetData[company][category] && typeof budgetData[company][category][mIdx] === 'number')
+      ? budgetData[company][category][mIdx] : 0;
+  }
+  function setBudget(company, category, mIdx, value) {
+    if (!budgetData[company]) budgetData[company] = {};
+    if (!budgetData[company][category]) budgetData[company][category] = new Array(12).fill(0);
+    budgetData[company][category][mIdx] = value;
+    localStorage.setItem("budgetData", JSON.stringify(budgetData));
+  }
+  function computeActual(company, category, mIdx, year) {
+    return masterListing
+      .filter(i => i.company === company && i.category === category && i.invDate)
+      .filter(i => {
+        const d = new Date(i.invDate + "T00:00:00");
+        return !isNaN(d) && d.getFullYear() === year && d.getMonth() === mIdx;
+      })
+      .reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+  }
+
   document.addEventListener("DOMContentLoaded", function() {
+    populateCategorySelect(document.getElementById("recCategory"));
+    populateCategorySelect(document.getElementById("mCategory"));
+    populateCategorySelect(document.getElementById("vCategory"));
+    document.getElementById("mCategory").value = "Office Water";
+    applyLang();
     renderPart1();
     renderPart2();
     renderPart3();
     renderPart4();
     initAnalyticsChart();
+    setupInvoiceDropZone();
   });
 
   function handleCompanyChange() {
@@ -716,122 +750,91 @@
     localStorage.setItem("tasksData", JSON.stringify(tasksData));
     localStorage.setItem("draftDocs", JSON.stringify(draftDocs));
     localStorage.setItem("personalExpenses", JSON.stringify(personalExpenses));
+    localStorage.setItem("scheduleData", JSON.stringify(scheduleData));
   }
 
-  // -------------------------------------------------------------
-  // PART 1 LOGIC
-  // -------------------------------------------------------------
+  // ============================================================
+  // PART 1
+  // ============================================================
   function renderPart1() {
     const selMonth = document.getElementById("part1MonthPicker").value;
     const tbody = document.getElementById("recurringTableBody");
     tbody.innerHTML = "";
-
     const filtered = recurringData.filter(item => item.company === currentCompany && item.month === selMonth);
     let pendingCount = 0;
-
     filtered.forEach(item => {
       if (!item.submitted) pendingCount++;
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="text-center">
-          <input type="checkbox" class="form-check-input" ${item.submitted ? "checked" : ""} onchange="toggleRecurringSubmitted(${item.id})">
-        </td>
+        <td class="text-center"><input type="checkbox" class="form-check-input" ${item.submitted ? "checked" : ""} onchange="toggleRecurringSubmitted(${item.id})"></td>
         <td class="fw-bold text-white">${item.vendor}</td>
         <td><span class="badge bg-secondary">${item.category}</span></td>
         <td class="fw-bold text-info">RM ${parseFloat(item.amount).toFixed(2)}</td>
         <td>${item.invNo || "-"}</td>
         <td>${item.date || "-"}</td>
-        <td>
-          <span class="badge ${item.submitted ? 'bg-success' : 'bg-warning text-dark'}">${item.status}</span>
-        </td>
+        <td><span class="badge ${item.submitted ? 'bg-success' : 'bg-warning text-dark'}">${item.status}</span></td>
         <td class="text-center">
-          <button class="btn btn-sm btn-outline-info py-0 me-1" onclick="syncRecurringToMaster(${item.id})"><i class="bi bi-arrow-right-circle"></i> 记入总表</button>
+          <button class="btn btn-sm btn-outline-info py-0 me-1" onclick="syncRecurringToMaster(${item.id})"><i class="bi bi-arrow-right-circle"></i></button>
           <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteRecurring(${item.id})"><i class="bi bi-trash"></i></button>
-        </td>
-      `;
+        </td>`;
       tbody.appendChild(tr);
     });
-
     const alertBanner = document.getElementById("part1AlertBanner");
     const countSpan = document.getElementById("pendingRecurringCount");
-    if (pendingCount > 0) {
-      countSpan.innerText = pendingCount;
-      alertBanner.classList.remove("d-none");
-    } else {
-      alertBanner.classList.add("d-none");
-    }
+    if (pendingCount > 0) { if(countSpan) countSpan.innerText = pendingCount; alertBanner.classList.remove("d-none"); }
+    else alertBanner.classList.add("d-none");
   }
 
   function addRecurringItem(e) {
     e.preventDefault();
     const selMonth = document.getElementById("part1MonthPicker").value;
-    const newItem = {
-      id: Date.now(),
-      company: currentCompany,
-      month: selMonth,
+    recurringData.push({
+      id: Date.now(), company: currentCompany, month: selMonth,
       vendor: document.getElementById("recVendor").value,
       category: document.getElementById("recCategory").value,
       amount: parseFloat(document.getElementById("recAmount").value),
       invNo: document.getElementById("recInvoiceNo").value,
       date: document.getElementById("recInvoiceDate").value,
-      submitted: false,
-      status: "待提交 / Pending"
-    };
-    recurringData.push(newItem);
-    saveData();
-    renderPart1();
-    document.getElementById("addRecurringForm").reset();
+      submitted: false, status: "待提交 / Pending"
+    });
+    saveData(); renderPart1(); document.getElementById("addRecurringForm").reset();
   }
-
   function toggleRecurringSubmitted(id) {
     const item = recurringData.find(i => i.id === id);
-    if (item) {
-      item.submitted = !item.submitted;
-      item.status = item.submitted ? "已结清 / Settled" : "待提交 / Pending";
-      saveData();
-      renderPart1();
-    }
+    if (item) { item.submitted = !item.submitted; item.status = item.submitted ? "已结清 / Settled" : "待提交 / Pending"; saveData(); renderPart1(); }
   }
-
-  function deleteRecurring(id) {
-    recurringData = recurringData.filter(i => i.id !== id);
-    saveData();
-    renderPart1();
-  }
-
+  function deleteRecurring(id) { recurringData = recurringData.filter(i => i.id !== id); saveData(); renderPart1(); }
   function syncRecurringToMaster(id) {
     const item = recurringData.find(i => i.id === id);
     if (!item) return;
-
-    const masterItem = {
-      id: Date.now(),
-      company: item.company,
-      month: "August",
-      building: "The Bousteador",
-      unit: "8-04",
-      invDate: item.date || "2026-08-26",
-      dingtalkDate: "2026-08-28",
-      desc: `Recurring Expense - ${item.category}`,
-      vendor: item.vendor,
-      invNo: item.invNo || "INV-REC",
-      payMode: "Payment Application",
-      category: item.category,
-      amount: item.amount,
-      remark: "Synced from Part 1 Checklist"
-    };
-
-    masterListing.push(masterItem);
-    item.submitted = true;
-    item.status = "已结清 / Settled";
-    saveData();
-    renderPart1();
-    renderPart2();
-    alert("✅ 已成功将固定开支同步记入 Master Listing！");
+    masterListing.push({
+      id: Date.now(), company: item.company, month: "August", building: "The Bousteador", unit: "8-04",
+      invDate: item.date || "2026-08-26", dingtalkDate: "2026-08-28",
+      desc: `Recurring Expense - ${item.category}`, vendor: item.vendor, invNo: item.invNo || "INV-REC",
+      payMode: "Payment Application", category: item.category, amount: item.amount, remark: "Synced from Part 1 Checklist"
+    });
+    item.submitted = true; item.status = "已结清 / Settled";
+    saveData(); renderPart1(); renderPart2();
   }
 
-  // -------------------------------------------------------------
-  // PART 2 LOGIC
-  // -------------------------------------------------------------
+  // ============================================================
+  // PART 2 — Master Listing + AI 识别 + 明细预算表 + Summary
+  // ============================================================
+  let currentInvoiceBase64 = null, currentInvoiceMediaType = null, currentInvoiceKind = null;
+  let editingMasterId = null;
+
+  function setupInvoiceDropZone() {
+    const zone = document.getElementById('invoiceDropZone');
+    ['dragover','dragenter'].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); zone.style.borderColor = '#60a5fa'; }));
+    ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); zone.style.borderColor = '#3b82f6'; }));
+    zone.addEventListener('drop', e => {
+      if (e.dataTransfer.files.length) {
+        document.getElementById('invoiceFileInput').files = e.dataTransfer.files;
+        handleInvoiceUpload({ target: { files: e.dataTransfer.files } });
+      }
+    });
+  }
+
   function renderPart2() {
     renderMasterListingTable();
     renderAdminReportTable();
@@ -841,34 +844,32 @@
   function renderMasterListingTable() {
     const tbody = document.getElementById("masterListingTableBody");
     tbody.innerHTML = "";
-
-    const filtered = masterListing.filter(i => i.company === currentCompany);
-    filtered.forEach(item => {
+    masterListing.filter(i => i.company === currentCompany).forEach(item => {
       const tr = document.createElement("tr");
+      if (item.id === editingMasterId) tr.style.backgroundColor = "#3a3215";
       tr.innerHTML = `
-        <td>${item.month}</td>
-        <td>${item.building}</td>
-        <td>${item.unit}</td>
-        <td>${item.invDate}</td>
-        <td>${item.dingtalkDate}</td>
-        <td>${item.desc}</td>
-        <td class="fw-bold text-info">${item.vendor}</td>
-        <td>${item.invNo}</td>
-        <td>${item.payMode}</td>
+        <td>${item.month}</td><td>${item.building}</td><td>${item.unit}</td>
+        <td>${item.invDate}</td><td>${item.dingtalkDate}</td><td>${item.desc}</td>
+        <td class="fw-bold text-info">${item.vendor}</td><td>${item.invNo}</td><td>${item.payMode}</td>
         <td><span class="badge bg-secondary">${item.category}</span></td>
         <td class="fw-bold text-success">RM ${parseFloat(item.amount).toFixed(2)}</td>
         <td>${item.remark || ""}</td>
-      `;
+        <td class="text-center text-nowrap">
+          <button class="btn btn-sm btn-outline-info py-0 me-1" onclick="editMasterEntry(${item.id})"><i class="bi bi-pencil"></i></button>
+          <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteMasterEntry(${item.id})"><i class="bi bi-trash"></i></button>
+        </td>`;
       tbody.appendChild(tr);
     });
   }
 
   function addMasterEntry(e) {
     e.preventDefault();
-    const newItem = {
-      id: Date.now(),
-      company: currentCompany,
-      month: "August",
+    const monthVal = document.getElementById("mMonth").value;
+    let monthLabel = "August";
+    if (monthVal) { const mi = parseInt(monthVal.split("-")[1], 10) - 1; if (MONTH_NAMES[mi]) monthLabel = MONTH_NAMES[mi]; }
+
+    const entry = {
+      company: currentCompany, month: monthLabel,
       building: document.getElementById("mBuilding").value,
       unit: document.getElementById("mUnit").value,
       invDate: document.getElementById("mInvDate").value,
@@ -882,349 +883,446 @@
       remark: document.getElementById("mRemark").value
     };
 
-    masterListing.push(newItem);
-    autoCheckAndAddVendor(newItem.vendor, newItem.category, "W10-1911-38000006");
-    saveData();
-    renderPart2();
-    renderPart3();
-    alert("✅ 发票数据已精准同步至 Master Listing 及 Vendor 库！");
+    if (editingMasterId !== null) {
+      const idx = masterListing.findIndex(i => i.id === editingMasterId);
+      if (idx !== -1) { entry.id = editingMasterId; masterListing[idx] = entry; }
+      exitMasterEditMode();
+    } else {
+      entry.id = Date.now();
+      masterListing.push(entry);
+    }
+    autoCheckAndAddVendor(entry.vendor, entry.category, "");
+    saveData(); renderPart2(); renderPart3(); resetInvoiceUploadArea();
   }
 
-  // 精准识别用户上传发票图片中的数据 (Boustead Nucleus)
+  function editMasterEntry(id) {
+    const item = masterListing.find(i => i.id === id);
+    if (!item) return;
+    editingMasterId = id;
+    const mi = MONTH_NAMES.indexOf(item.month);
+    const yearGuess = (item.invDate && item.invDate.slice(0,4)) || "2026";
+    document.getElementById("mMonth").value = mi >= 0 ? `${yearGuess}-${String(mi+1).padStart(2,'0')}` : "";
+    document.getElementById("mBuilding").value = item.building;
+    document.getElementById("mUnit").value = item.unit;
+    document.getElementById("mInvDate").value = item.invDate;
+    document.getElementById("mDingtalkDate").value = item.dingtalkDate;
+    document.getElementById("mDesc").value = item.desc;
+    document.getElementById("mVendor").value = item.vendor;
+    document.getElementById("mInvNo").value = item.invNo;
+    document.getElementById("mPayMode").value = item.payMode;
+    document.getElementById("mCategory").value = item.category;
+    document.getElementById("mAmount").value = item.amount;
+    document.getElementById("mRemark").value = item.remark;
+    document.getElementById("mSubmitBtn").innerHTML = '<i class="bi bi-save me-1"></i> 保存修改 / Save';
+    document.getElementById("mCancelEditBtn").style.display = "inline-block";
+    document.querySelector("#part2 .command-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    renderMasterListingTable();
+  }
+  function cancelMasterEdit() { exitMasterEditMode(); resetInvoiceUploadArea(); renderMasterListingTable(); }
+  function exitMasterEditMode() {
+    editingMasterId = null;
+    document.getElementById("mSubmitBtn").innerHTML = '<i class="bi bi-database-add me-1"></i> ' + I18N[currentLang].record_to_master_btn;
+    document.getElementById("mCancelEditBtn").style.display = "none";
+    document.getElementById("invoiceExtractStatus").textContent = "";
+  }
+  function deleteMasterEntry(id) {
+    if (!confirm("Delete this record? / 确定要删除这一笔记录吗？")) return;
+    if (editingMasterId === id) { exitMasterEditMode(); resetInvoiceUploadArea(); }
+    masterListing = masterListing.filter(i => i.id !== id);
+    saveData(); renderPart2();
+  }
+  function resetInvoiceUploadArea() {
+    currentInvoiceBase64 = null; currentInvoiceMediaType = null; currentInvoiceKind = null;
+    document.getElementById("invoiceFilePill").style.display = "none";
+    document.getElementById("invoiceFileInput").value = "";
+  }
+
+  // ---------- 真实 AI 发票识别：走 /api/extract 这个 Vercel 后端代理 ----------
   function handleInvoiceUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
-
-    // 准确读取上传的图片发票信息 (Boustead Nucleus Water Charges Invoice)
-    setTimeout(() => {
-      document.getElementById("mVendor").value = "Boustead Nucleus Sdn Bhd";
-      document.getElementById("mInvNo").value = "NT/ESST001011";
-      document.getElementById("mAmount").value = "7.10";
-      document.getElementById("mInvDate").value = "2026-08-26";
-      document.getElementById("mDingtalkDate").value = "2026-08-28";
-      document.getElementById("mBuilding").value = "The Bousteador";
-      document.getElementById("mUnit").value = "8-04";
-      document.getElementById("mCategory").value = "Office Water / Utilities";
-      document.getElementById("mDesc").value = "WATER CHARGES - BILLING 26/6/2026 - 24/7/2026 (JULY 2026)";
-      document.getElementById("mRemark").value = "SST ID: W10-1911-38000006 (Tax: RM 0.40)";
-      alert("🤖 AI 高精度识别成功！已准确提取图片中的：Boustead Nucleus Sdn Bhd, 发票号 NT/ESST001011, 日期 26/08/2026, 水费含税金额 RM 7.10！");
-    }, 600);
-  }
-
-  function renderAdminReportTable() {
-    const tbody = document.getElementById("adminReportTableBody");
-    tbody.innerHTML = "";
-
-    const categories = [
-      "Office Water / Utilities", "Office Rental", "Office Electricity", 
-      "Office Internet", "Office Cleaning Service", "Office Supplies", "Pantry Supplies"
-    ];
-
-    categories.forEach(cat => {
-      const tr = document.createElement("tr");
-      let rowHtml = `<td class="fw-bold text-start ps-3">${cat}</td>`;
-
-      for (let m = 0; m < 8; m++) {
-        let budgetVal = 1000.00;
-        if (cat === "Office Rental") budgetVal = 27394.20;
-        if (cat === "Office Water / Utilities") budgetVal = 150.00;
-
-        let actualVal = 0.00;
-        if (m === 7 && cat === "Office Water / Utilities") {
-          actualVal = 7.10; // 对应 August Boustead 水费
-        }
-
-        rowHtml += `
-          <td>${budgetVal.toFixed(2)}</td>
-          <td class="fw-bold text-info">${actualVal.toFixed(2)}</td>
-        `;
-      }
-      tr.innerHTML = rowHtml;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function renderSummaryReportTable() {
-    const sec = document.getElementById("paydaesSummarySection");
-    if (currentCompany !== "Paydaes") {
-      sec.style.display = "none";
+    const validTypes = ['image/jpeg','image/png','image/jpg','application/pdf'];
+    const statusEl = document.getElementById("invoiceExtractStatus");
+    if (!validTypes.includes(file.type)) {
+      statusEl.textContent = "格式不支持，请上传 JPEG、PNG 或 PDF 文件 / Unsupported format";
+      statusEl.className = "extract-status err";
       return;
     }
-    sec.style.display = "block";
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result;
+      currentInvoiceBase64 = dataUrl.split(',')[1];
+      currentInvoiceMediaType = file.type;
+      currentInvoiceKind = (file.type === 'application/pdf') ? 'pdf' : 'image';
+      const pill = document.getElementById("invoiceFilePill");
+      pill.style.display = "inline-flex";
+      pill.textContent = (currentInvoiceKind === 'pdf' ? '📄 ' : '🖼️ ') + file.name;
+      statusEl.textContent = "正在识别与归类中，请稍候… / Extracting…";
+      statusEl.className = "extract-status";
 
-    const tbody = document.getElementById("summaryTableBody");
-    tbody.innerHTML = `
-      <tr>
-        <td rowspan="4" class="fw-bold align-middle" style="background-color: #1e293b; color: #ffffff;">BSPD</td>
-        <td class="fw-bold text-start">RENTAL/UTILITIES EXPENSES</td>
-        <td>34,064.20</td><td>28,581.40</td><td>48,794.20</td><td>33,527.25</td><td>80,594.20</td><td>49,172.95</td><td>35,094.20</td><td>61,354.78</td><td>35,094.20</td><td>29,594.10</td><td>35,594.20</td><td>31,066.16</td>
-      </tr>
-      <tr>
-        <td class="fw-bold text-start">GENERAL OFFICE EXPENSES</td>
-        <td>7,100.00</td><td>825.71</td><td>4,350.00</td><td>762.34</td><td>1,050.00</td><td>3,796.88</td><td>1,450.00</td><td>282.00</td><td>1,050.00</td><td>159.00</td><td>1,050.00</td><td>228.92</td>
-      </tr>
-      <tr>
-        <td class="fw-bold text-start">CLEANING EXPENSES</td>
-        <td>1,498.00</td><td>1,458.00</td><td>1,998.00</td><td>0.00</td><td>1,498.00</td><td>3,246.00</td><td>1,998.00</td><td>1,458.00</td><td>1,498.00</td><td>1,900.00</td><td>3,998.00</td><td>2,916.00</td>
-      </tr>
-      <tr>
-        <td class="fw-bold text-start">PANTRY EXPENSES</td>
-        <td>5,000.00</td><td>393.50</td><td>3,000.00</td><td>0.00</td><td>150.00</td><td>1,317.51</td><td>150.00</td><td>78.60</td><td>150.00</td><td>0.00</td><td>150.00</td><td>0.00</td>
-      </tr>
-      <tr class="bg-yellow-highlight">
-        <td colspan="2" class="fw-bold">TOTAL BUDGET (12 MONTHS)</td>
-        <td colspan="12" class="fs-6 fw-bold">RM 571,626.40</td>
-      </tr>
-      <tr class="bg-yellow-highlight">
-        <td colspan="2" class="fw-bold">TOTAL BUDGET BALANCE</td>
-        <td colspan="12" class="fs-6 fw-bold text-success">RM 235,517.32</td>
-      </tr>
-      <tr class="bg-yellow-highlight">
-        <td colspan="2" class="fw-bold">TOTAL ACTUAL SPENDING (JAN - AUG)</td>
-        <td colspan="12" class="fs-6 fw-bold text-primary">RM 336,109.08</td>
-      </tr>
-    `;
+      try {
+        const fileContentBlock = currentInvoiceKind === 'pdf'
+          ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: currentInvoiceBase64 } }
+          : { type: "image", source: { type: "base64", media_type: currentInvoiceMediaType, data: currentInvoiceBase64 } };
+
+        const response = await fetch("/api/extract", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-6",
+            max_tokens: 1000,
+            messages: [{
+              role: "user",
+              content: [
+                fileContentBlock,
+                { type: "text", text: `这是一张公司行政报销收据/发票。请仔细阅读并只返回一个 JSON 对象（不要任何其他文字、不要markdown代码块），字段如下：
+{
+  "invoice_date": "YYYY-MM-DD 格式的发票/收据日期，找不到则留空字符串",
+  "payable_name": "收款方/商家名称",
+  "invoice_no": "发票号或收据编号，找不到则填 -",
+  "description": "简短英文描述这笔费用是什么，控制在10个单词以内",
+  "amount": 数字类型的金额，不要货币符号,
+  "remark": "如果发票上有 SST/Tax ID 或其他重要备注信息，简短写在这里，没有则留空字符串",
+  "bank_name": "如果发票上有列出收款方银行名称，填在这里，没有则留空字符串",
+  "bank_account": "如果发票上有列出收款方银行账号，填在这里，没有则留空字符串",
+  "suggested_category": "从以下列表中选出最匹配的一项，必须完全照抄列表中的写法：${ALL_CATEGORIES.join(' | ')}"
+}` }
+              ]
+            }]
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          const msg = (data && data.error && data.error.message) ? data.error.message : `服务器返回错误 (${response.status})`;
+          throw new Error(msg);
+        }
+        if (!data || !Array.isArray(data.content)) throw new Error("AI 没有返回可用内容，请重试一次");
+        const textBlock = data.content.find(b => b.type === 'text');
+        if (!textBlock || !textBlock.text) throw new Error("AI 未返回文字结果，请重试一次");
+        const clean = textBlock.text.replace(/```json|```/g, '').trim();
+        let parsed;
+        try { parsed = JSON.parse(clean); } catch (err) { throw new Error("AI 返回的内容无法解析，请重试一次"); }
+
+        if (parsed.invoice_date) {
+          document.getElementById("mInvDate").value = parsed.invoice_date;
+          const ym = parsed.invoice_date.slice(0,7);
+          if (ym) document.getElementById("mMonth").value = ym;
+        }
+        document.getElementById("mVendor").value = parsed.payable_name || "";
+        document.getElementById("mInvNo").value = parsed.invoice_no || "";
+        document.getElementById("mDesc").value = parsed.description || "";
+        if (typeof parsed.amount === 'number') document.getElementById("mAmount").value = parsed.amount;
+        document.getElementById("mRemark").value = parsed.remark || "";
+        if (parsed.suggested_category && ALL_CATEGORIES.includes(parsed.suggested_category)) {
+          document.getElementById("mCategory").value = parsed.suggested_category;
+        }
+        document.getElementById("mDingtalkDate").value = new Date().toISOString().slice(0,10);
+        window.__lastExtractedBank = { bank: parsed.bank_name || "", acc: parsed.bank_account || "" };
+
+        statusEl.textContent = "✓ 识别 + 归类完成，请核对下方信息后加入 Master Listing";
+        statusEl.className = "extract-status ok";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "识别失败：" + err.message + "（可以手动填写下方表单）";
+        statusEl.className = "extract-status err";
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ---------- 明细预算表：每个 Category 都列出来，Budget 可编辑，Actual 自动算 ----------
+  function renderAdminReportTable() {
+    const year = parseInt(document.getElementById("reportYear").value, 10) || 2026;
+    const thead = document.getElementById("adminReportTableHead");
+    const tbody = document.getElementById("adminReportTableBody");
+
+    let headHtml = '<tr class="header-navy"><th rowspan="2" style="min-width:230px;" class="align-middle">CATEGORY</th>';
+    MONTH_ABBR.forEach(m => headHtml += `<th colspan="2">${m}</th>`);
+    headHtml += '</tr><tr class="header-navy">';
+    MONTH_ABBR.forEach(() => headHtml += '<th>BUDGET</th><th>ACTUAL</th>');
+    headHtml += '</tr>';
+    thead.innerHTML = headHtml;
+
+    let bodyHtml = '';
+    Object.entries(CATEGORY_GROUPS).forEach(([group, cats]) => {
+      let groupBudgetTotals = new Array(12).fill(0), groupActualTotals = new Array(12).fill(0);
+      cats.forEach(cat => {
+        for (let m=0;m<12;m++){
+          groupBudgetTotals[m]+= getBudget(currentCompany, cat, m);
+          groupActualTotals[m]+= computeActual(currentCompany, cat, m, year);
+        }
+      });
+      bodyHtml += `<tr class="group-header-row"><td class="text-start">${group}</td>`;
+      for (let m=0;m<12;m++){
+        bodyHtml += `<td class="fw-bold">${groupBudgetTotals[m].toFixed(2)}</td><td class="fw-bold text-info">${groupActualTotals[m].toFixed(2)}</td>`;
+      }
+      bodyHtml += `</tr>`;
+
+      cats.forEach(cat => {
+        bodyHtml += `<tr><td class="text-start ps-3">${cat}</td>`;
+        for (let m=0;m<12;m++){
+          const bVal = getBudget(currentCompany, cat, m);
+          const aVal = computeActual(currentCompany, cat, m, year);
+          bodyHtml += `<td><input type="number" step="0.01" class="budget-input" value="${bVal}" onchange="setBudget('${currentCompany}', '${cat.replace(/'/g,"\\'")}', ${m}, parseFloat(this.value)||0); renderAdminReportTable(); renderSummaryReportTable();"></td>`;
+          bodyHtml += `<td class="actual-cell">${aVal.toFixed(2)}</td>`;
+        }
+        bodyHtml += `</tr>`;
+      });
+    });
+    tbody.innerHTML = bodyHtml;
+  }
+
+  // ---------- Monthly Summary（仅 Paydaes）----------
+  function renderSummaryReportTable() {
+    const sec = document.getElementById("paydaesSummarySection");
+    if (currentCompany !== "Paydaes") { sec.style.display = "none"; return; }
+    sec.style.display = "block";
+    const year = parseInt(document.getElementById("reportYear").value, 10) || 2026;
+
+    let headHtml = '<tr style="background-color:#002060;color:#fff;font-weight:bold;"><th>COMPANY</th><th>DESCRIPTION</th>';
+    MONTH_ABBR.forEach(m => headHtml += `<th>${m} BUDGET</th><th>${m} ACTUAL</th>`);
+    headHtml += '</tr>';
+    document.getElementById("summaryTableHead").innerHTML = headHtml;
+
+    const groupNames = Object.keys(CATEGORY_GROUPS);
+    let totalBudget12 = 0, totalActualYTD = 0;
+    const monthSubBudget = new Array(12).fill(0), monthSubActual = new Array(12).fill(0);
+
+    let rowsHtml = '';
+    groupNames.forEach((group, gi) => {
+      const cats = CATEGORY_GROUPS[group];
+      let cells = '';
+      for (let m=0;m<12;m++){
+        let b=0, a=0;
+        cats.forEach(cat => { b += getBudget("Paydaes", cat, m); a += computeActual("Paydaes", cat, m, year); });
+        monthSubBudget[m]+=b; monthSubActual[m]+=a;
+        totalBudget12 += b;
+        cells += `<td>${b.toFixed(2)}</td><td>${a.toFixed(2)}</td>`;
+      }
+      rowsHtml += `<tr>${gi===0 ? `<td rowspan="${groupNames.length}" class="fw-bold align-middle" style="background-color:#1e293b;color:#fff;">BSPD</td>` : ''}<td class="fw-bold text-start">${group}</td>${cells}</tr>`;
+    });
+
+    const now = new Date();
+    for (let m=0;m<12;m++){ if (new Date(year, m, 1) <= now) totalActualYTD += monthSubActual[m]; }
+
+    let subtotalRow = '<tr class="bg-yellow-highlight"><td colspan="2" class="fw-bold">SUB TOTAL</td>';
+    for (let m=0;m<12;m++) subtotalRow += `<td colspan="2">${monthSubBudget[m].toFixed(2)} / ${monthSubActual[m].toFixed(2)}</td>`;
+    subtotalRow += '</tr>';
+
+    rowsHtml += subtotalRow;
+    rowsHtml += `<tr class="bg-yellow-highlight"><td colspan="2" class="fw-bold">TOTAL BUDGET (12 MONTHS)</td><td colspan="${MONTH_ABBR.length*2}" class="fs-6 fw-bold">RM ${totalBudget12.toFixed(2)}</td></tr>`;
+    rowsHtml += `<tr class="bg-yellow-highlight"><td colspan="2" class="fw-bold">TOTAL ACTUAL SPENDING (YTD)</td><td colspan="${MONTH_ABBR.length*2}" class="fs-6 fw-bold text-primary">RM ${totalActualYTD.toFixed(2)}</td></tr>`;
+    rowsHtml += `<tr class="bg-yellow-highlight"><td colspan="2" class="fw-bold">TOTAL BUDGET BALANCE</td><td colspan="${MONTH_ABBR.length*2}" class="fs-6 fw-bold text-success">RM ${(totalBudget12-totalActualYTD).toFixed(2)}</td></tr>`;
+
+    document.getElementById("summaryTableBody").innerHTML = rowsHtml;
   }
 
   function copySummaryTableWithStyles() {
     const tableEl = document.getElementById("paydaesSummaryReportTable");
     const clone = tableEl.cloneNode(true);
-    
-    clone.style.borderCollapse = "collapse";
-    clone.style.fontFamily = "Arial, sans-serif";
-    clone.style.width = "100%";
-
+    clone.style.borderCollapse = "collapse"; clone.style.fontFamily = "Arial, sans-serif"; clone.style.width = "100%";
     const blob = new Blob([clone.outerHTML], { type: "text/html" });
-    const data = [new ClipboardItem({ "text/html": blob })];
-
-    navigator.clipboard.write(data).then(() => {
-      alert("✅ 带高级蓝/高亮黄排版的Summary表格已成功复制！可以直接 Paste 进邮件。");
-    });
+    navigator.clipboard.write([new ClipboardItem({ "text/html": blob })]).then(() => {
+      alert("✅ Summary 表格已复制，可直接 Paste 进邮件 / Copied — paste into your email.");
+    }).catch(() => alert("复制失败，请手动选取文字 / Copy failed, please select manually."));
   }
 
-  // -------------------------------------------------------------
-  // PART 3 LOGIC
-  // -------------------------------------------------------------
+  // ---------- 精准匹配模板的 Excel 导出 ----------
+  function exportToExcel() {
+    const filtered = masterListing.filter(i => i.company === currentCompany);
+    if (filtered.length === 0) { alert("当前公司暂无 Master Listing 记录可导出 / No records to export"); return; }
+    const headers = ["Month","Building","Office/Unit","Invoice Date","Dingtalk Submission Date","Description","Payable Name","Invoice No","Payment Mode","Expenses Category","Amount","Remarks"];
+    const aoa = [[], ["ADMIN EXPENSES MASTER LISTING - " + currentCompany.toUpperCase()], [], headers];
+    filtered.forEach(item => {
+      const invDate = item.invDate ? new Date(item.invDate + "T00:00:00") : "";
+      const dingDate = item.dingtalkDate ? new Date(item.dingtalkDate + "T00:00:00") : "";
+      aoa.push([item.month, item.building, item.unit, invDate, dingDate, item.desc, item.vendor, item.invNo, item.payMode, item.category, item.amount, item.remark]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(aoa, { cellDates: true });
+    ws['!cols'] = [{wch:9.16},{wch:17.66},{wch:9},{wch:15.33},{wch:18},{wch:55.16},{wch:36.5},{wch:27},{wch:22.66},{wch:42.5},{wch:12.66},{wch:60.16}];
+    for (let r = 4; r < aoa.length; r++) {
+      [3,4].forEach(c => { const addr = XLSX.utils.encode_cell({ r, c }); if (ws[addr] && ws[addr].t !== 's') ws[addr].z = 'yyyy-mm-dd'; });
+      const amtAddr = XLSX.utils.encode_cell({ r, c: 10 }); if (ws[amtAddr]) ws[amtAddr].z = '#,##0.00_);[Red](#,##0.00)';
+    }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Master Listing");
+    XLSX.writeFile(wb, `${currentCompany}_Master_Listing_${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+
+  // ============================================================
+  // PART 3 — Vendor
+  // ============================================================
   function renderPart3() {
     const tbody = document.getElementById("vendorTableBody");
     tbody.innerHTML = "";
-
     vendorData.forEach(v => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="fw-bold text-info">${v.id}</td>
-        <td class="fw-bold text-white">${v.name}</td>
+        <td class="fw-bold text-info">${v.id}</td><td class="fw-bold text-white">${v.name}</td>
         <td><span class="badge bg-secondary">${v.category}</span></td>
-        <td>${v.bank || "-"}</td>
-        <td>${v.acc || "-"}</td>
-        <td>${v.sst || "-"}</td>
-        <td class="text-center">
-          <button class="btn btn-sm btn-outline-danger py-0" onclick="deleteVendor('${v.id}')"><i class="bi bi-trash"></i> 删除</button>
-        </td>
-      `;
+        <td>${v.bank || "-"}</td><td>${v.acc || "-"}</td><td>${v.sst || "-"}</td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger py-0" onclick="deleteVendor('${v.id}')"><i class="bi bi-trash"></i></button></td>`;
       tbody.appendChild(tr);
     });
   }
-
   function addVendor(e) {
     e.preventDefault();
-    const name = document.getElementById("vName").value;
-    const cat = document.getElementById("vCategory").value;
-    autoCheckAndAddVendor(name, cat, "Registered");
+    autoCheckAndAddVendor(document.getElementById("vName").value, document.getElementById("vCategory").value, "", true);
     document.getElementById("addVendorForm").reset();
   }
-
-  function autoCheckAndAddVendor(name, category, sstId) {
+  function autoCheckAndAddVendor(name, category, sstId, forceManualBank) {
     const exists = vendorData.find(v => v.name.toLowerCase() === name.toLowerCase());
-    if (!exists) {
-      const firstChar = name.trim().charAt(0).toUpperCase();
-      const code = /[A-Z]/.test(firstChar) ? firstChar : 'V';
-      const count = vendorData.filter(v => v.id.startsWith(code)).length + 1;
-      const newId = `${code}${String(count).padStart(3, '0')}`;
-
-      vendorData.push({
-        id: newId,
-        name: name,
-        category: category,
-        bank: document.getElementById("vBank") ? document.getElementById("vBank").value : "Maybank",
-        acc: document.getElementById("vAcc") ? document.getElementById("vAcc").value : "-",
-        sst: sstId || "Registered"
-      });
-      saveData();
-      renderPart3();
-    }
+    if (exists) return;
+    const firstChar = name.trim().charAt(0).toUpperCase();
+    const code = /[A-Z]/.test(firstChar) ? firstChar : 'V';
+    const count = vendorData.filter(v => v.id.startsWith(code)).length + 1;
+    const newId = `${code}${String(count).padStart(3, '0')}`;
+    const extracted = window.__lastExtractedBank || {};
+    vendorData.push({
+      id: newId, name, category,
+      bank: forceManualBank ? (document.getElementById("vBank")?.value || "") : (extracted.bank || ""),
+      acc: forceManualBank ? (document.getElementById("vAcc")?.value || "") : (extracted.acc || ""),
+      sst: sstId || ""
+    });
+    saveData(); renderPart3();
+  }
+  function deleteVendor(id) { vendorData = vendorData.filter(v => v.id !== id); saveData(); renderPart3(); }
+  function exportVendors() {
+    if (vendorData.length === 0) { alert("暂无 Vendor 可导出"); return; }
+    const aoa = [["Vendor ID","Company Name","Category","Bank Name","Account No.","SST/Tax ID"]];
+    vendorData.forEach(v => aoa.push([v.id, v.name, v.category, v.bank, v.acc, v.sst]));
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Vendor List");
+    XLSX.writeFile(wb, `Vendor_List_${new Date().toISOString().slice(0,10)}.xlsx`);
   }
 
-  function deleteVendor(id) {
-    vendorData = vendorData.filter(v => v.id !== id);
-    saveData();
-    renderPart3();
-  }
-
-  // -------------------------------------------------------------
-  // PART 4 LOGIC
-  // -------------------------------------------------------------
+  // ============================================================
+  // PART 4 — Super Copilot (含日程安排 + KPI 仪表盘)
+  // ============================================================
   function renderPart4() {
+    renderSchedule();
     renderTasks();
     renderDraftDocs();
     renderPersonalExpenses();
+    updateCopilotKPIs();
   }
+
+  function renderSchedule() {
+    const dateVal = document.getElementById("copilotDatePicker").value;
+    const ul = document.getElementById("scheduleList");
+    ul.innerHTML = "";
+    scheduleData.filter(s => s.date === dateVal).sort((a,b)=> (a.time||"").localeCompare(b.time||"")).forEach(s => {
+      const li = document.createElement("li");
+      li.className = "list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-secondary px-0";
+      li.innerHTML = `<div><span class="badge bg-primary me-2">${s.time || "--:--"}</span>${s.title}</div>
+        <button class="btn btn-sm text-danger" onclick="deleteSchedule(${s.id})"><i class="bi bi-x-circle"></i></button>`;
+      ul.appendChild(li);
+    });
+  }
+  function addSchedule(e) {
+    e.preventDefault();
+    scheduleData.push({ id: Date.now(), date: document.getElementById("copilotDatePicker").value, time: document.getElementById("scheduleTime").value, title: document.getElementById("scheduleTitle").value });
+    saveData(); renderSchedule(); updateCopilotKPIs();
+    document.getElementById("addScheduleForm").reset();
+  }
+  function deleteSchedule(id) { scheduleData = scheduleData.filter(s => s.id !== id); saveData(); renderSchedule(); updateCopilotKPIs(); }
 
   function renderTasks() {
     const ul = document.getElementById("taskList");
     ul.innerHTML = "";
-
     tasksData.forEach(t => {
       const li = document.createElement("li");
       li.className = "list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-secondary px-0";
       li.innerHTML = `
         <div>
-          <input type="checkbox" class="form-check-input me-2" ${t.priority ? "checked" : ""} onchange="toggleTaskPriority(${t.id})">
+          <input type="checkbox" class="form-check-input me-2" title="完成" ${t.done ? "checked" : ""} onchange="toggleTaskDone(${t.id})">
+          <input type="checkbox" class="form-check-input me-2" title="优先" ${t.priority ? "checked" : ""} onchange="toggleTaskPriority(${t.id})" style="accent-color:#f59e0b;">
           <span class="${t.done ? 'text-decoration-line-through text-muted' : ''}">${t.title}</span>
           <div class="small text-muted">${t.start || ''} ~ ${t.end || ''}</div>
         </div>
-        <button class="btn btn-sm text-danger" onclick="deleteTask(${t.id})"><i class="bi bi-x-circle"></i></button>
-      `;
+        <button class="btn btn-sm text-danger" onclick="deleteTask(${t.id})"><i class="bi bi-x-circle"></i></button>`;
       ul.appendChild(li);
     });
   }
-
   function addTask(e) {
     e.preventDefault();
-    tasksData.push({
-      id: Date.now(),
-      title: document.getElementById("taskTitle").value,
-      start: document.getElementById("taskStart").value,
-      end: document.getElementById("taskEnd").value,
-      priority: true,
-      done: false
-    });
-    saveData();
-    renderTasks();
-    document.getElementById("addTaskForm").reset();
+    tasksData.push({ id: Date.now(), title: document.getElementById("taskTitle").value, start: document.getElementById("taskStart").value, end: document.getElementById("taskEnd").value, priority: true, done: false });
+    saveData(); renderTasks(); updateCopilotKPIs(); document.getElementById("addTaskForm").reset();
   }
-
-  function toggleTaskPriority(id) {
-    const t = tasksData.find(i => i.id === id);
-    if (t) {
-      t.priority = !t.priority;
-      saveData();
-      renderTasks();
-    }
-  }
-
-  function deleteTask(id) {
-    tasksData = tasksData.filter(i => i.id !== id);
-    saveData();
-    renderTasks();
-  }
+  function toggleTaskPriority(id) { const t = tasksData.find(i => i.id === id); if (t) { t.priority = !t.priority; saveData(); renderTasks(); updateCopilotKPIs(); } }
+  function toggleTaskDone(id) { const t = tasksData.find(i => i.id === id); if (t) { t.done = !t.done; saveData(); renderTasks(); updateCopilotKPIs(); } }
+  function deleteTask(id) { tasksData = tasksData.filter(i => i.id !== id); saveData(); renderTasks(); updateCopilotKPIs(); }
 
   function renderDraftDocs() {
     const ul = document.getElementById("draftDocList");
     ul.innerHTML = "";
-
     draftDocs.forEach(d => {
       const li = document.createElement("li");
       li.className = "list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-secondary px-0";
-      li.innerHTML = `
-        <div>
-          <i class="bi bi-file-earmark-text text-success me-2"></i>
-          <span>${d.title}</span>
-          <small class="text-muted d-block">${d.date}</small>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-outline-success py-0 me-1" onclick="completeDraftDoc(${d.id})">云同步</button>
-          <button class="btn btn-sm text-danger py-0" onclick="deleteDraftDoc(${d.id})"><i class="bi bi-trash"></i></button>
-        </div>
-      `;
+      li.innerHTML = `<div><i class="bi bi-file-earmark-text text-success me-2"></i><span>${d.title}</span><small class="text-muted d-block">${d.date}</small></div>
+        <div><button class="btn btn-sm btn-outline-success py-0 me-1" onclick="completeDraftDoc(${d.id})">云同步</button>
+        <button class="btn btn-sm text-danger py-0" onclick="deleteDraftDoc(${d.id})"><i class="bi bi-trash"></i></button></div>`;
       ul.appendChild(li);
     });
   }
-
   function addDraftDoc() {
     const title = document.getElementById("draftDocTitle").value;
     if (!title) return;
-    draftDocs.push({
-      id: Date.now(),
-      title: title,
-      date: new Date().toISOString().split('T')[0]
-    });
-    saveData();
-    renderDraftDocs();
-    document.getElementById("draftDocTitle").value = "";
+    draftDocs.push({ id: Date.now(), title, date: new Date().toISOString().split('T')[0] });
+    saveData(); renderDraftDocs(); updateCopilotKPIs(); document.getElementById("draftDocTitle").value = "";
   }
-
-  function completeDraftDoc(id) {
-    alert("☁️ 草稿文档已成功同步至 Executive Cloud Drive 归档！");
-    deleteDraftDoc(id);
-  }
-
-  function deleteDraftDoc(id) {
-    draftDocs = draftDocs.filter(d => d.id !== id);
-    saveData();
-    renderDraftDocs();
-  }
+  function completeDraftDoc(id) { deleteDraftDoc(id); }
+  function deleteDraftDoc(id) { draftDocs = draftDocs.filter(d => d.id !== id); saveData(); renderDraftDocs(); updateCopilotKPIs(); }
 
   function renderPersonalExpenses() {
     const ul = document.getElementById("personalExpenseList");
     ul.innerHTML = "";
-
     personalExpenses.forEach(p => {
       const li = document.createElement("li");
       li.className = "list-group-item bg-transparent text-white d-flex justify-content-between align-items-center border-secondary px-0";
-      li.innerHTML = `
-        <span>${p.purpose}</span>
-        <span class="fw-bold text-warning">${p.curr} ${parseFloat(p.amount).toFixed(2)}</span>
-      `;
+      li.innerHTML = `<span>${p.purpose}</span><span class="fw-bold text-warning">${p.curr} ${parseFloat(p.amount).toFixed(2)}</span>`;
       ul.appendChild(li);
     });
   }
-
   function addPersonalExpense(e) {
     e.preventDefault();
-    personalExpenses.push({
-      id: Date.now(),
-      curr: document.getElementById("pCurr").value,
-      amount: parseFloat(document.getElementById("pAmt").value),
-      purpose: document.getElementById("pPurpose").value,
-      date: new Date().toISOString().split('T')[0]
-    });
-    saveData();
-    renderPersonalExpenses();
-    document.getElementById("addPersonalExpenseForm").reset();
+    personalExpenses.push({ id: Date.now(), curr: document.getElementById("pCurr").value, amount: parseFloat(document.getElementById("pAmt").value), purpose: document.getElementById("pPurpose").value, date: new Date().toISOString().split('T')[0] });
+    saveData(); renderPersonalExpenses(); updateCopilotKPIs(); document.getElementById("addPersonalExpenseForm").reset();
+  }
+
+  function updateCopilotKPIs() {
+    const dateVal = document.getElementById("copilotDatePicker").value;
+    const refDate = dateVal ? new Date(dateVal + "T00:00:00") : new Date();
+    const y = refDate.getFullYear(), m = refDate.getMonth();
+
+    document.getElementById("kpiTodaySchedule").textContent = scheduleData.filter(s => s.date === dateVal).length;
+
+    const doneCount = tasksData.filter(t => t.done).length;
+    document.getElementById("kpiTaskDone").textContent = `${doneCount}/${tasksData.length}`;
+    document.getElementById("kpiTaskPct").textContent = tasksData.length ? Math.round(doneCount / tasksData.length * 100) + "%" : "0%";
+    document.getElementById("kpiPendingPriority").textContent = tasksData.filter(t => t.priority && !t.done).length;
+    document.getElementById("kpiDrafts").textContent = draftDocs.length;
+
+    const monthSpend = personalExpenses.filter(p => {
+      const d = new Date(p.date + "T00:00:00");
+      return d.getFullYear() === y && d.getMonth() === m;
+    }).reduce((s,p) => s + (parseFloat(p.amount)||0), 0);
+    document.getElementById("kpiMonthSpend").textContent = monthSpend.toFixed(2);
   }
 
   function initAnalyticsChart() {
     const ctx = document.getElementById('copilotAnalyticsChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-        datasets: [{
-          label: '月度开销趋势 (k MYR)',
-          data: [31.2, 41.7, 57.7, 63.4, 33.5, 34.6, 39.4, 34.3],
-          backgroundColor: '#3b82f6'
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { labels: { color: '#ffffff' } }
-        },
-        scales: {
-          x: { ticks: { color: '#94a3b8' } },
-          y: { ticks: { color: '#94a3b8' } }
-        }
-      }
+      data: { labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        datasets: [{ label: '月度开销趋势 (MYR)', data: new Array(12).fill(0).map((_,m)=> {
+          return masterListing.filter(i=>i.company===currentCompany && MONTH_NAMES[m]===i.month).reduce((s,i)=>s+(parseFloat(i.amount)||0),0);
+        }), backgroundColor: '#3b82f6' }] },
+      options: { responsive: true, plugins: { legend: { labels: { color: '#ffffff' } } },
+        scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } }
     });
-  }
-
-  function exportToExcel() {
-    alert("📊 全量 Excel 报表导出完成！");
-  }
-
-  function exportVendors() {
-    alert("📑 Vendor Listing 表格导出成功！");
   }
 </script>
 </body>
